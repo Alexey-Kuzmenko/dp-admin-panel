@@ -14,5 +14,18 @@ module.exports = {
       'warn',
       { allowConstantExport: true },
     ],
+    'semi': 'off',
+    'no-console': 'warn',
+    'no-alert': 'error',
+    'quotes': ['warn', 'single'],
+    'max-len': ['warn', {
+      'code': 120,
+      'ignoreComments': true,
+      'ignoreRegExpLiterals': true,
+    }],
+    '@typescript-eslint/semi': ['warn'],
+    "@typescript-eslint/no-inferrable-types": "warn",
+    "@typescript-eslint/no-explicit-any": "warn",
+    "@typescript-eslint/no-unused-vars": "warn",
   },
 }
