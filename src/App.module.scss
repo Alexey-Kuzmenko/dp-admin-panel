@@ -1,0 +1,8 @@
+@use './scss/utilities/variables' as vars;
+
+.App {
+    max-width: 100%;
+    height: auto;
+    min-height: 100vh;
+    background-color: vars.$primary;
+}

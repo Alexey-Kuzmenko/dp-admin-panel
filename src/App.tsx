@@ -1,35 +1,32 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { Route, Routes } from 'react-router-dom';
+import { ThemeProvider, Typography } from '@mui/material';
+import { theme } from './theme/ThemeRegistry';
+
+import styles from './App.module.scss';
 
 function App() {
-  const [count, setCount] = useState(0)
+
+  const routes: JSX.Element = (
+    <Routes>
+      <Route path='/' element={<Typography variant='h1'>Root element</Typography>}>
+        <Route index element={<h1>Dashboard</h1>} />
+        <Route path='contacts' element={<h1>Contacts</h1>} />
+        <Route path='content' element={<h1>Content</h1>} />
+        <Route path='images' element={<h1>Images</h1>} />
+        <Route path='projects' element={<h1>Projects</h1>} />
+        <Route path='skills' element={<h1>Skills</h1>} />
+        <Route path='users' element={<h1>Users</h1>} />
+      </Route>
+    </Routes>
+  );
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <ThemeProvider theme={theme}>
+      <div className={styles.App}>
+        {routes}
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    </ThemeProvider>
+  );
 }
 
-export default App
+export default App;
