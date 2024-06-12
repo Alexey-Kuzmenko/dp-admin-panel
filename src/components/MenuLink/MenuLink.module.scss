@@ -1,0 +1,23 @@
+@use '../../scss/utilities/variables' as vars;
+
+.MenuLink {
+    font-weight: 600;
+    text-align: center;
+    font-size: 1.5rem;
+    color: vars.$white;
+    text-decoration: none;
+
+    &_active {
+        color: vars.$accent;
+    }
+
+    @media (min-width: vars.$xl) {
+        font-size: 2rem;
+        transition: color .3s ease;
+
+        &:hover {
+            color: vars.$accent;
+            transition: color .3s ease;
+        }
+    }
+}

@@ -1,0 +1,25 @@
+@use '../../scss/utilities/variables' as vars;
+
+.Header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    box-shadow: vars.$header-box-shadow;
+
+    background-color: vars.$primary;
+
+    &__innerFlexContainer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    &__title {
+        cursor: default;
+    }
+
+    &__profileIcon {
+        color: vars.$white;
+        cursor: pointer;
+    }
+}

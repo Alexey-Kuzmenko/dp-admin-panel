@@ -1,6 +1,5 @@
 import { ThemeOptions, createTheme } from '@mui/material/styles';
 
-
 const themeOptions: ThemeOptions = {
     typography: {
         fontFamily: 'Nunito Sans',
