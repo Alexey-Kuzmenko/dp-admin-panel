@@ -3,10 +3,11 @@
 .Header {
     position: fixed;
     top: 0;
+
     width: 100%;
-    box-shadow: vars.$header-box-shadow;
 
     background-color: vars.$primary;
+    box-shadow: vars.$header-box-shadow;
 
     &__innerFlexContainer {
         display: flex;
@@ -19,7 +20,8 @@
     }
 
     &__profileIcon {
-        color: vars.$white;
         cursor: pointer;
+
+        color: vars.$white;
     }
 }

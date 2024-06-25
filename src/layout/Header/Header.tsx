@@ -2,9 +2,11 @@ import { Container } from '../Container/Container';
 import { Box, Typography } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
 import { Menu } from '../../components';
+import { MenuLinkModel } from '../../models/menu-link.model';
+import generatePageTitle from '../../utils/generatePageTitile';
+import { useLocation } from 'react-router-dom';
 
 import styles from './Header.module.scss';
-import { MenuLinkModel } from '../../models/menu-link.model';
 
 const menuLinks: Array<MenuLinkModel> = [
     {
@@ -38,6 +40,9 @@ const menuLinks: Array<MenuLinkModel> = [
 ];
 
 export const Header = () => {
+    const { pathname } = useLocation();
+    const pageTitle: string = generatePageTitle(pathname === '/' ? 'dashboard' : pathname);
+
     return (
         <header className={styles.Header}>
             <Container>
@@ -52,7 +57,7 @@ export const Header = () => {
                             textTransform='uppercase'
                             sx={{ marginLeft: '10px' }}
                             className={styles.Header__title}>
-                            Dashboard
+                            {pageTitle}
                         </Typography>
                     </Box>
 

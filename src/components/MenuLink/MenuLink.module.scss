@@ -1,23 +1,27 @@
 @use '../../scss/utilities/variables' as vars;
 
 .MenuLink {
-    font-weight: 600;
     text-align: center;
-    font-size: 1.5rem;
-    color: vars.$white;
     text-decoration: none;
+
+    color: vars.$white;
+
+    font-size: 1.5rem;
+    font-weight: 600;
 
     &_active {
         color: vars.$accent;
     }
 
     @media (min-width: vars.$xl) {
-        font-size: 2rem;
         transition: color .3s ease;
 
+        font-size: 2rem;
+
         &:hover {
-            color: vars.$accent;
             transition: color .3s ease;
+
+            color: vars.$accent;
         }
     }
 }
