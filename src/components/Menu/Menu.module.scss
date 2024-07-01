@@ -1,0 +1,51 @@
+@use '../../scss/utilities/variables' as vars;
+
+.Menu {
+    &__controls {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    &__body {
+        position: fixed;
+        z-index: 6;
+        top: 0;
+        left: -100%;
+
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+
+        width: 100%;
+        max-width: 250px;
+        height: 100vh;
+        padding: 35px 25px;
+
+        transition: left 1s ease-in-out;
+
+        background-color: vars.$primary;
+
+        &_open {
+            left: 0;
+
+            transition: left 1s ease-in-out;
+        }
+    }
+
+    &__list {
+        display: flex;
+        flex-direction: column;
+
+        width: 100%;
+        padding: 55px 0 0;
+
+        list-style: none;
+        gap: 25px;
+    }
+
+    // ? potential solution
+    &__logoutBtn {
+        color: vars.$white;
+    }
+}

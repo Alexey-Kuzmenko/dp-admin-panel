@@ -1,8 +1,7 @@
 import { Route, Routes } from 'react-router-dom';
 import { ThemeProvider, Typography } from '@mui/material';
 import { theme } from './theme/ThemeRegistry';
-// ! testing
-import { Container } from './layout';
+import { Layout } from './layout';
 
 import styles from './App.module.scss';
 
@@ -10,8 +9,8 @@ function App() {
 
   const routes: JSX.Element = (
     <Routes>
-      <Route path='/' element={<Container><Typography variant='h1'>Root element</Typography></Container>}>
-        <Route index element={<h1>Dashboard</h1>} />
+      <Route path='/' element={<Layout />}>
+        <Route index element={<Typography variant='h3'>Dashboard</Typography>} />
         <Route path='contacts' element={<h1>Contacts</h1>} />
         <Route path='content' element={<h1>Content</h1>} />
         <Route path='images' element={<h1>Images</h1>} />
