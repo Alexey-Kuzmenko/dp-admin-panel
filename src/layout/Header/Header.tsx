@@ -3,11 +3,12 @@ import { Box, Typography } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
 import { Menu } from '../../components';
 import { MenuLinkModel } from '../../models/menu-link.model';
-import generatePageTitle from '../../utils/generatePageTitile';
+import generatePageTitle from '../../utils/generate-page-title';
 import { useLocation } from 'react-router-dom';
 
 import styles from './Header.module.scss';
 
+// * temporary data
 const menuLinks: Array<MenuLinkModel> = [
     {
         href: '/',
@@ -49,7 +50,6 @@ export const Header = () => {
                 <div className={styles.Header__innerFlexContainer}>
 
                     <Box component='div' sx={{ display: 'flex', alignItems: 'center' }}>
-                        {/* Wrapper for menu and page title */}
                         <Menu menuLinks={menuLinks} />
                         <Typography
                             component='h1'

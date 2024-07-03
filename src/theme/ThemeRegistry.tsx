@@ -42,6 +42,12 @@ const themeOptions: ThemeOptions = {
         },
         secondary: {
             main: '#3959FF'
+        },
+        success: {
+            main: '#01b533'
+        },
+        error: {
+            main: '#b50101'
         }
     },
     components: {
