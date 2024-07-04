@@ -34,9 +34,9 @@ export const StatusMark: React.FC<StatusMarkProps> = ({ status, mark, label, dir
                 {
                     label === 'api'
                         ?
-                        <Typography variant='h5'>API status</Typography>
+                        <Typography variant='h5' sx={{ cursor: 'default' }}>API status</Typography>
                         :
-                        <Typography variant='h5'>Site status</Typography>
+                        <Typography variant='h5' sx={{ cursor: 'default' }}>Site status</Typography>
                 }
 
                 {
@@ -46,14 +46,14 @@ export const StatusMark: React.FC<StatusMarkProps> = ({ status, mark, label, dir
                             textTransform='uppercase'
                             variant='h5'
                             color={theme.palette.success.main}
-                            sx={{ fontWeight: 400 }}
+                            sx={{ fontWeight: 400, cursor: 'default' }}
                         >alive</Typography>
                         :
                         <Typography
                             textTransform='uppercase'
                             variant='h5'
                             color={theme.palette.error.main}
-                            sx={{ fontWeight: 400 }}
+                            sx={{ fontWeight: 400, cursor: 'default' }}
                         >down</Typography>
                 }
             </div>
