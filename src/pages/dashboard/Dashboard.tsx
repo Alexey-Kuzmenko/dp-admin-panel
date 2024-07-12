@@ -1,5 +1,5 @@
 import { StatusMark } from '../../components';
-import checkStatusCode from '../../utils/check-status-code';
+import checkStatusCode from '../../utils/checkStatusCode';
 
 import styles from './Dashboard.module.scss';
 

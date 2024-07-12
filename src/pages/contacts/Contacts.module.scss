@@ -1,0 +1,8 @@
+@use '../../scss/utilities/variables' as vars;
+
+.Contacts {
+    &__accordion {
+        background-color: vars.$primary-light !important;
+        border-bottom: 2px solid vars.$white;
+    }
+}

@@ -1,7 +1,7 @@
 import { Typography } from '@mui/material';
 import cn from 'classnames';
 import { theme } from '../../theme/ThemeRegistry';
-import { Mark } from '../../utils/check-status-code';
+import { Mark } from '../../utils/checkStatusCode';
 
 import styles from './StatusMark.module.scss';
 
