@@ -2,7 +2,15 @@
 
 .Contacts {
     &__accordion {
-        background-color: vars.$primary-light !important;
+        position: static !important;
+
         border-bottom: 2px solid vars.$white;
+        background-color: vars.$primary-light !important;
+
+        &_hiddenHeader {
+            h1 {
+                visibility: hidden;
+            }
+        }
     }
 }
