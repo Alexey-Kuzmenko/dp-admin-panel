@@ -1,18 +1,12 @@
 @use '../../scss/utilities/variables' as vars;
+@use '../../scss/utilities/placeholders';
 
 .Contacts {
     &__accordion {
-        position: static !important;
-
-        border-bottom: 2px solid vars.$white;
-        background-color: vars.$primary-light !important;
+        @extend %accordion;
 
         &_hidden {
-            visibility: hidden;
-
-            h1 {
-                display: none;
-            }
+            @extend %accordion-hidden;
         }
     }
 }

@@ -6,12 +6,12 @@ import { Typography } from '@mui/material';
 import { CodeBlock } from '../../components';
 import { theme } from '../../theme/ThemeRegistry';
 import { modelsCodeBlocks } from '../../models/models-code-blocks';
-
-// ! testing
 import cn from 'classnames';
 import { JsonEditor } from 'json-edit-react';
-import data from '../../data/mockData.json';
 import { useAppSelector } from '../../hooks/redux-hooks';
+
+// * temporary data
+import data from '../../data/mockData.json';
 
 import styles from './Contacts.module.scss';
 
@@ -20,6 +20,7 @@ export const Contacts = () => {
 
     return (
         <div className={styles.Contacts}>
+
             {/* DTO accordion */}
             <Accordion className={cn(styles.Contacts__accordion, {
                 [styles.Contacts__accordion_hidden]: isMenuOpen === true
