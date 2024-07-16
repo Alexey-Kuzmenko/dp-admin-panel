@@ -11,18 +11,18 @@ import { modelsCodeBlocks } from '../../models/models-code-blocks';
 import cn from 'classnames';
 import { JsonEditor } from 'json-edit-react';
 import data from '../../data/mockData.json';
+import { useAppSelector } from '../../hooks/redux-hooks';
 
 import styles from './Contacts.module.scss';
 
 export const Contacts = () => {
-    // * temporary variable
-    const isMenuOpen = true;
+    const isMenuOpen = useAppSelector((store) => store.menu.isMenuOpen);
 
     return (
         <div className={styles.Contacts}>
             {/* DTO accordion */}
             <Accordion className={cn(styles.Contacts__accordion, {
-                [styles.Contacts__accordion_hiddenHeader]: isMenuOpen === true
+                [styles.Contacts__accordion_hidden]: isMenuOpen === true
             })}>
                 <AccordionSummary
                     expandIcon={<ExpandMoreIcon sx={{ color: theme.palette.primary.contrastText }} />}
@@ -40,7 +40,9 @@ export const Contacts = () => {
             </Accordion>
 
             {/* JSON preview accordion */}
-            <Accordion className={styles.Contacts__accordion}>
+            <Accordion className={cn(styles.Contacts__accordion, {
+                [styles.Contacts__accordion_hidden]: isMenuOpen === true
+            })}>
                 <AccordionSummary
                     expandIcon={<ExpandMoreIcon sx={{ color: theme.palette.primary.contrastText }} />}
                     aria-controls="panel1-content"

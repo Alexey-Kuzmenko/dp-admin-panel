@@ -1,11 +1,13 @@
-import React, { useId, useState } from 'react';
+import React, { useId } from 'react';
 import { BurgerMenuIcon } from '../BurgerMenuIcon/BurgerMenuIcon';
 import cn from 'classnames';
 import { Backdrop, Box } from '@mui/material';
 import { MenuLink } from '../MenuLink/MenuLink';
 import { MenuLinkModel } from '../../models/menu-link.model';
-import Logo from '../../assets/Logo.svg';
+import { useAppSelector, useAppDispatch } from '../../hooks/redux-hooks';
+import { closeMenu } from '../../store/menuSlice';
 
+import Logo from '../../assets/Logo.svg';
 import styles from './Menu.module.scss';
 
 interface MenuProps {
@@ -13,17 +15,18 @@ interface MenuProps {
 }
 
 export const Menu: React.FC<MenuProps> = ({ menuLinks }) => {
-    const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
+    const dispatch = useAppDispatch();
+    const isMenuOpen = useAppSelector((store) => store.menu.isMenuOpen);
 
     const handleBackdropClick = (): void => {
-        setIsMenuOpen(false);
+        dispatch(closeMenu());
     };
 
     const renderLinks = (): JSX.Element[] => {
         return menuLinks.map((link: MenuLinkModel) => {
             return (
                 <li key={useId()}>
-                    <MenuLink setIsMenuOpen={setIsMenuOpen} href={link.href} label={link.label} />
+                    <MenuLink href={link.href} label={link.label} />
                 </li>
             );
         });
@@ -33,7 +36,7 @@ export const Menu: React.FC<MenuProps> = ({ menuLinks }) => {
         <>
             <div className={styles.Menu}>
 
-                <BurgerMenuIcon type='default' isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
+                <BurgerMenuIcon type='default' />
 
                 <nav className={cn(styles.Menu__body, {
                     [styles.Menu__body_open]: isMenuOpen === true
@@ -42,7 +45,7 @@ export const Menu: React.FC<MenuProps> = ({ menuLinks }) => {
                     <Box component='div'>
                         <div className={styles.Menu__controls}>
                             <img src={Logo} alt='Logo' />
-                            <BurgerMenuIcon type='open' isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
+                            <BurgerMenuIcon type='open' />
                         </div>
 
                         <ul className={styles.Menu__list}>

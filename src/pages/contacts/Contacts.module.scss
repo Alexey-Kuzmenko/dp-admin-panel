@@ -7,9 +7,11 @@
         border-bottom: 2px solid vars.$white;
         background-color: vars.$primary-light !important;
 
-        &_hiddenHeader {
+        &_hidden {
+            visibility: hidden;
+
             h1 {
-                visibility: hidden;
+                display: none;
             }
         }
     }
