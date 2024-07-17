@@ -52,7 +52,7 @@ export const Contacts = () => {
                     <Typography component='h1' variant='h5'>All contacts</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                    <JsonEditor data={{ data }} />
+                    <JsonEditor data={data} className={styles.Contacts__jsonEditor} />
                 </AccordionDetails>
             </Accordion>
 

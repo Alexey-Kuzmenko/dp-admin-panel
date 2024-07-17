@@ -9,4 +9,8 @@
             @extend %accordion-hidden;
         }
     }
+
+    &__jsonEditor {
+        @extend %json-editor
+    }
 }
