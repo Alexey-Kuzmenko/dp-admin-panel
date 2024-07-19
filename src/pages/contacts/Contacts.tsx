@@ -9,13 +9,16 @@ import { modelsCodeBlocks } from '../../models/models-code-blocks';
 import cn from 'classnames';
 import { JsonEditor } from 'json-edit-react';
 import { useAppSelector } from '../../hooks/redux-hooks';
+import { VIEWPORT_MIN_WIDTH } from '../../constants/constants';
+
+import styles from './Contacts.module.scss';
 
 // * temporary data
 import data from '../../data/mockData.json';
 
-import styles from './Contacts.module.scss';
-
 export const Contacts = () => {
+    // ! testing
+    const viewportWidth = window.innerWidth;
     const isMenuOpen = useAppSelector((store) => store.menu.isMenuOpen);
 
     return (
@@ -52,7 +55,15 @@ export const Contacts = () => {
                     <Typography component='h1' variant='h5'>All contacts</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                    <JsonEditor data={data} className={styles.Contacts__jsonEditor} />
+                    {
+                        viewportWidth < VIEWPORT_MIN_WIDTH ?
+                            <Typography component='h2' variant='body1'>
+                                *JSON editor not available on current screen width. Please rotate
+                                your device and reload the page, or log in from another device.
+                            </Typography>
+                            :
+                            <JsonEditor data={data} className={styles.Contacts__jsonEditor} />
+                    }
                 </AccordionDetails>
             </Accordion>
 
