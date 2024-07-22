@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import Accordion from '@mui/material/Accordion';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import AccordionSummary from '@mui/material/AccordionSummary';
@@ -10,6 +11,7 @@ import cn from 'classnames';
 import { JsonEditor } from 'json-edit-react';
 import { useAppSelector } from '../../hooks/redux-hooks';
 import { VIEWPORT_MIN_WIDTH } from '../../constants/constants';
+import { ContactModel } from '../../models/contact.model';
 
 import styles from './Contacts.module.scss';
 
@@ -17,9 +19,12 @@ import styles from './Contacts.module.scss';
 import data from '../../data/mockData.json';
 
 export const Contacts = () => {
-    // ! testing
     const viewportWidth = window.innerWidth;
     const isMenuOpen = useAppSelector((store) => store.menu.isMenuOpen);
+    const [jsonData, setJsonData] = useState<object>(data);
+
+    // ! debug
+    console.log(jsonData);
 
     return (
         <div className={styles.Contacts}>
@@ -62,7 +67,13 @@ export const Contacts = () => {
                                 your device and reload the page, or log in from another device.
                             </Typography>
                             :
-                            <JsonEditor data={data} className={styles.Contacts__jsonEditor} />
+                            <JsonEditor
+                                data={jsonData}
+                                className={styles.Contacts__jsonEditor}
+                                onUpdate={({ newData }) => {
+                                    setJsonData(newData);
+                                }}
+                            />
                     }
                 </AccordionDetails>
             </Accordion>
