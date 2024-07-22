@@ -43,7 +43,7 @@ export const Contacts = () => {
                 </AccordionDetails>
             </Accordion>
 
-            {/* JSON preview accordion */}
+            {/* JSON editor accordion */}
             <Accordion className={cn(styles.Contacts__accordion, {
                 [styles.Contacts__accordion_hidden]: isMenuOpen === true
             })}>
@@ -64,6 +64,38 @@ export const Contacts = () => {
                             :
                             <JsonEditor data={data} className={styles.Contacts__jsonEditor} />
                     }
+                </AccordionDetails>
+            </Accordion>
+
+            {/* Add contact accordion */}
+            <Accordion className={cn(styles.Contacts__accordion, {
+                [styles.Contacts__accordion_hidden]: isMenuOpen === true
+            })}>
+                <AccordionSummary
+                    expandIcon={<ExpandMoreIcon sx={{ color: theme.palette.primary.contrastText }} />}
+                    aria-controls="panel1-content"
+                    id="json-preview-header"
+                >
+                    <Typography component='h1' variant='h5'>Add contact</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                    From
+                </AccordionDetails>
+            </Accordion>
+
+            {/* Delete contact accordion */}
+            <Accordion className={cn(styles.Contacts__accordion, {
+                [styles.Contacts__accordion_hidden]: isMenuOpen === true
+            })}>
+                <AccordionSummary
+                    expandIcon={<ExpandMoreIcon sx={{ color: theme.palette.primary.contrastText }} />}
+                    aria-controls="panel1-content"
+                    id="json-preview-header"
+                >
+                    <Typography component='h1' variant='h5'>Delete contact</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                    Form
                 </AccordionDetails>
             </Accordion>
 
