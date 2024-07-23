@@ -1,7 +1,8 @@
 import { DetailedHTMLProps, FormHTMLAttributes } from 'react';
-import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
+import { FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
 
+import styles from './SlectionForm.module.scss';
 
 interface SelectionFormProps extends DetailedHTMLProps<FormHTMLAttributes<HTMLFormElement>, HTMLFormElement> {
     values: Array<string>
@@ -24,7 +25,7 @@ export const SelectionForm: React.FC<SelectionFormProps> = ({ values, selectId, 
             handleSubmit
         } = useForm<FormValues>({
             defaultValues: {
-                searchValue: 'None'
+                searchValue: ''
             },
             mode: 'onBlur'
         });
@@ -43,17 +44,28 @@ export const SelectionForm: React.FC<SelectionFormProps> = ({ values, selectId, 
                 name='searchValue'
                 control={control}
                 render={({ field }) => (
-                    <FormControl variant="filled" sx={{ width: '100%', maxWidth: '300px' }}>
-                        <InputLabel id={labelId}>{label}</InputLabel>
+                    <FormControl variant="filled" sx={{ width: '100%', maxWidth: '600px' }}>
+                        <InputLabel id={labelId}
+                            className={styles.SelectionForm__label}
+                            sx={{
+                                '& .MuiInputLabel-root': {
+                                    color: '#3959FF'
+                                }
+                            }}
+                        >
+                            {label}
+                        </InputLabel>
+
                         <Select
-                            sx={{ borderBottom: '2px solid #fff' }}
+                            className={styles.SelectionForm__select}
                             {...field}
                             labelId={labelId}
                             id={selectId}
-                        // onChange={() => { }}
                         >
+                            <MenuItem value=''>None</MenuItem>
                             {renderMenuItem()}
                         </Select>
+
                     </FormControl>
                 )}
             />

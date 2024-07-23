@@ -4,3 +4,4 @@ export * from './MenuLink/MenuLink';
 export * from './StatusMark/StatusMark';
 export * from './CodeBlock/CodeBlock';
 export * from './SelectionForm/SelectionForm';
+export * from './Button/Button';

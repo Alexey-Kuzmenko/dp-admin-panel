@@ -70,16 +70,17 @@ const themeOptions: ThemeOptions = {
                 }
             }
         },
-        MuiMenu: {
+        MuiSelect: {
             styleOverrides: {
                 root: {
-                    '& .MuiSelect-filled-root': { borderBottom: '2px solid #fff' },
-                    '& .MuiSelect-filled-root.Mui-focused': { borderBottom: '2px solid #3959FF' },
-                    '& .MuiSelect-iconFilled': { color: '#fff' },
-                    '& .MuiSelectLabel-root': { color: '#fff' },
-                    '& .MuiSelectLabel-root.Mui-focused': {
-                        color: '#3959FF'
-                    },
+                    color: '#fff',
+                    borderBottom: '2px solid #fff',
+                    ':focus': {
+                        borderBottom: '2px solid #3959FF'
+                    }
+                },
+                icon: {
+                    color: '#fff'
                 }
             }
         }

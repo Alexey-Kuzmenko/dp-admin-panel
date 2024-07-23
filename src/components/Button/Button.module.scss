@@ -1,0 +1,79 @@
+@use '../../scss/utilities/variables' as vars;
+
+.Button {
+    padding: 5px 15px;
+
+    cursor: pointer;
+    text-align: center;
+
+    border: none;
+    border: 2px solid vars.$dark-white;
+    border-radius: vars.$border-radius;
+
+    font-weight: 500;
+
+    a {
+        text-decoration: none;
+
+        color: inherit;
+    }
+
+    &:disabled {
+        cursor: not-allowed;
+        pointer-events: none;
+
+        border: 2px solid vars.$grey;
+        background-color: vars.$grey;
+    }
+
+    &_contained {
+        color: vars.$primary;
+        background-color: vars.$dark-white;
+    }
+
+    &_outlined {
+        color: vars.$dark-white;
+        background-color: vars.$primary;
+    }
+
+    &_text {
+        padding: 5px 0 0;
+
+        color: vars.$dark-white;
+        border: none;
+        background-color: transparent;
+    }
+
+    @media (min-width: vars.$md) {
+        & {
+            transition: all ease .4s;
+        }
+
+        &_contained {
+            &:hover {
+                transition: all ease .4s;
+
+                color: vars.$dark-white;
+                border: 2px solid vars.$accent;
+                background-color: vars.$accent
+            }
+        }
+
+        &_outlined {
+            &:hover {
+                transition: all ease .4s;
+
+                color: vars.$primary;
+                background-color: vars.$dark-white
+            }
+        }
+
+        &_text {
+            &:hover {
+                transition: all ease .4s;
+
+                color: vars.$accent;
+            }
+        }
+    }
+}
