@@ -5,15 +5,16 @@ import { Controller, useForm } from 'react-hook-form';
 
 interface SelectionFormProps extends DetailedHTMLProps<FormHTMLAttributes<HTMLFormElement>, HTMLFormElement> {
     values: Array<string>
+    label: string
+    selectId: string
     labelId: string
-    id: string
 }
 
 interface FormValues {
     searchValue: string
 }
 
-export const SelectionForm: React.FC<SelectionFormProps> = ({ values, labelId, id, ...props }) => {
+export const SelectionForm: React.FC<SelectionFormProps> = ({ values, selectId, labelId, label, ...props }) => {
     const
         {
             control,
@@ -21,7 +22,12 @@ export const SelectionForm: React.FC<SelectionFormProps> = ({ values, labelId, i
                 errors,
             },
             handleSubmit
-        } = useForm<FormValues>();
+        } = useForm<FormValues>({
+            defaultValues: {
+                searchValue: 'None'
+            },
+            mode: 'onBlur'
+        });
 
     const renderMenuItem = (): JSX.Element[] => {
         return values.map((v: string) => {
@@ -37,17 +43,16 @@ export const SelectionForm: React.FC<SelectionFormProps> = ({ values, labelId, i
                 name='searchValue'
                 control={control}
                 render={({ field }) => (
-                    <FormControl variant="filled">
-                        <InputLabel id="demo-simple-select-filled-label">Age</InputLabel>
+                    <FormControl variant="filled" sx={{ width: '100%', maxWidth: '300px' }}>
+                        <InputLabel id={labelId}>{label}</InputLabel>
                         <Select
+                            sx={{ borderBottom: '2px solid #fff' }}
                             {...field}
                             labelId={labelId}
-                            id={id}
-                            onChange={() => { }}
+                            id={selectId}
+                        // onChange={() => { }}
                         >
-                            <MenuItem value={10}>Ten</MenuItem>
-                            <MenuItem value={20}>Twenty</MenuItem>
-                            <MenuItem value={30}>Thirty</MenuItem>
+                            {renderMenuItem()}
                         </Select>
                     </FormControl>
                 )}

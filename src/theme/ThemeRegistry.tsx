@@ -68,7 +68,19 @@ const themeOptions: ThemeOptions = {
                     textarea: { color: '#fff' },
                     input: { color: '#fff' },
                 }
-
+            }
+        },
+        MuiMenu: {
+            styleOverrides: {
+                root: {
+                    '& .MuiSelect-filled-root': { borderBottom: '2px solid #fff' },
+                    '& .MuiSelect-filled-root.Mui-focused': { borderBottom: '2px solid #3959FF' },
+                    '& .MuiSelect-iconFilled': { color: '#fff' },
+                    '& .MuiSelectLabel-root': { color: '#fff' },
+                    '& .MuiSelectLabel-root.Mui-focused': {
+                        color: '#3959FF'
+                    },
+                }
             }
         }
     }

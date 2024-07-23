@@ -4,19 +4,24 @@ import AccordionDetails from '@mui/material/AccordionDetails';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Typography } from '@mui/material';
-import { CodeBlock } from '../../components';
+import { CodeBlock, SelectionForm } from '../../components';
 import { theme } from '../../theme/ThemeRegistry';
 import { modelsCodeBlocks } from '../../models/models-code-blocks';
 import cn from 'classnames';
 import { JsonEditor } from 'json-edit-react';
 import { useAppSelector } from '../../hooks/redux-hooks';
 import { VIEWPORT_MIN_WIDTH } from '../../constants/constants';
-import { ContactModel } from '../../models/contact.model';
 
 import styles from './Contacts.module.scss';
 
 // * temporary data
 import data from '../../data/mockData.json';
+const ids: string[] = [
+    'd944a37b-6383-4862-a181-eac8e611811d',
+    'ace375c8-ee45-4eab-88c2-d49f22c01ddc',
+    'e7cdabc7-ac69-468b-824f-0e603a547b26',
+    'c53e6365-1ab2-46e9-8ae0-ffa72d08dbf5'
+];
 
 export const Contacts = () => {
     const viewportWidth = window.innerWidth;
@@ -106,7 +111,13 @@ export const Contacts = () => {
                     <Typography component='h1' variant='h5'>Delete contact</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                    Form
+                    <SelectionForm
+                        values={ids}
+                        label='Choose contact id'
+                        selectId='contacts-select'
+                        labelId='contacts-select-label'
+                        id='contacts-select-form'
+                    />
                 </AccordionDetails>
             </Accordion>
 
