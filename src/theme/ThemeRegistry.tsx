@@ -54,10 +54,10 @@ const themeOptions: ThemeOptions = {
         MuiTextField: {
             styleOverrides: {
                 root: {
-                    '& .MuiFilledInput-root': { borderBottom: '2px solid #fff' },
+                    '& .MuiFilledInput-root': { borderBottom: '2px solid #FFFF' },
                     '& .MuiFilledInput-root.Mui-focused': { borderBottom: '2px solid #3959FF' },
                     '& .MuiFilledInput-root.Mui-error': { borderBottom: '2px solid #d32f2f' },
-                    '& .MuiInputLabel-root': { color: '#fff' },
+                    '& .MuiInputLabel-root': { color: '#FFFF' },
                     '& .MuiInputLabel-root.Mui-focused': {
                         color: '#3959FF'
                     },
@@ -65,22 +65,19 @@ const themeOptions: ThemeOptions = {
                     '& .MuiInputLabel-root.Mui-focused.Mui-error': {
                         color: '#d32f2f'
                     },
-                    textarea: { color: '#fff' },
-                    input: { color: '#fff' },
+                    textarea: { color: '#FFFF' },
+                    input: { color: '#FFFF' },
                 }
             }
         },
         MuiSelect: {
             styleOverrides: {
                 root: {
-                    color: '#fff',
-                    borderBottom: '2px solid #fff',
-                    ':focus': {
-                        borderBottom: '2px solid #3959FF'
-                    }
+                    borderBottom: '2px solid #FFFF',
+                    color: '#FFFF'
                 },
                 icon: {
-                    color: '#fff'
+                    color: '#FFFF'
                 }
             }
         }

@@ -1,74 +1,85 @@
-import { DetailedHTMLProps, FormHTMLAttributes } from 'react';
-import { FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/material';
-import { Controller, useForm } from 'react-hook-form';
+import React, { DetailedHTMLProps, FormHTMLAttributes, useState } from 'react';
+import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
+import { Controller, SubmitHandler, useForm } from 'react-hook-form';
+import { Button } from '../Button/Button';
 
-import styles from './SlectionForm.module.scss';
+import styles from './SelectionForm.module.scss';
 
 interface SelectionFormProps extends DetailedHTMLProps<FormHTMLAttributes<HTMLFormElement>, HTMLFormElement> {
     values: Array<string>
     label: string
     selectId: string
     labelId: string
+    setId: (id: string) => void
+    onDelete: React.MouseEventHandler
 }
 
 interface FormValues {
     searchValue: string
 }
 
-export const SelectionForm: React.FC<SelectionFormProps> = ({ values, selectId, labelId, label, ...props }) => {
-    const
-        {
-            control,
-            formState: {
-                errors,
-            },
-            handleSubmit
-        } = useForm<FormValues>({
-            defaultValues: {
-                searchValue: ''
-            },
-            mode: 'onBlur'
-        });
+export const SelectionForm: React.FC<SelectionFormProps> =
+    ({ values, selectId, labelId, label, setId, onDelete, ...props }) => {
 
-    const renderMenuItem = (): JSX.Element[] => {
-        return values.map((v: string) => {
-            return (
-                <MenuItem value={v}>{v}</MenuItem>
-            );
-        });
+        const
+            {
+                control,
+                handleSubmit,
+                reset
+            } = useForm<FormValues>({
+                defaultValues: {
+                    searchValue: ''
+                },
+                mode: 'onBlur'
+            });
+
+        const [isValid, setIsValid] = useState<boolean>(false);
+
+        const handleFormSubmit: SubmitHandler<FormValues> = ({ searchValue }) => {
+            if (searchValue.length) {
+                setIsValid(true);
+            }
+
+            setId(searchValue);
+            reset();
+        };
+
+        const renderMenuItem = (): JSX.Element[] => {
+            return values.map((v: string) => {
+                return (
+                    <MenuItem key={v} value={v}>{v}</MenuItem>
+                );
+            });
+        };
+
+        return (
+            <form {...props} className={styles.SelectionForm} onSubmit={handleSubmit(handleFormSubmit)}>
+                <Controller
+                    name='searchValue'
+                    rules={{ required: true }}
+                    control={control}
+                    render={({ field }) => (
+                        <FormControl variant='filled' sx={{ width: '100%', maxWidth: '600px' }}>
+
+                            <InputLabel id={labelId} className={styles.SelectionForm__selectLabel}>{label}</InputLabel>
+
+                            <Select
+                                {...field}
+                                labelId={labelId}
+                                id={selectId}
+                            >
+                                {renderMenuItem()}
+                            </Select>
+
+                        </FormControl>
+                    )}
+                />
+
+                <div className={styles.SelectionForm__controls}>
+                    <Button role='button' type='submit' variant='outlined'>Find</Button>
+                    <Button role='link' variant='contained' onClick={onDelete} disabled={!isValid}>Delete</Button>
+                </div>
+
+            </form>
+        );
     };
-
-    return (
-        <form {...props}>
-            <Controller
-                name='searchValue'
-                control={control}
-                render={({ field }) => (
-                    <FormControl variant="filled" sx={{ width: '100%', maxWidth: '600px' }}>
-                        <InputLabel id={labelId}
-                            className={styles.SelectionForm__label}
-                            sx={{
-                                '& .MuiInputLabel-root': {
-                                    color: '#3959FF'
-                                }
-                            }}
-                        >
-                            {label}
-                        </InputLabel>
-
-                        <Select
-                            className={styles.SelectionForm__select}
-                            {...field}
-                            labelId={labelId}
-                            id={selectId}
-                        >
-                            <MenuItem value=''>None</MenuItem>
-                            {renderMenuItem()}
-                        </Select>
-
-                    </FormControl>
-                )}
-            />
-        </form>
-    );
-};

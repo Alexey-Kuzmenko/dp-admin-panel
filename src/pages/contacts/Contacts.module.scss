@@ -3,11 +3,11 @@
 
 .Contacts {
     &__accordion {
-        @extend %accordion;
-
         &_hidden {
             @extend %accordion-hidden;
         }
+
+        @extend %accordion;
     }
 
     &__jsonEditor {

@@ -3,33 +3,39 @@ import Accordion from '@mui/material/Accordion';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { CodeBlock, SelectionForm } from '../../components';
 import { theme } from '../../theme/ThemeRegistry';
 import { modelsCodeBlocks } from '../../models/models-code-blocks';
 import cn from 'classnames';
 import { JsonEditor } from 'json-edit-react';
-import { useAppSelector } from '../../hooks/redux-hooks';
+import { useAppDispatch, useAppSelector } from '../../hooks/redux-hooks';
 import { VIEWPORT_MIN_WIDTH } from '../../constants/constants';
+import generateCodeBlock from '../../utils/generateCodeBlock';
+import { deleteContactById } from '../../store/contactSlice';
 
 import styles from './Contacts.module.scss';
 
-// * temporary data
-import data from '../../data/mockData.json';
-const ids: string[] = [
-    'd944a37b-6383-4862-a181-eac8e611811d',
-    'ace375c8-ee45-4eab-88c2-d49f22c01ddc',
-    'e7cdabc7-ac69-468b-824f-0e603a547b26',
-    'c53e6365-1ab2-46e9-8ae0-ffa72d08dbf5'
-];
-
 export const Contacts = () => {
-    const viewportWidth = window.innerWidth;
+    const contacts = useAppSelector((store) => store.contacts.contacts);
     const isMenuOpen = useAppSelector((store) => store.menu.isMenuOpen);
-    const [jsonData, setJsonData] = useState<object>(data);
+    const dispatch = useAppDispatch();
+    const [jsonData, setJsonData] = useState<object>(contacts);
+    const [contactId, setContactId] = useState<string>('');
+
+    const contactsIds = contacts.map((c) => c._id);
+    const contact = contacts.find((c) => c._id === contactId);
+
+    const viewportWidth = window.innerWidth;
+
+    const handleDelete = () => {
+        dispatch(deleteContactById(contactId));
+    };
 
     // ! debug
     console.log(jsonData);
+    console.log(contactId);
+    console.log(contact);
 
     return (
         <div className={styles.Contacts}>
@@ -40,8 +46,8 @@ export const Contacts = () => {
             })}>
                 <AccordionSummary
                     expandIcon={<ExpandMoreIcon sx={{ color: theme.palette.primary.contrastText }} />}
-                    aria-controls="panel1-content"
-                    id="dto-preview-header"
+                    aria-controls="dto-preview-accordion-content"
+                    id="dto-preview-accordion-header"
                 >
                     <Typography component='h1' variant='h5'>Dto</Typography>
                 </AccordionSummary>
@@ -59,8 +65,8 @@ export const Contacts = () => {
             })}>
                 <AccordionSummary
                     expandIcon={<ExpandMoreIcon sx={{ color: theme.palette.primary.contrastText }} />}
-                    aria-controls="panel1-content"
-                    id="json-preview-header"
+                    aria-controls="json-editor-accordion-content"
+                    id="json-editor-accordion-header"
                 >
                     <Typography component='h1' variant='h5'>All contacts</Typography>
                 </AccordionSummary>
@@ -73,7 +79,7 @@ export const Contacts = () => {
                             </Typography>
                             :
                             <JsonEditor
-                                data={jsonData}
+                                data={contacts}
                                 className={styles.Contacts__jsonEditor}
                                 onUpdate={({ newData }) => {
                                     setJsonData(newData);
@@ -105,19 +111,38 @@ export const Contacts = () => {
             })}>
                 <AccordionSummary
                     expandIcon={<ExpandMoreIcon sx={{ color: theme.palette.primary.contrastText }} />}
-                    aria-controls="panel1-content"
-                    id="json-preview-header"
+                    aria-controls="delete-contact-accordion-content"
+                    id="delete-contact-accordion-header"
                 >
                     <Typography component='h1' variant='h5'>Delete contact</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
+
                     <SelectionForm
-                        values={ids}
+                        values={contactsIds}
                         label='Choose contact id'
                         selectId='contacts-select'
                         labelId='contacts-select-label'
                         id='contacts-select-form'
+                        setId={setContactId}
+                        onDelete={handleDelete}
                     />
+
+                    {
+                        !contact
+                            ?
+                            <Typography component='h2' variant='h4' sx={{ textAlign: 'center', marginTop: '30px' }}>
+                                Contact ID is not selected
+                            </Typography>
+                            :
+                            <Box component='div' sx={{ marginTop: '20px' }}>
+                                <CodeBlock
+                                    code={generateCodeBlock(contact)}
+                                    lang='typescript'
+                                />
+                            </Box>
+                    }
+
                 </AccordionDetails>
             </Accordion>
 
