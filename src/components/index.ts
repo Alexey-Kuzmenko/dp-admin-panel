@@ -5,3 +5,4 @@ export * from './StatusMark/StatusMark';
 export * from './CodeBlock/CodeBlock';
 export * from './SelectionForm/SelectionForm';
 export * from './Button/Button';
+export * from './Form/Form';

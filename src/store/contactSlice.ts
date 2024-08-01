@@ -44,13 +44,17 @@ const contactSlice = createSlice({
     name: 'contacts',
     initialState,
     reducers: {
-        deleteContactById: (state, action) => {
-            state.contacts = state.contacts.filter((c) => c._id !== action.payload);
+        addContact: () => { },
+        deleteContact: (state, { payload }) => {
+            state.contacts = state.contacts.filter((c) => c._id !== payload);
+        },
+        editContacts: (state, { payload }) => {
+            state.contacts = payload;
         }
     }
 });
 
-export const { deleteContactById } = contactSlice.actions;
+export const { deleteContact, editContacts } = contactSlice.actions;
 
 export default contactSlice.reducer;
 

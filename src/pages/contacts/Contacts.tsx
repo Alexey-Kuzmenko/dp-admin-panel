@@ -4,7 +4,7 @@ import AccordionDetails from '@mui/material/AccordionDetails';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Box, Typography } from '@mui/material';
-import { CodeBlock, SelectionForm } from '../../components';
+import { CodeBlock, SelectionForm, Form, Button } from '../../components';
 import { theme } from '../../theme/ThemeRegistry';
 import { modelsCodeBlocks } from '../../models/models-code-blocks';
 import cn from 'classnames';
@@ -12,7 +12,8 @@ import { JsonEditor } from 'json-edit-react';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux-hooks';
 import { VIEWPORT_MIN_WIDTH } from '../../constants/constants';
 import generateCodeBlock from '../../utils/generateCodeBlock';
-import { deleteContactById } from '../../store/contactSlice';
+import { deleteContact, editContacts } from '../../store/contactSlice';
+import { contactModelKeys } from '../../models/contact.model';
 
 import styles from './Contacts.module.scss';
 
@@ -20,22 +21,25 @@ export const Contacts = () => {
     const contacts = useAppSelector((store) => store.contacts.contacts);
     const isMenuOpen = useAppSelector((store) => store.menu.isMenuOpen);
     const dispatch = useAppDispatch();
-    const [jsonData, setJsonData] = useState<object>(contacts);
     const [contactId, setContactId] = useState<string>('');
+    const [jsonEditorData, setJsonEditorData] = useState<object>(contacts);
 
     const contactsIds = contacts.map((c) => c._id);
     const contact = contacts.find((c) => c._id === contactId);
 
     const viewportWidth = window.innerWidth;
 
-    const handleDelete = () => {
-        dispatch(deleteContactById(contactId));
+    const handleDelete = (): void => {
+        dispatch(deleteContact(contactId));
     };
 
-    // ! debug
-    console.log(jsonData);
-    console.log(contactId);
-    console.log(contact);
+    const handleSave = (): void => {
+        dispatch(editContacts(jsonEditorData));
+    };
+
+    const handleReset = (): void => {
+        setJsonEditorData(contacts);
+    };
 
     return (
         <div className={styles.Contacts}>
@@ -79,13 +83,28 @@ export const Contacts = () => {
                             </Typography>
                             :
                             <JsonEditor
-                                data={contacts}
+                                data={jsonEditorData}
                                 className={styles.Contacts__jsonEditor}
+                                theme='githubDark'
                                 onUpdate={({ newData }) => {
-                                    setJsonData(newData);
+                                    setJsonEditorData(newData);
+                                }}
+                                restrictEdit={({ key }) => key === '_id'}
+                                restrictAdd={({ parentData }) => parentData !== null}
+                                restrictDelete={({ key }) => contactModelKeys.includes(key as string)}
+                                restrictTypeSelection={({ path, value }) => {
+                                    if (path.includes('iconType')) return ['string'];
+                                    if (typeof value === 'boolean') return false;
+                                    if (typeof value === 'string') return ['string'];
+                                    return ['string', 'object'];
                                 }}
                             />
                     }
+
+                    <div className={styles.Contacts__jsonEditorControls}>
+                        <Button onClick={handleSave}>Save changes</Button>
+                        <Button variant='outlined' onClick={handleReset}>Reset state</Button>
+                    </div>
                 </AccordionDetails>
             </Accordion>
 
@@ -101,7 +120,7 @@ export const Contacts = () => {
                     <Typography component='h1' variant='h5'>Add contact</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                    From
+                    <Form title='Add contact' />
                 </AccordionDetails>
             </Accordion>
 
@@ -131,7 +150,7 @@ export const Contacts = () => {
                     {
                         !contact
                             ?
-                            <Typography component='h2' variant='h4' sx={{ textAlign: 'center', marginTop: '30px' }}>
+                            <Typography component='h2' variant='h5' sx={{ textAlign: 'center', marginTop: '30px' }}>
                                 Contact ID is not selected
                             </Typography>
                             :
