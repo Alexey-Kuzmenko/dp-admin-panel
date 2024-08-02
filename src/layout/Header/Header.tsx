@@ -2,7 +2,7 @@ import { Container } from '../Container/Container';
 import { Box, Typography } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
 import { Menu } from '../../components';
-import { MenuLinkModel } from '../../models/menu-link.model';
+import { MenuLinkModel } from '../../types/menu-link.type';
 import generatePageTitle from '../../utils/generatePageTitle';
 import { useLocation } from 'react-router-dom';
 

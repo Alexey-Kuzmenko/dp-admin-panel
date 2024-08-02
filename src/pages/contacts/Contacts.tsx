@@ -4,7 +4,7 @@ import AccordionDetails from '@mui/material/AccordionDetails';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Box, Typography } from '@mui/material';
-import { CodeBlock, SelectionForm, Form, Button } from '../../components';
+import { CodeBlock, SelectionForm, Form, Button, Alert } from '../../components';
 import { theme } from '../../theme/ThemeRegistry';
 import { modelsCodeBlocks } from '../../models/models-code-blocks';
 import cn from 'classnames';
@@ -14,6 +14,7 @@ import { VIEWPORT_MIN_WIDTH } from '../../constants/constants';
 import generateCodeBlock from '../../utils/generateCodeBlock';
 import { deleteContact, editContacts } from '../../store/contactSlice';
 import { contactModelKeys } from '../../models/contact.model';
+import { AlertState } from '../../types/alert-state.type';
 
 import styles from './Contacts.module.scss';
 
@@ -21,8 +22,10 @@ export const Contacts = () => {
     const contacts = useAppSelector((store) => store.contacts.contacts);
     const isMenuOpen = useAppSelector((store) => store.menu.isMenuOpen);
     const dispatch = useAppDispatch();
+
     const [contactId, setContactId] = useState<string>('');
     const [jsonEditorData, setJsonEditorData] = useState<object>(contacts);
+    const [alertState, setAlertState] = useState<AlertState>({ type: 'success', isOpen: false, message: '' });
 
     const contactsIds = contacts.map((c) => c._id);
     const contact = contacts.find((c) => c._id === contactId);
@@ -31,14 +34,21 @@ export const Contacts = () => {
 
     const handleDelete = (): void => {
         dispatch(deleteContact(contactId));
+        setAlertState({ type: 'success', isOpen: true, message: 'Contact successfully deleted' });
     };
 
     const handleSave = (): void => {
         dispatch(editContacts(jsonEditorData));
+        setAlertState({ type: 'success', isOpen: true, message: 'Changes saved successfully' });
     };
 
     const handleReset = (): void => {
         setJsonEditorData(contacts);
+        setAlertState({ type: 'warning', isOpen: true, message: 'State was reset' });
+    };
+
+    const handleAlertClose = () => {
+        setAlertState({ ...alertState, isOpen: false });
     };
 
     return (
@@ -164,6 +174,14 @@ export const Contacts = () => {
 
                 </AccordionDetails>
             </Accordion>
+
+            {/* Alerts */}
+            <Alert
+                type={alertState.type}
+                message={alertState.message}
+                isOpen={alertState.isOpen}
+                onClose={handleAlertClose}
+            />
 
         </div>
     );

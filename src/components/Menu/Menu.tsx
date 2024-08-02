@@ -3,7 +3,7 @@ import { BurgerMenuIcon } from '../BurgerMenuIcon/BurgerMenuIcon';
 import cn from 'classnames';
 import { Backdrop, Box } from '@mui/material';
 import { MenuLink } from '../MenuLink/MenuLink';
-import { MenuLinkModel } from '../../models/menu-link.model';
+import { MenuLinkModel } from '../../types/menu-link.type';
 import { useAppSelector, useAppDispatch } from '../../hooks/redux-hooks';
 import { closeMenu } from '../../store/menuSlice';
 

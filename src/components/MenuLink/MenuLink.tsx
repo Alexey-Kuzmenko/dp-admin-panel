@@ -1,6 +1,6 @@
 import { NavLink } from 'react-router-dom';
 import styles from './MenuLink.module.scss';
-import { MenuLinkModel } from '../../models/menu-link.model';
+import { MenuLinkModel } from '../../types/menu-link.type';
 import { useAppDispatch } from '../../hooks/redux-hooks';
 import { closeMenu } from '../../store/menuSlice';
 

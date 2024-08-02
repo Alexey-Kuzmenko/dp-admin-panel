@@ -1,16 +1,14 @@
 import { Alert as MuiAlert } from '@mui/material';
 import cn from 'classnames';
+import { AlertState } from '../../types/alert-state.type';
 
 import styles from './Alert.module.scss';
 
-interface AlertProps {
-    type?: 'error' | 'warning' | 'info' | 'success'
-    message: string
-    isOpen: boolean
+interface AlertProps extends AlertState {
     onClose: () => void
 }
 
-export const Alert: React.FC<AlertProps> = ({ type = 'success', message, isOpen, onClose }) => {
+export const Alert: React.FC<AlertProps> = ({ type, message, isOpen, onClose }) => {
     return (
         <div className={cn(styles.Alert, {
             [styles.Alert_open]: isOpen === true
