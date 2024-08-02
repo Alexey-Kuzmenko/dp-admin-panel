@@ -1,0 +1,19 @@
+.Alert {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    left: 0;
+    right: 0;
+
+    position: fixed;
+    z-index: 100;
+    top: -100%;
+
+    transition: top .3s ease-in-out;
+
+    &_open {
+        top: 2vh;
+
+        transition: top .3s ease-in-out;
+    }
+}
