@@ -4,7 +4,7 @@ import AccordionDetails from '@mui/material/AccordionDetails';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Box, Typography } from '@mui/material';
-import { CodeBlock, SelectionForm, Form, Button, Alert } from '../../components';
+import { CodeBlock, SelectionForm, Button, Alert } from '../../components';
 import { theme } from '../../theme/ThemeRegistry';
 import { modelsCodeBlocks } from '../../models/models-code-blocks';
 import cn from 'classnames';
@@ -12,11 +12,20 @@ import { JsonEditor } from 'json-edit-react';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux-hooks';
 import { VIEWPORT_MIN_WIDTH } from '../../constants/constants';
 import generateCodeBlock from '../../utils/generateCodeBlock';
-import { deleteContact, editContacts } from '../../store/contactSlice';
-import { contactModelKeys } from '../../models/contact.model';
+import { addContact, deleteContact, editContact } from '../../store/contactSlice';
+import { ContactModel, contactModelKeys } from '../../models/contact.model';
 import { AlertState } from '../../types/alert-state.type';
+import { validateValue } from '../../utils/validateValue';
 
 import styles from './Contacts.module.scss';
+
+const contactTemplate: Omit<ContactModel, '_id'> = {
+    label: '',
+    body: '',
+    href: '',
+    iconType: 'email',
+    atl: ''
+};
 
 export const Contacts = () => {
     const contacts = useAppSelector((store) => store.contacts.contacts);
@@ -24,6 +33,7 @@ export const Contacts = () => {
     const dispatch = useAppDispatch();
 
     const [contactId, setContactId] = useState<string>('');
+    const [newContact, setNewContact] = useState<object>(contactTemplate);
     const [jsonEditorData, setJsonEditorData] = useState<object>(contacts);
     const [alertState, setAlertState] = useState<AlertState>({ type: 'success', isOpen: false, message: '' });
 
@@ -37,13 +47,30 @@ export const Contacts = () => {
         setAlertState({ type: 'success', isOpen: true, message: 'Contact successfully deleted' });
     };
 
-    const handleSave = (): void => {
-        dispatch(editContacts(jsonEditorData));
-        setAlertState({ type: 'success', isOpen: true, message: 'Changes saved successfully' });
+    // ! refactor
+    const handleSave = (action: 'edit' | 'add'): void => {
+        if (action === 'add') {
+            if (validateValue(newContact) === false) {
+                setAlertState({ type: 'error', isOpen: true, message: 'Rejected! Object values can\'t be empty' });
+            } else {
+                dispatch(addContact(newContact));
+                setNewContact(contactTemplate);
+                setAlertState({ type: 'success', isOpen: true, message: 'Changes saved successfully' });
+            }
+        }
+
+        if (action === 'edit') {
+            dispatch(editContact(jsonEditorData));
+            setAlertState({ type: 'success', isOpen: true, message: 'Changes saved successfully' });
+        }
     };
 
-    const handleReset = (): void => {
-        setJsonEditorData(contacts);
+    // ! refactor
+    const handleReset = (action: 'edit' | 'add'): void => {
+        if (action === 'add') {
+            setNewContact(contactTemplate);
+        }
+        // setJsonEditorData(contacts);
         setAlertState({ type: 'warning', isOpen: true, message: 'State was reset' });
     };
 
@@ -60,8 +87,8 @@ export const Contacts = () => {
             })}>
                 <AccordionSummary
                     expandIcon={<ExpandMoreIcon sx={{ color: theme.palette.primary.contrastText }} />}
-                    aria-controls="dto-preview-accordion-content"
-                    id="dto-preview-accordion-header"
+                    aria-controls='contacts-dto-preview-accordion-content'
+                    id='contacts-dto-preview-accordion-header'
                 >
                     <Typography component='h1' variant='h5'>Dto</Typography>
                 </AccordionSummary>
@@ -73,16 +100,47 @@ export const Contacts = () => {
                 </AccordionDetails>
             </Accordion>
 
-            {/* JSON editor accordion */}
+            {/* All contacts accordion */}
             <Accordion className={cn(styles.Contacts__accordion, {
                 [styles.Contacts__accordion_hidden]: isMenuOpen === true
             })}>
                 <AccordionSummary
                     expandIcon={<ExpandMoreIcon sx={{ color: theme.palette.primary.contrastText }} />}
-                    aria-controls="json-editor-accordion-content"
-                    id="json-editor-accordion-header"
+                    aria-controls='contacts-json-preview-accordion-content'
+                    id='contacts-json-preview-accordion-header'
                 >
                     <Typography component='h1' variant='h5'>All contacts</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                    {
+                        viewportWidth < VIEWPORT_MIN_WIDTH ?
+                            <Typography component='h2' variant='body1'>
+                                *JSON editor not available on current screen width. Please rotate
+                                your device and reload the page, or login from another device.
+                            </Typography>
+                            :
+                            <JsonEditor
+                                data={contacts}
+                                className={styles.Contacts__jsonEditor}
+                                theme='githubDark'
+                                restrictEdit={({ fullData }) => fullData !== null}
+                                restrictAdd={({ fullData }) => fullData !== null}
+                                restrictDelete={({ fullData }) => fullData !== null}
+                            />
+                    }
+                </AccordionDetails>
+            </Accordion>
+
+            {/* Add contact accordion */}
+            <Accordion className={cn(styles.Contacts__accordion, {
+                [styles.Contacts__accordion_hidden]: isMenuOpen === true
+            })}>
+                <AccordionSummary
+                    expandIcon={<ExpandMoreIcon sx={{ color: theme.palette.primary.contrastText }} />}
+                    aria-controls='add-contact-json-editor-content'
+                    id='add-contact-json-editor-header'
+                >
+                    <Typography component='h1' variant='h5'>Add contact</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
                     {
@@ -93,13 +151,12 @@ export const Contacts = () => {
                             </Typography>
                             :
                             <JsonEditor
-                                data={jsonEditorData}
+                                data={newContact}
                                 className={styles.Contacts__jsonEditor}
                                 theme='githubDark'
                                 onUpdate={({ newData }) => {
-                                    setJsonEditorData(newData);
+                                    setNewContact(newData);
                                 }}
-                                restrictEdit={({ key }) => key === '_id'}
                                 restrictAdd={({ parentData }) => parentData !== null}
                                 restrictDelete={({ key }) => contactModelKeys.includes(key as string)}
                                 restrictTypeSelection={({ path, value }) => {
@@ -112,25 +169,9 @@ export const Contacts = () => {
                     }
 
                     <div className={styles.Contacts__jsonEditorControls}>
-                        <Button onClick={handleSave}>Save changes</Button>
-                        <Button variant='outlined' onClick={handleReset}>Reset state</Button>
+                        <Button onClick={() => handleSave('add')}>Save changes</Button>
+                        <Button variant='outlined' onClick={() => handleReset('add')}>Reset state</Button>
                     </div>
-                </AccordionDetails>
-            </Accordion>
-
-            {/* Add contact accordion */}
-            <Accordion className={cn(styles.Contacts__accordion, {
-                [styles.Contacts__accordion_hidden]: isMenuOpen === true
-            })}>
-                <AccordionSummary
-                    expandIcon={<ExpandMoreIcon sx={{ color: theme.palette.primary.contrastText }} />}
-                    aria-controls="panel1-content"
-                    id="json-preview-header"
-                >
-                    <Typography component='h1' variant='h5'>Add contact</Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                    <Form title='Add contact' />
                 </AccordionDetails>
             </Accordion>
 
@@ -140,8 +181,8 @@ export const Contacts = () => {
             })}>
                 <AccordionSummary
                     expandIcon={<ExpandMoreIcon sx={{ color: theme.palette.primary.contrastText }} />}
-                    aria-controls="delete-contact-accordion-content"
-                    id="delete-contact-accordion-header"
+                    aria-controls='delete-contact-accordion-content'
+                    id='delete-contact-accordion-header'
                 >
                     <Typography component='h1' variant='h5'>Delete contact</Typography>
                 </AccordionSummary>

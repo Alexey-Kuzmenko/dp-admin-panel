@@ -12,7 +12,6 @@ export const Form: React.FC<FormProps> = ({ title, ...props }) => {
             <Typography variant='h4' component='h2' textAlign='center'>{title}</Typography>
 
             <div className={styles.Form__textFields}>
-
             </div>
 
         </form>
