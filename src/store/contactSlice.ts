@@ -1,4 +1,5 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { v4 as uuidv4 } from 'uuid';
 import { ContactModel } from '../models/contact.model';
 
 interface ContactState {
@@ -11,8 +12,8 @@ const initialState: ContactState = {
         {
             _id: '65f1899dd7226661102dede3',
             label: 'Telegram',
-            body: '@ok_dev_ua',
-            href: 'https://t.me/ok_dev_ua',
+            body: '@test_ua',
+            href: 'https://t.me/test',
             iconType: 'telegram',
         },
         {
@@ -27,14 +28,14 @@ const initialState: ContactState = {
             _id: '65f18ac9d7226661102dede9',
             label: 'LinkedIn',
             body: 'Oleksii Kuzmenko',
-            href: 'https://www.linkedin.com/in/oleksii-kuzmenko-0aba34243',
+            href: 'https://www.linkedin.com/',
             iconType: 'linkedIn',
         },
         {
             _id: '65f18e2ed7226661102dedf4',
             label: 'Instagram',
-            body: 'kuzmenko.js',
-            href: 'https://www.instagram.com/kuzmenko.js?igsh=MTI1Mmx3dzJtN2s2aA==',
+            body: 'user',
+            href: 'https://www.instagram.com/',
             iconType: 'instagram',
         }
     ]
@@ -44,14 +45,26 @@ const contactSlice = createSlice({
     name: 'contacts',
     initialState,
     reducers: {
-        addContact: (state, { payload }) => {
-            state.contacts.push(payload);
+        addContact: (state, { payload }: PayloadAction<Omit<ContactModel, '_id'>>) => {
+            const newContact: ContactModel = {
+                _id: uuidv4(),
+                ...payload
+            };
+
+            state.contacts.push(newContact);
         },
-        deleteContact: (state, { payload }) => {
+        deleteContact: (state, { payload }: PayloadAction<string>) => {
             state.contacts = state.contacts.filter((c) => c._id !== payload);
         },
-        editContact: (state, { payload }) => {
-            state.contacts = payload;
+        editContact: (state, { payload }: PayloadAction<ContactModel>) => {
+            const contact = state.contacts.find((c) => c._id === payload._id);
+
+            if (contact) {
+                const contactIndex = state.contacts.indexOf(contact);
+                const contactsCopy = [...state.contacts];
+                contactsCopy[contactIndex] = payload;
+                state.contacts = contactsCopy;
+            }
         }
     }
 });

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import Accordion from '@mui/material/Accordion';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import AccordionSummary from '@mui/material/AccordionSummary';
@@ -31,46 +31,63 @@ export const Contacts = () => {
     const contacts = useAppSelector((store) => store.contacts.contacts);
     const isMenuOpen = useAppSelector((store) => store.menu.isMenuOpen);
     const dispatch = useAppDispatch();
-
-    const [contactId, setContactId] = useState<string>('');
-    const [newContact, setNewContact] = useState<object>(contactTemplate);
-    const [jsonEditorData, setJsonEditorData] = useState<object>(contacts);
-    const [alertState, setAlertState] = useState<AlertState>({ type: 'success', isOpen: false, message: '' });
-
     const contactsIds = contacts.map((c) => c._id);
-    const contact = contacts.find((c) => c._id === contactId);
+
+    const [alertState, setAlertState] = useState<AlertState>({ type: 'success', isOpen: false, message: '' });
+    const [newContact, setNewContact] = useState<object>(contactTemplate);
+
+    const [deletedContactId, setDeletedContactId] = useState<string>('');
+    const deletedContact = contacts.find((c) => c._id === deletedContactId);
+
+    const [editedContact, setEditedContact] = useState<object>();
+    const editedContactCopy = useRef<ContactModel>();
 
     const viewportWidth = window.innerWidth;
 
     const handleDelete = (): void => {
-        dispatch(deleteContact(contactId));
+        dispatch(deleteContact(deletedContactId));
         setAlertState({ type: 'success', isOpen: true, message: 'Contact successfully deleted' });
     };
 
-    // ! refactor
     const handleSave = (action: 'edit' | 'add'): void => {
         if (action === 'add') {
             if (validateValue(newContact) === false) {
                 setAlertState({ type: 'error', isOpen: true, message: 'Rejected! Object values can\'t be empty' });
             } else {
-                dispatch(addContact(newContact));
+                dispatch(addContact(newContact as ContactModel));
                 setNewContact(contactTemplate);
                 setAlertState({ type: 'success', isOpen: true, message: 'Changes saved successfully' });
             }
         }
 
-        if (action === 'edit') {
-            dispatch(editContact(jsonEditorData));
-            setAlertState({ type: 'success', isOpen: true, message: 'Changes saved successfully' });
+        if (action === 'edit' && editedContact) {
+            if (validateValue(editedContact) === false) {
+                setAlertState({ type: 'error', isOpen: true, message: 'Rejected! Object values can\'t be empty' });
+            } else {
+                dispatch(editContact(editedContact as ContactModel));
+                setAlertState({ type: 'success', isOpen: true, message: 'Changes saved successfully' });
+            }
         }
     };
 
-    // ! refactor
+    const handleFind = (id: string): void => {
+        const jsonEditorData = contacts.find((c) => c._id === id);
+
+        if (jsonEditorData) {
+            setEditedContact(jsonEditorData);
+            editedContactCopy.current = jsonEditorData;
+        }
+    };
+
     const handleReset = (action: 'edit' | 'add'): void => {
         if (action === 'add') {
             setNewContact(contactTemplate);
         }
-        // setJsonEditorData(contacts);
+
+        if (action === 'edit') {
+            setEditedContact(editedContactCopy.current);
+        }
+
         setAlertState({ type: 'warning', isOpen: true, message: 'State was reset' });
     };
 
@@ -175,6 +192,69 @@ export const Contacts = () => {
                 </AccordionDetails>
             </Accordion>
 
+            {/* Edit contact accordion */}
+            <Accordion className={cn(styles.Contacts__accordion, {
+                [styles.Contacts__accordion_hidden]: isMenuOpen === true
+            })}>
+                <AccordionSummary
+                    expandIcon={<ExpandMoreIcon sx={{ color: theme.palette.primary.contrastText }} />}
+                    aria-controls='edit-contact-json-editor-content'
+                    id='edit-contact-json-editor-header'
+                >
+                    <Typography component='h1' variant='h5'>Edit contact</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+
+                    <SelectionForm
+                        values={contactsIds}
+                        label='Choose contact id'
+                        selectId='contacts-select'
+                        labelId='contacts-select-label'
+                        id='contacts-select-form'
+                        onFind={handleFind}
+                    />
+
+                    {
+                        !editedContact ?
+                            <Typography component='h2' variant='h5' sx={{ textAlign: 'center', marginTop: '30px' }}>
+                                Contact ID is not selected
+                            </Typography>
+                            :
+                            viewportWidth < VIEWPORT_MIN_WIDTH ?
+                                <Typography component='h2' variant='body1'>
+                                    *JSON editor not available on current screen width. Please rotate
+                                    your device and reload the page, or log in from another device.
+                                </Typography>
+                                :
+
+                                <Box component='div' sx={{ marginTop: '20px' }}>
+                                    <JsonEditor
+                                        data={editedContact}
+                                        className={styles.Contacts__jsonEditor}
+                                        theme='githubDark'
+                                        onUpdate={({ newData }) => {
+                                            setEditedContact(newData);
+                                        }}
+                                        restrictAdd={({ fullData }) => fullData !== null}
+                                        restrictDelete={({ fullData }) => fullData !== null}
+                                        restrictEdit={({ key }) => key === '_id'}
+                                        restrictTypeSelection={({ path, value }) => {
+                                            if (path.includes('iconType')) return ['string'];
+                                            if (typeof value === 'boolean') return false;
+                                            if (typeof value === 'string') return ['string'];
+                                            return ['string', 'object'];
+                                        }}
+                                    />
+                                </Box>
+                    }
+
+                    <div className={styles.Contacts__jsonEditorControls}>
+                        <Button onClick={() => handleSave('edit')}>Save changes</Button>
+                        <Button variant='outlined' onClick={() => handleReset('edit')}>Reset state</Button>
+                    </div>
+                </AccordionDetails>
+            </Accordion>
+
             {/* Delete contact accordion */}
             <Accordion className={cn(styles.Contacts__accordion, {
                 [styles.Contacts__accordion_hidden]: isMenuOpen === true
@@ -194,12 +274,12 @@ export const Contacts = () => {
                         selectId='contacts-select'
                         labelId='contacts-select-label'
                         id='contacts-select-form'
-                        setId={setContactId}
+                        onFind={setDeletedContactId}
                         onDelete={handleDelete}
                     />
 
                     {
-                        !contact
+                        !deletedContact
                             ?
                             <Typography component='h2' variant='h5' sx={{ textAlign: 'center', marginTop: '30px' }}>
                                 Contact ID is not selected
@@ -207,7 +287,7 @@ export const Contacts = () => {
                             :
                             <Box component='div' sx={{ marginTop: '20px' }}>
                                 <CodeBlock
-                                    code={generateCodeBlock(contact)}
+                                    code={generateCodeBlock(deletedContact)}
                                     lang='typescript'
                                 />
                             </Box>

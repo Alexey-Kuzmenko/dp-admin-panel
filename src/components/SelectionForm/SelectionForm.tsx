@@ -10,8 +10,8 @@ interface SelectionFormProps extends DetailedHTMLProps<FormHTMLAttributes<HTMLFo
     label: string
     selectId: string
     labelId: string
-    setId: (id: string) => void
-    onDelete: React.MouseEventHandler
+    onFind: (id: string) => void
+    onDelete?: React.MouseEventHandler
 }
 
 interface FormValues {
@@ -19,7 +19,7 @@ interface FormValues {
 }
 
 export const SelectionForm: React.FC<SelectionFormProps> =
-    ({ values, selectId, labelId, label, setId, onDelete, ...props }) => {
+    ({ values, selectId, labelId, label, onFind, onDelete, ...props }) => {
 
         const
             {
@@ -40,7 +40,7 @@ export const SelectionForm: React.FC<SelectionFormProps> =
                 setIsValid(true);
             }
 
-            setId(searchValue);
+            onFind(searchValue);
             reset();
         };
 
@@ -77,7 +77,15 @@ export const SelectionForm: React.FC<SelectionFormProps> =
 
                 <div className={styles.SelectionForm__controls}>
                     <Button role='button' type='submit' variant='outlined'>Find</Button>
-                    <Button role='link' variant='contained' onClick={onDelete} disabled={!isValid}>Delete</Button>
+                    {
+                        !onDelete
+                            ?
+                            null
+                            :
+                            <Button role='link' variant='contained' onClick={onDelete} disabled={!isValid}>
+                                Delete
+                            </Button>
+                    }
                 </div>
 
             </form>
