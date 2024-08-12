@@ -13,7 +13,6 @@ export const Form: React.FC<FormProps> = ({ title, ...props }) => {
 
             <div className={styles.Form__textFields}>
             </div>
-
         </form>
     );
 };

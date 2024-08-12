@@ -1,4 +1,4 @@
-import React, { useId } from 'react';
+import React from 'react';
 import { BurgerMenuIcon } from '../BurgerMenuIcon/BurgerMenuIcon';
 import cn from 'classnames';
 import { Backdrop, Box } from '@mui/material';
@@ -6,6 +6,7 @@ import { MenuLink } from '../MenuLink/MenuLink';
 import { MenuLinkModel } from '../../types/menu-link.type';
 import { useAppSelector, useAppDispatch } from '../../hooks/redux-hooks';
 import { closeMenu } from '../../store/menuSlice';
+import { v4 as uuidv4 } from 'uuid';
 
 import Logo from '../../assets/Logo.svg';
 import styles from './Menu.module.scss';
@@ -25,7 +26,7 @@ export const Menu: React.FC<MenuProps> = ({ menuLinks }) => {
     const renderLinks = (): JSX.Element[] => {
         return menuLinks.map((link: MenuLinkModel) => {
             return (
-                <li key={useId()}>
+                <li key={uuidv4()}>
                     <MenuLink href={link.href} label={link.label} />
                 </li>
             );

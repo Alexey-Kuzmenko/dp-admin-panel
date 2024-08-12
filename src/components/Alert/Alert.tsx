@@ -17,6 +17,5 @@ export const Alert: React.FC<AlertProps> = ({ type, message, isOpen, onClose }) 
                 {message}
             </MuiAlert>
         </div>
-
     );
 };

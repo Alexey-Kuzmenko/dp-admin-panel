@@ -87,7 +87,6 @@ export const SelectionForm: React.FC<SelectionFormProps> =
                             </Button>
                     }
                 </div>
-
             </form>
         );
     };

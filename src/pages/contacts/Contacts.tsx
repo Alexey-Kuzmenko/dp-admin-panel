@@ -1,21 +1,25 @@
 import { useRef, useState } from 'react';
+
 import Accordion from '@mui/material/Accordion';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Box, Typography } from '@mui/material';
-import { CodeBlock, SelectionForm, Button, Alert } from '../../components';
 import { theme } from '../../theme/ThemeRegistry';
-import { modelsCodeBlocks } from '../../models/models-code-blocks';
+
+import { CodeBlock, SelectionForm, Button, Alert } from '../../components';
 import cn from 'classnames';
 import { JsonEditor } from 'json-edit-react';
+
 import { useAppDispatch, useAppSelector } from '../../hooks/redux-hooks';
 import { VIEWPORT_MIN_WIDTH } from '../../constants/constants';
-import generateCodeBlock from '../../utils/generateCodeBlock';
 import { addContact, deleteContact, editContact } from '../../store/contactSlice';
+import { modelsCodeBlocks } from '../../models/models-code-blocks';
 import { ContactModel, contactModelKeys } from '../../models/contact.model';
-import { AlertState } from '../../types/alert-state.type';
+
+import generateCodeBlock from '../../utils/generateCodeBlock';
 import { validateValue } from '../../utils/validateValue';
+import { AlertState } from '../../types/alert-state.type';
 
 import styles from './Contacts.module.scss';
 
