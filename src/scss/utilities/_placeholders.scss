@@ -1,0 +1,29 @@
+@use './variables' as vars;
+
+%accordion {
+    position: static !important;
+
+    border-bottom: 2px solid vars.$white;
+    background-color: vars.$primary-light !important;
+}
+
+%accordion-hidden {
+    visibility: hidden;
+
+    h1 {
+        display: none;
+    }
+}
+
+%json-editor {
+    max-width: min(1000px, 90vw) !important;
+    margin: 0 auto;
+}
+
+%controls {
+    display: flex;
+    align-items: center;
+    column-gap: 30px;
+
+    width: fit-content;
+}

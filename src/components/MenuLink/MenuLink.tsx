@@ -1,16 +1,16 @@
 import { NavLink } from 'react-router-dom';
 import styles from './MenuLink.module.scss';
-import { MenuLinkModel } from '../../models/menu-link.model';
-import React from 'react';
+import { MenuLinkModel } from '../../types/menu-link.type';
+import { useAppDispatch } from '../../hooks/redux-hooks';
+import { closeMenu } from '../../store/menuSlice';
 
-interface MenuLinkProps extends MenuLinkModel {
-    setIsMenuOpen: (state: boolean) => void
-}
+interface MenuLinkProps extends MenuLinkModel { }
 
-export const MenuLink: React.FC<MenuLinkProps> = ({ href, label, setIsMenuOpen }) => {
+export const MenuLink: React.FC<MenuLinkProps> = ({ href, label }) => {
+    const dispatch = useAppDispatch();
 
     const handleClick = (): void => {
-        setIsMenuOpen(false);
+        dispatch(closeMenu());
     };
 
     return (

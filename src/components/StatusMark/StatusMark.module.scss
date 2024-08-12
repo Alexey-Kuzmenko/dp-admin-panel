@@ -1,0 +1,61 @@
+@use '../../scss/utilities/variables' as vars;
+
+.StatusMark {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+
+    width: 100%;
+    max-width: 360px;
+    padding: 20px;
+
+    border-radius: 0.938rem;
+    background-color: vars.$primary-light;
+
+    &_reverse {
+        flex-direction: row-reverse;
+    }
+
+    &__content {
+        display: flex;
+        align-items: center;
+        flex-flow: column nowrap;
+        justify-content: center;
+    }
+
+    &__status {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        width: 100px;
+        height: 100px;
+
+        border-radius: 100%;
+        background-color: vars.$primary-light;
+
+        &_success {
+            border: 3px solid vars.$success;
+        }
+
+        &_error {
+            border: 3px solid vars.$error;
+        }
+    }
+
+    &__statusText {
+        cursor: default;
+        text-align: center;
+
+        font-size: 1.5rem;
+        font-weight: 600;
+
+        &_success {
+            color: vars.$success;
+        }
+
+        &_error {
+            color: vars.$error;
+        }
+    }
+}

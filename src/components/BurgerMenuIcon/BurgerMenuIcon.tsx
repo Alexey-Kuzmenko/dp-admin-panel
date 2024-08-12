@@ -1,19 +1,20 @@
 import MenuIcon from '@mui/icons-material/Menu';
 import MenuOpenIcon from '@mui/icons-material/MenuOpen';
 import { Box } from '@mui/material';
+import { useAppDispatch } from '../../hooks/redux-hooks';
+import { toggleMenu } from '../../store/menuSlice';
 
 import styles from './BurgerMenuIcon.module.scss';
 
 interface BurgerMenuIconProps {
-    isMenuOpen: boolean
-    setIsMenuOpen: (state: boolean) => void
     type: 'default' | 'open'
 }
 
-export const BurgerMenuIcon: React.FC<BurgerMenuIconProps> = ({ isMenuOpen, setIsMenuOpen, type }) => {
+export const BurgerMenuIcon: React.FC<BurgerMenuIconProps> = ({ type }) => {
+    const dispatch = useAppDispatch();
 
     const handleClick = (): void => {
-        setIsMenuOpen(!isMenuOpen);
+        dispatch(toggleMenu());
     };
 
     let icon: JSX.Element = (

@@ -42,16 +42,22 @@ const themeOptions: ThemeOptions = {
         },
         secondary: {
             main: '#3959FF'
+        },
+        success: {
+            main: '#01b533'
+        },
+        error: {
+            main: '#b50101'
         }
     },
     components: {
         MuiTextField: {
             styleOverrides: {
                 root: {
-                    '& .MuiFilledInput-root': { borderBottom: '2px solid #fff' },
+                    '& .MuiFilledInput-root': { borderBottom: '2px solid #FFFF' },
                     '& .MuiFilledInput-root.Mui-focused': { borderBottom: '2px solid #3959FF' },
                     '& .MuiFilledInput-root.Mui-error': { borderBottom: '2px solid #d32f2f' },
-                    '& .MuiInputLabel-root': { color: '#fff' },
+                    '& .MuiInputLabel-root': { color: '#FFFF' },
                     '& .MuiInputLabel-root.Mui-focused': {
                         color: '#3959FF'
                     },
@@ -59,10 +65,20 @@ const themeOptions: ThemeOptions = {
                     '& .MuiInputLabel-root.Mui-focused.Mui-error': {
                         color: '#d32f2f'
                     },
-                    textarea: { color: '#fff' },
-                    input: { color: '#fff' },
+                    textarea: { color: '#FFFF' },
+                    input: { color: '#FFFF' },
                 }
-
+            }
+        },
+        MuiSelect: {
+            styleOverrides: {
+                root: {
+                    borderBottom: '2px solid #FFFF',
+                    color: '#FFFF'
+                },
+                icon: {
+                    color: '#FFFF'
+                }
             }
         }
     }
