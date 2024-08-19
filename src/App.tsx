@@ -3,7 +3,7 @@ import { ThemeProvider } from '@mui/material';
 import { theme } from './theme/ThemeRegistry';
 import { Layout } from './layout';
 // * pages
-import { Dashboard, Contacts } from './pages';
+import { Dashboard, Contacts, Content } from './pages';
 
 import styles from './App.module.scss';
 
@@ -14,7 +14,7 @@ function App() {
       <Route path='/' element={<Layout />}>
         <Route index element={<Dashboard />} />
         <Route path='contacts' element={<Contacts />} />
-        <Route path='content' element={<h1>Content</h1>} />
+        <Route path='content' element={<Content />} />
         <Route path='images' element={<h1>Images</h1>} />
         <Route path='projects' element={<h1>Projects</h1>} />
         <Route path='skills' element={<h1>Skills</h1>} />
