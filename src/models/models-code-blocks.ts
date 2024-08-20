@@ -7,7 +7,7 @@ export const modelsCodeBlocks = {
         body: string
         href: string
         iconType: ContactIconType
-        atl: string
+        atl?: string
     }
 `,
     content: `

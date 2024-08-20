@@ -184,13 +184,12 @@ export const Contacts = () => {
                                 onUpdate={({ newData }) => {
                                     setNewContact(newData);
                                 }}
-                                restrictAdd={({ parentData }) => parentData !== null}
+                                restrictAdd={({ fullData }) => fullData !== null}
                                 restrictDelete={({ key }) => contactModelKeys.includes(key as string)}
-                                restrictTypeSelection={({ path, value }) => {
-                                    if (path.includes('iconType')) return ['string'];
+                                restrictTypeSelection={({ value }) => {
                                     if (typeof value === 'boolean') return false;
                                     if (typeof value === 'string') return ['string'];
-                                    return ['string', 'object'];
+                                    return ['string'];
                                 }}
                             />
                     }
@@ -244,15 +243,15 @@ export const Contacts = () => {
                                         onUpdate={({ newData }) => {
                                             setEditedContact(newData);
                                         }}
-                                        restrictAdd={({ fullData }) => fullData !== null}
-                                        restrictDelete={({ fullData }) => fullData !== null}
+                                        restrictAdd={({ key }) => key in editContact}
+                                        restrictDelete={({ key }) => contactModelKeys.includes(key as string)}
                                         restrictEdit={({ key }) => key === '_id'}
-                                        restrictTypeSelection={({ path, value }) => {
-                                            if (path.includes('iconType')) return ['string'];
+                                        restrictTypeSelection={({ value }) => {
                                             if (typeof value === 'boolean') return false;
                                             if (typeof value === 'string') return ['string'];
-                                            return ['string', 'object'];
+                                            return ['string'];
                                         }}
+                                        defaultValue={''}
                                     />
                                 </Box>
                     }

@@ -194,10 +194,10 @@ export const Content = () => {
                                 onUpdate={({ newData }) => {
                                     setNewContent(newData);
                                 }}
-                                restrictAdd={({ parentData }) => parentData !== null}
+                                restrictAdd={({ fullData }) => fullData !== null}
                                 restrictDelete={({ key }) => contentModelKeys.includes(key as string)}
                                 restrictTypeSelection={({ path, value }) => {
-                                    if (path.includes('iconType')) return ['string'];
+                                    if (path.includes('type')) return ['string'];
                                     if (typeof value === 'boolean') return false;
                                     if (typeof value === 'string') return ['string'];
                                     return ['string', 'object'];
@@ -253,14 +253,13 @@ export const Content = () => {
                                         onUpdate={({ newData }) => {
                                             setEditedContent(newData);
                                         }}
-                                        restrictAdd={({ fullData }) => fullData !== null}
-                                        restrictDelete={({ fullData }) => fullData !== null}
+                                        restrictAdd={({ key }) => key in editContent}
+                                        restrictDelete={({ key }) => contentModelKeys.includes(key as string)}
                                         restrictEdit={({ key }) => key === '_id'}
-                                        restrictTypeSelection={({ path, value }) => {
-                                            if (path.includes('iconType')) return ['string'];
+                                        restrictTypeSelection={({ value }) => {
                                             if (typeof value === 'boolean') return false;
                                             if (typeof value === 'string') return ['string'];
-                                            return ['string', 'object'];
+                                            return ['string', 'array'];
                                         }}
                                     />
                                 </Box>
