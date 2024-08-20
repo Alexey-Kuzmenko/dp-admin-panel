@@ -1,23 +1,32 @@
 import { useState, useRef } from 'react';
+
 import { Accordion, AccordionSummary, Typography, AccordionDetails, Box } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { Alert, Button, CodeBlock } from '../../components';
-import { modelsCodeBlocks } from '../../models/models-code-blocks';
 import { theme } from '../../theme/ThemeRegistry';
-import cn from 'classnames';
-import { useAppDispatch, useAppSelector } from '../../hooks/redux-hooks';
-import { VIEWPORT_MIN_WIDTH } from '../../constants/constants';
-import { SelectionForm } from '../../components';
-import { JsonEditor } from 'json-edit-react';
-import { ContentModel, Content as SubContent } from '../../models/content.model';
-import { AlertState } from '../../types/alert-state.type';
-import { validateValue } from '../../utils/validateValue';
-import { addPageContent, deletePageContent, editContent } from '../../store/contentSlice';
-import { contentModelKeys } from '../../models/content.model';
-import generateCodeBlock from '../../utils/generateCodeBlock';
+import { Alert, Button, CodeBlock, SelectionForm } from '../../components';
 
+import { JsonEditor } from 'json-edit-react';
+import cn from 'classnames';
+
+import { useAppDispatch, useAppSelector } from '../../hooks/redux-hooks';
+import { addPageContent, deletePageContent, editContent } from '../../store/contentSlice';
+
+import { modelsCodeBlocks } from '../../models/models-code-blocks';
+import { ContentModel, Content as SubContent } from '../../models/content.model';
+import { contentModelKeys } from '../../models/content.model';
+import { AlertState } from '../../types/alert-state.type';
+
+import { validateValue } from '../../utils/validateValue';
+import generateCodeBlock from '../../utils/generateCodeBlock';
 import { generateContentFormValues } from '../../utils/generateContentFormValues';
 import { findContent } from '../../utils/findContent';
+
+import {
+    VIEWPORT_MIN_WIDTH,
+    ALERT_SUCCESS_MGS,
+    ALERT_ERROR_MGS, ALERT_RESET_MGS,
+    JSON_EDITOR_WARN_MSG
+} from '../../constants/constants';
 
 import styles from './Content.module.scss';
 
@@ -59,20 +68,20 @@ export const Content = () => {
     const handleSave = (action: 'edit' | 'add'): void => {
         if (action === 'add') {
             if (validateValue((newContent as ContentModel).eng) === false && ((newContent as ContentModel).ua)) {
-                setAlertState({ type: 'error', isOpen: true, message: 'Rejected! Object values can\'t be empty' });
+                setAlertState({ type: 'error', isOpen: true, message: ALERT_ERROR_MGS });
             } else {
                 dispatch(addPageContent(newContent as ContentModel));
                 setNewContent(contentTemplate);
-                setAlertState({ type: 'success', isOpen: true, message: 'Changes saved successfully' });
+                setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
             }
         }
 
         if (action === 'edit' && editedContent && selectionFormValue.length) {
             if (validateValue(editedContent) === false) {
-                setAlertState({ type: 'error', isOpen: true, message: 'Rejected! Object values can\'t be empty' });
+                setAlertState({ type: 'error', isOpen: true, message: ALERT_ERROR_MGS });
             } else {
                 dispatch(editContent({ content: editedContent as SubContent, formValue: selectionFormValue }));
-                setAlertState({ type: 'success', isOpen: true, message: 'Changes saved successfully' });
+                setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
             }
         }
     };
@@ -86,7 +95,7 @@ export const Content = () => {
             setEditedContent(editedContentCopy.current);
         }
 
-        setAlertState({ type: 'warning', isOpen: true, message: 'State was reset' });
+        setAlertState({ type: 'warning', isOpen: true, message: ALERT_RESET_MGS });
     };
 
     const handleFind = (value: string): void => {
@@ -99,13 +108,13 @@ export const Content = () => {
         }
     };
 
-    const handleAlertClose = () => {
-        setAlertState({ ...alertState, isOpen: false });
-    };
-
     const handleDelete = (): void => {
         dispatch(deletePageContent(deletedContentId));
         setAlertState({ type: 'success', isOpen: true, message: 'Contact successfully deleted' });
+    };
+
+    const handleAlertClose = () => {
+        setAlertState({ ...alertState, isOpen: false });
     };
 
     return (
@@ -145,8 +154,7 @@ export const Content = () => {
                     {
                         viewportWidth < VIEWPORT_MIN_WIDTH ?
                             <Typography component='h2' variant='body1'>
-                                *JSON editor not available on current screen width. Please rotate
-                                your device and reload the page, or login from another device.
+                                {JSON_EDITOR_WARN_MSG}
                             </Typography>
                             :
                             <JsonEditor
@@ -176,8 +184,7 @@ export const Content = () => {
                     {
                         viewportWidth < VIEWPORT_MIN_WIDTH ?
                             <Typography component='h2' variant='body1' >
-                                *JSON editor not available on current screen width. Please rotate
-                                your device and reload the page, or log in from another device.
+                                {JSON_EDITOR_WARN_MSG}
                             </Typography>
                             :
                             <JsonEditor
@@ -235,8 +242,7 @@ export const Content = () => {
                             :
                             viewportWidth < VIEWPORT_MIN_WIDTH ?
                                 <Typography component='h2' variant='body1' sx={{ marginTop: '30px' }}>
-                                    *JSON editor not available on current screen width. Please rotate
-                                    your device and reload the page, or login from another device.
+                                    {JSON_EDITOR_WARN_MSG}
                                 </Typography>
                                 :
                                 <Box component='div' sx={{ marginTop: '20px' }}>

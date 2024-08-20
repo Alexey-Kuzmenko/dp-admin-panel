@@ -6,20 +6,28 @@ import AccordionSummary from '@mui/material/AccordionSummary';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Box, Typography } from '@mui/material';
 import { theme } from '../../theme/ThemeRegistry';
-
 import { CodeBlock, SelectionForm, Button, Alert } from '../../components';
+
 import cn from 'classnames';
 import { JsonEditor } from 'json-edit-react';
 
 import { useAppDispatch, useAppSelector } from '../../hooks/redux-hooks';
-import { VIEWPORT_MIN_WIDTH } from '../../constants/constants';
 import { addContact, deleteContact, editContact } from '../../store/contactSlice';
+
 import { modelsCodeBlocks } from '../../models/models-code-blocks';
 import { ContactModel, contactModelKeys } from '../../models/contact.model';
+import { AlertState } from '../../types/alert-state.type';
 
 import generateCodeBlock from '../../utils/generateCodeBlock';
 import { validateValue } from '../../utils/validateValue';
-import { AlertState } from '../../types/alert-state.type';
+
+import {
+    VIEWPORT_MIN_WIDTH,
+    ALERT_SUCCESS_MGS,
+    ALERT_ERROR_MGS,
+    ALERT_RESET_MGS,
+    JSON_EDITOR_WARN_MSG
+} from '../../constants/constants';
 
 import styles from './Contacts.module.scss';
 
@@ -48,38 +56,24 @@ export const Contacts = () => {
 
     const viewportWidth = window.innerWidth;
 
-    const handleDelete = (): void => {
-        dispatch(deleteContact(deletedContactId));
-        setAlertState({ type: 'success', isOpen: true, message: 'Contact successfully deleted' });
-    };
-
     const handleSave = (action: 'edit' | 'add'): void => {
         if (action === 'add') {
             if (validateValue(newContact) === false) {
-                setAlertState({ type: 'error', isOpen: true, message: 'Rejected! Object values can\'t be empty' });
+                setAlertState({ type: 'error', isOpen: true, message: ALERT_ERROR_MGS });
             } else {
                 dispatch(addContact(newContact as ContactModel));
                 setNewContact(contactTemplate);
-                setAlertState({ type: 'success', isOpen: true, message: 'Changes saved successfully' });
+                setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
             }
         }
 
         if (action === 'edit' && editedContact) {
             if (validateValue(editedContact) === false) {
-                setAlertState({ type: 'error', isOpen: true, message: 'Rejected! Object values can\'t be empty' });
+                setAlertState({ type: 'error', isOpen: true, message: ALERT_ERROR_MGS });
             } else {
                 dispatch(editContact(editedContact as ContactModel));
-                setAlertState({ type: 'success', isOpen: true, message: 'Changes saved successfully' });
+                setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
             }
-        }
-    };
-
-    const handleFind = (id: string): void => {
-        const jsonEditorData = contacts.find((c) => c._id === id);
-
-        if (jsonEditorData) {
-            setEditedContact(jsonEditorData);
-            editedContactCopy.current = jsonEditorData;
         }
     };
 
@@ -92,7 +86,21 @@ export const Contacts = () => {
             setEditedContact(editedContactCopy.current);
         }
 
-        setAlertState({ type: 'warning', isOpen: true, message: 'State was reset' });
+        setAlertState({ type: 'warning', isOpen: true, message: ALERT_RESET_MGS });
+    };
+
+    const handleFind = (id: string): void => {
+        const jsonEditorData = contacts.find((c) => c._id === id);
+
+        if (jsonEditorData) {
+            setEditedContact(jsonEditorData);
+            editedContactCopy.current = jsonEditorData;
+        }
+    };
+
+    const handleDelete = (): void => {
+        dispatch(deleteContact(deletedContactId));
+        setAlertState({ type: 'success', isOpen: true, message: 'Contact successfully deleted' });
     };
 
     const handleAlertClose = () => {
@@ -136,8 +144,7 @@ export const Contacts = () => {
                     {
                         viewportWidth < VIEWPORT_MIN_WIDTH ?
                             <Typography component='h2' variant='body1'>
-                                *JSON editor not available on current screen width. Please rotate
-                                your device and reload the page, or login from another device.
+                                {JSON_EDITOR_WARN_MSG}
                             </Typography>
                             :
                             <JsonEditor
@@ -167,8 +174,7 @@ export const Contacts = () => {
                     {
                         viewportWidth < VIEWPORT_MIN_WIDTH ?
                             <Typography component='h2' variant='body1'>
-                                *JSON editor not available on current screen width. Please rotate
-                                your device and reload the page, or log in from another device.
+                                {JSON_EDITOR_WARN_MSG}
                             </Typography>
                             :
                             <JsonEditor
@@ -226,8 +232,7 @@ export const Contacts = () => {
                             :
                             viewportWidth < VIEWPORT_MIN_WIDTH ?
                                 <Typography component='h2' variant='body1' sx={{ marginTop: '30px' }}>
-                                    *JSON editor not available on current screen width. Please rotate
-                                    your device and reload the page, or log in from another device.
+                                    {JSON_EDITOR_WARN_MSG}
                                 </Typography>
                                 :
 
