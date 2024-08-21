@@ -14,7 +14,7 @@ import { addPageContent, deletePageContent, editContent } from '../../store/cont
 import { modelsCodeBlocks } from '../../models/models-code-blocks';
 import { ContentModel, Content as SubContent } from '../../models/content.model';
 import { contentModelKeys } from '../../models/content.model';
-import { AlertState } from '../../types/alert-state.type';
+import { AlertState, AlertType } from '../../types/alert-state.type';
 
 import { validateValue } from '../../utils/validateValue';
 import generateCodeBlock from '../../utils/generateCodeBlock';
@@ -69,19 +69,23 @@ export const Content = () => {
         if (action === 'add') {
             if (validateValue((newContent as ContentModel).eng) === false && ((newContent as ContentModel).ua)) {
                 setAlertState({ type: 'error', isOpen: true, message: ALERT_ERROR_MGS });
+                hideAlertAutomatically('error');
             } else {
                 dispatch(addPageContent(newContent as ContentModel));
                 setNewContent(contentTemplate);
                 setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
+                hideAlertAutomatically('success');
             }
         }
 
         if (action === 'edit' && editedContent && selectionFormValue.length) {
             if (validateValue(editedContent) === false) {
                 setAlertState({ type: 'error', isOpen: true, message: ALERT_ERROR_MGS });
+                hideAlertAutomatically('error');
             } else {
                 dispatch(editContent({ content: editedContent as SubContent, formValue: selectionFormValue }));
                 setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
+                hideAlertAutomatically('success');
             }
         }
     };
@@ -96,6 +100,7 @@ export const Content = () => {
         }
 
         setAlertState({ type: 'warning', isOpen: true, message: ALERT_RESET_MGS });
+        hideAlertAutomatically('warning');
     };
 
     const handleFind = (value: string): void => {
@@ -111,11 +116,22 @@ export const Content = () => {
     const handleDelete = (): void => {
         dispatch(deletePageContent(deletedContentId));
         setAlertState({ type: 'success', isOpen: true, message: 'Contact successfully deleted' });
+        hideAlertAutomatically('success');
     };
 
     const handleAlertClose = () => {
         setAlertState({ ...alertState, isOpen: false });
     };
+
+    function hideAlertAutomatically(type: AlertType, timeout = 3_000): void {
+        setTimeout(() => {
+            setAlertState({
+                ...alertState,
+                type,
+                isOpen: false
+            });
+        }, timeout);
+    }
 
     return (
         <div className={styles.Content}>

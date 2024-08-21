@@ -16,7 +16,7 @@ import { addContact, deleteContact, editContact } from '../../store/contactSlice
 
 import { modelsCodeBlocks } from '../../models/models-code-blocks';
 import { ContactModel, contactModelKeys } from '../../models/contact.model';
-import { AlertState } from '../../types/alert-state.type';
+import { AlertState, AlertType } from '../../types/alert-state.type';
 
 import generateCodeBlock from '../../utils/generateCodeBlock';
 import { validateValue } from '../../utils/validateValue';
@@ -60,19 +60,23 @@ export const Contacts = () => {
         if (action === 'add') {
             if (validateValue(newContact) === false) {
                 setAlertState({ type: 'error', isOpen: true, message: ALERT_ERROR_MGS });
+                hideAlertAutomatically('error');
             } else {
                 dispatch(addContact(newContact as ContactModel));
                 setNewContact(contactTemplate);
                 setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
+                hideAlertAutomatically('success');
             }
         }
 
         if (action === 'edit' && editedContact) {
             if (validateValue(editedContact) === false) {
                 setAlertState({ type: 'error', isOpen: true, message: ALERT_ERROR_MGS });
+                hideAlertAutomatically('error');
             } else {
                 dispatch(editContact(editedContact as ContactModel));
                 setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
+                hideAlertAutomatically('success');
             }
         }
     };
@@ -87,6 +91,7 @@ export const Contacts = () => {
         }
 
         setAlertState({ type: 'warning', isOpen: true, message: ALERT_RESET_MGS });
+        hideAlertAutomatically('warning');
     };
 
     const handleFind = (id: string): void => {
@@ -101,11 +106,22 @@ export const Contacts = () => {
     const handleDelete = (): void => {
         dispatch(deleteContact(deletedContactId));
         setAlertState({ type: 'success', isOpen: true, message: 'Contact successfully deleted' });
+        hideAlertAutomatically('success');
     };
 
     const handleAlertClose = () => {
         setAlertState({ ...alertState, isOpen: false });
     };
+
+    function hideAlertAutomatically(type: AlertType, timeout = 3_000): void {
+        setTimeout(() => {
+            setAlertState({
+                ...alertState,
+                type,
+                isOpen: false
+            });
+        }, timeout);
+    }
 
     return (
         <div className={styles.Contacts}>
