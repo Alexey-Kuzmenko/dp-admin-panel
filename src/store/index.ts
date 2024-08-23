@@ -1,11 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit';
 import menuSlice from './menuSlice';
 import contactSlice from './contactSlice';
+import contentSlice from './contentSlice';
 
 const store = configureStore({
     reducer: {
         menu: menuSlice,
-        contacts: contactSlice
+        contacts: contactSlice,
+        content: contentSlice,
     }
 });
 
