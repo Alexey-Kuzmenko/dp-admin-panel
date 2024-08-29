@@ -12,7 +12,31 @@ const config: Config = {
     ],
     coverageDirectory: 'coverage',
     transform: {
-        '^.+\\.tsx?$': 'ts-jest'
+        '^.+\\.tsx?$': [
+            'ts-jest',
+            {
+                diagnostics: {
+                    ignoreCodes: [1343],
+                },
+                astTransformers: {
+                    before: [
+                        {
+                            path: 'node_modules/ts-jest-mock-import-meta',
+                            options: {
+                                metaObjectReplacement: {
+                                    env: {
+                                        /* 
+                                            ! Copy values from the .env file here
+                                            Add secrets like this: VITE_VAR_NAME: 'varValue'
+                                        */
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        ],
     },
     moduleNameMapper: {
         '^.+\\.svg$': 'jest-transformer-svg',
