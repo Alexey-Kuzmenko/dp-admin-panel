@@ -29,7 +29,6 @@ const config: Config = {
                                             ! Copy values from the .env file here
                                             Add secrets like this: VITE_VAR_NAME: 'varValue'
                                             */
-                                        VITE_SWAGGER_DOCS: 'https://api.ok-dev.pp.ua/docs'
                                     }
                                 }
                             }
