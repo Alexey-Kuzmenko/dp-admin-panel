@@ -6,8 +6,8 @@ interface ContactState {
     contacts: Array<ContactModel>
 }
 
-// * state with temporary data
-const initialState: ContactState = {
+// * state with temporary data. This value exported for only for tests
+export const initialState: ContactState = {
     contacts: [
         {
             _id: '65f1899dd7226661102dede3',
