@@ -6,8 +6,8 @@ interface ContentSate {
     content: Array<ContentModel>
 }
 
-// * state with temporary data
-const initialState: ContentSate = {
+// * state with temporary data. This value exported for only for tests
+export const initialState: ContentSate = {
     content: [
         {
             _id: uuidv4(),

@@ -47,8 +47,8 @@ describe('contactSlice', () => {
         const deletedContactId = initialState.contacts[0]._id;
         const action = { type: deleteContact.type, payload: deletedContactId };
         const result = contactReducer(initialState, action);
-        const updatedContacts = initialState.contacts.filter((c) => c._id !== deletedContactId);
+        const updatedState = initialState.contacts.filter((c) => c._id !== deletedContactId);
 
-        expect(result.contacts).toEqual(updatedContacts);
+        expect(result.contacts).toEqual(updatedState);
     });
 });
