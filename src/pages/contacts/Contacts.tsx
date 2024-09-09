@@ -123,8 +123,9 @@ export const Contacts = () => {
         }, timeout);
     }
 
+    // ! data attribute added for tests
     return (
-        <div className={styles.Contacts}>
+        <div className={styles.Contacts} data-testid="contacts-page">
 
             {/* DTO accordion */}
             <Accordion className={cn(styles.Contacts__accordion, {
