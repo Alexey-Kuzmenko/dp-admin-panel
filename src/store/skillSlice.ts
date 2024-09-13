@@ -7,7 +7,7 @@ interface SkillState {
 }
 
 // * temporary data
-const initialState: SkillState = {
+export const initialState: SkillState = {
     skills: [
         {
             _id: '65eb2cb67060abb0080a5797',
