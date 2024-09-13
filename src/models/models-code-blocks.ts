@@ -33,4 +33,11 @@ export const modelsCodeBlocks = {
         ua: Content;
     }
 `,
+    skills: `
+    interface SkillDto {
+        slug: string
+        label: string
+        iconClass: string
+    }
+`
 };
