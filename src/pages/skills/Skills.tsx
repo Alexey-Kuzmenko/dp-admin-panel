@@ -12,7 +12,8 @@ import cn from 'classnames';
 import { JsonEditor } from 'json-edit-react';
 
 import { useAppDispatch, useAppSelector } from '../../hooks/redux-hooks';
-import { addSkill, deleteSkill, editSkill } from '../../store/skillSlice';
+import { addSkill, deleteSkill, editSkill, selectSkills } from '../../store/skillSlice';
+import { selectMenuSlice } from '../../store/menuSlice';
 
 import { modelsCodeBlocks } from '../../models/models-code-blocks';
 import { AlertState, AlertType } from '../../types/alert-state.type';
@@ -38,8 +39,8 @@ const skillTemplate: Omit<SkillModel, '_id'> = {
 };
 
 export const Skills = () => {
-    const skills = useAppSelector((store) => store.skills.skills);
-    const isMenuOpen = useAppSelector((store) => store.menu.isMenuOpen);
+    const skills = useAppSelector(selectSkills);
+    const { isMenuOpen } = useAppSelector(selectMenuSlice);
     const dispatch = useAppDispatch();
     const skillsIds = skills.map((s) => s._id);
 

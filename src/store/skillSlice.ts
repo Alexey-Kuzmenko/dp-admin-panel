@@ -46,19 +46,24 @@ export const initialState: SkillState = {
 export const skillSlice = createSlice({
     name: 'skills',
     initialState,
-    reducers: {
-        addSkill: (state, { payload }: PayloadAction<Omit<SkillModel, '_id'>>) => {
+    selectors: {
+        selectSkills: (state) => state.skills
+    },
+    reducers: (create) => ({
+        addSkill: create.reducer((state, { payload }: PayloadAction<Omit<SkillModel, '_id'>>) => {
             const newSkill: SkillModel = {
                 _id: uuidv4(),
                 ...payload
             };
 
             state.skills.push(newSkill);
-        },
-        deleteSkill: (state, { payload }: PayloadAction<string>) => {
+        }),
+
+        deleteSkill: create.reducer((state, { payload }: PayloadAction<string>) => {
             state.skills = state.skills.filter((s) => s._id !== payload);
-        },
-        editSkill: (state, { payload }: PayloadAction<SkillModel>) => {
+        }),
+
+        editSkill: create.reducer((state, { payload }: PayloadAction<SkillModel>) => {
             const skill = state.skills.find((s) => s._id === payload._id);
 
             if (skill) {
@@ -67,9 +72,11 @@ export const skillSlice = createSlice({
                 skillsCopy[skillIndex] = payload;
                 state.skills = skillsCopy;
             }
-        }
-    }
+        })
+    })
 });
+
+export const { selectSkills } = skillSlice.selectors;
 
 export const { addSkill, deleteSkill, editSkill } = skillSlice.actions;
 

@@ -44,19 +44,24 @@ export const initialState: ContactState = {
 const contactSlice = createSlice({
     name: 'contacts',
     initialState,
-    reducers: {
-        addContact: (state, { payload }: PayloadAction<Omit<ContactModel, '_id'>>) => {
+    selectors: {
+        selectContacts: (state) => state.contacts
+    },
+    reducers: (create) => ({
+        addContact: create.reducer((state, { payload }: PayloadAction<Omit<ContactModel, '_id'>>) => {
             const newContact: ContactModel = {
                 _id: uuidv4(),
                 ...payload
             };
 
             state.contacts.push(newContact);
-        },
-        deleteContact: (state, { payload }: PayloadAction<string>) => {
+        }),
+
+        deleteContact: create.reducer((state, { payload }: PayloadAction<string>) => {
             state.contacts = state.contacts.filter((c) => c._id !== payload);
-        },
-        editContact: (state, { payload }: PayloadAction<ContactModel>) => {
+        }),
+
+        editContact: create.reducer((state, { payload }: PayloadAction<ContactModel>) => {
             const contact = state.contacts.find((c) => c._id === payload._id);
 
             if (contact) {
@@ -65,9 +70,11 @@ const contactSlice = createSlice({
                 contactsCopy[contactIndex] = payload;
                 state.contacts = contactsCopy;
             }
-        }
-    }
+        })
+    })
 });
+
+export const { selectContacts } = contactSlice.selectors;
 
 export const { addContact, deleteContact, editContact } = contactSlice.actions;
 

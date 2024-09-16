@@ -12,7 +12,8 @@ import cn from 'classnames';
 import { JsonEditor } from 'json-edit-react';
 
 import { useAppDispatch, useAppSelector } from '../../hooks/redux-hooks';
-import { addContact, deleteContact, editContact } from '../../store/contactSlice';
+import { addContact, deleteContact, editContact, selectContacts } from '../../store/contactSlice';
+import { selectMenuSlice } from '../../store/menuSlice';
 
 import { modelsCodeBlocks } from '../../models/models-code-blocks';
 import { ContactModel, contactModelKeys } from '../../models/contact.model';
@@ -40,8 +41,8 @@ const contactTemplate: Omit<ContactModel, '_id'> = {
 };
 
 export const Contacts = () => {
-    const contacts = useAppSelector((store) => store.contacts.contacts);
-    const isMenuOpen = useAppSelector((store) => store.menu.isMenuOpen);
+    const contacts = useAppSelector(selectContacts);
+    const { isMenuOpen } = useAppSelector(selectMenuSlice);
     const dispatch = useAppDispatch();
     const contactsIds = contacts.map((c) => c._id);
 

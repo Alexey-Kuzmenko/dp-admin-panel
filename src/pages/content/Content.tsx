@@ -9,7 +9,8 @@ import { JsonEditor } from 'json-edit-react';
 import cn from 'classnames';
 
 import { useAppDispatch, useAppSelector } from '../../hooks/redux-hooks';
-import { addPageContent, deletePageContent, editContent } from '../../store/contentSlice';
+import { addPageContent, deletePageContent, editContent, selectContent } from '../../store/contentSlice';
+import { selectMenuSlice } from '../../store/menuSlice';
 
 import { modelsCodeBlocks } from '../../models/models-code-blocks';
 import { ContentModel, Content as SubContent } from '../../models/content.model';
@@ -47,8 +48,8 @@ const contentTemplate: Omit<ContentModel, '_id'> = {
 };
 
 export const Content = () => {
-    const isMenuOpen = useAppSelector((store) => store.menu.isMenuOpen);
-    const content = useAppSelector((store) => store.content.content);
+    const { isMenuOpen } = useAppSelector(selectMenuSlice);
+    const content = useAppSelector(selectContent);
     const dispatch = useAppDispatch();
     const contentTypes = generateContentFormValues(content);
     const contentIds = content.map((c) => c._id);
