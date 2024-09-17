@@ -3,13 +3,15 @@ import menuReducer from './menuSlice';
 import contactReducer from './contactSlice';
 import contentReducer from './contentSlice';
 import skillReducer from './skillSlice';
+import projectSlice from './projectSlice';
 
 const store = configureStore({
     reducer: {
         menu: menuReducer,
         contacts: contactReducer,
         content: contentReducer,
-        skills: skillReducer
+        skills: skillReducer,
+        projects: projectSlice
     }
 });
 

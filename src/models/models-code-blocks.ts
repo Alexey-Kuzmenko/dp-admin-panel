@@ -39,5 +39,24 @@ export const modelsCodeBlocks = {
         label: string
         iconClass: string
     }
+`,
+    projects: `
+    interface ProjectTechnology {
+        iconClass: string
+        label: string
+    }
+
+    type ProjectTags = 'TypeScript' | 'React' | 'Next.js' | 'JavaScript' | 'SCSS';
+
+    interface ProjectDto {
+        name: string
+        tags: Array<string>
+        description: string
+        link: string
+        repoLink: string
+        image: string
+        body: string
+        technologies: Array<ProjectTechnology>
+    }
 `
 };
