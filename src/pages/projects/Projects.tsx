@@ -1,90 +1,81 @@
-import { useState, useRef } from 'react';
+import { useRef, useState } from 'react';
 
 import { Accordion, AccordionSummary, Typography, AccordionDetails, Box } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { theme } from '../../theme/ThemeRegistry';
 import { Alert, Button, CodeBlock, SelectionForm } from '../../components';
 
-import { JsonEditor } from 'json-edit-react';
 import cn from 'classnames';
+import { JsonEditor } from 'json-edit-react';
 
-import { useAppDispatch, useAppSelector } from '../../hooks/redux-hooks';
-import { addPageContent, deletePageContent, editContent, selectContent } from '../../store/contentSlice';
+import { useAppSelector, useAppDispatch } from '../../hooks/redux-hooks';
+import { addProject, deleteProject, editProject, selectProjects } from '../../store/projectSlice';
 import { selectMenuSlice } from '../../store/menuSlice';
 
 import { modelsCodeBlocks } from '../../models/models-code-blocks';
-import { ContentModel, Content as SubContent } from '../../models/content.model';
-import { contentModelKeys } from '../../models/content.model';
 import { AlertState, AlertType } from '../../types/alert-state.type';
+import { ProjectModel, projectModelKeys } from '../../models/project.model';
 
-import { validateValue } from '../../utils/validateValue';
 import generateCodeBlock from '../../utils/generateCodeBlock';
-import { generateContentFormValues } from '../../utils/generateContentFormValues';
-import { findContent } from '../../utils/findContent';
+import { validateValue } from '../../utils/validateValue';
 
 import {
-    VIEWPORT_MIN_WIDTH,
+    ALERT_ERROR_MGS,
+    ALERT_RESET_MGS,
     ALERT_SUCCESS_MGS,
-    ALERT_ERROR_MGS, ALERT_RESET_MGS,
-    JSON_EDITOR_WARN_MSG
+    JSON_EDITOR_WARN_MSG,
+    VIEWPORT_MIN_WIDTH
 } from '../../constants/constants';
 
-import styles from './Content.module.scss';
+import styles from './Projects.module.scss';
 
-const contentTemplate: Omit<ContentModel, '_id'> = {
-    type: 'about',
-    eng: {
-        title: '',
-        body: '',
-        image: '',
-        links: [],
-    },
-    ua: {
-        title: '',
-        body: '',
-        image: '',
-        links: [],
-    }
+const projectTemplate: Omit<ProjectModel, '_id'> = {
+    name: '',
+    tags: [],
+    description: '',
+    link: '',
+    repoLink: '',
+    image: '',
+    body: '',
+    technologies: []
 };
 
-export const Content = () => {
+export const Projects = () => {
+    const projects = useAppSelector(selectProjects);
     const { isMenuOpen } = useAppSelector(selectMenuSlice);
-    const content = useAppSelector(selectContent);
     const dispatch = useAppDispatch();
-    const contentTypes = generateContentFormValues(content);
-    const contentIds = content.map((c) => c._id);
+    const projectsIds = projects.map((p) => p._id);
 
     const [alertState, setAlertState] = useState<AlertState>({ type: 'success', isOpen: false, message: '' });
-    const [newContent, setNewContent] = useState<object | Omit<ContentModel, '_id'>>(contentTemplate);
-    const [selectionFormValue, setSelectionFormValue] = useState<string>('');
+    const [newProject, setNewProject] = useState<object>(projectTemplate);
 
-    const [deletedContentId, setDeletedContentId] = useState<string>('');
-    const deletedContent = content.find((c) => c._id === deletedContentId);
+    const [deletedProjectId, setDeletedProjectId] = useState<string>('');
+    const deletedProject = projects.find((p) => p._id === deletedProjectId);
 
-    const [editedContent, setEditedContent] = useState<object>();
-    const editedContentCopy = useRef<SubContent>();
+    const [editedProject, setEditedProject] = useState<object>();
+    const editedProjectCopy = useRef<ProjectModel>();
 
     const viewportWidth = window.innerWidth;
 
     const handleSave = (action: 'edit' | 'add'): void => {
         if (action === 'add') {
-            if (validateValue((newContent as ContentModel).eng) === false && ((newContent as ContentModel).ua)) {
+            if (validateValue(newProject) === false) {
                 setAlertState({ type: 'error', isOpen: true, message: ALERT_ERROR_MGS });
                 hideAlertAutomatically('error');
             } else {
-                dispatch(addPageContent(newContent as ContentModel));
-                setNewContent(contentTemplate);
+                dispatch(addProject(newProject as ProjectModel));
+                setNewProject(projectTemplate);
                 setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
                 hideAlertAutomatically('success');
             }
         }
 
-        if (action === 'edit' && editedContent && selectionFormValue.length) {
-            if (validateValue(editedContent) === false) {
+        if (action === 'edit' && editedProject) {
+            if (validateValue(editedProject) === false) {
                 setAlertState({ type: 'error', isOpen: true, message: ALERT_ERROR_MGS });
                 hideAlertAutomatically('error');
             } else {
-                dispatch(editContent({ content: editedContent as SubContent, formValue: selectionFormValue }));
+                dispatch(editProject(editedProject as ProjectModel));
                 setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
                 hideAlertAutomatically('success');
             }
@@ -93,29 +84,28 @@ export const Content = () => {
 
     const handleReset = (action: 'edit' | 'add'): void => {
         if (action === 'add') {
-            setNewContent(contentTemplate);
+            setNewProject(projectTemplate);
         }
 
         if (action === 'edit') {
-            setEditedContent(editedContentCopy.current);
+            setEditedProject(editedProjectCopy.current);
         }
 
         setAlertState({ type: 'warning', isOpen: true, message: ALERT_RESET_MGS });
         hideAlertAutomatically('warning');
     };
 
-    const handleFind = (value: string): void => {
-        const jsonEditorData = findContent(content, value);
-        setSelectionFormValue(value);
+    const handleFind = (id: string): void => {
+        const jsonEditorData = projects.find((f) => f._id === id);
 
         if (jsonEditorData) {
-            setEditedContent(jsonEditorData);
-            editedContentCopy.current = jsonEditorData;
+            setEditedProject(jsonEditorData);
+            editedProjectCopy.current = jsonEditorData;
         }
     };
 
     const handleDelete = (): void => {
-        dispatch(deletePageContent(deletedContentId));
+        dispatch(deleteProject(deletedProjectId));
         setAlertState({ type: 'success', isOpen: true, message: 'Contact successfully deleted' });
         hideAlertAutomatically('success');
     };
@@ -135,37 +125,37 @@ export const Content = () => {
     }
 
     return (
-        <div className={styles.Content}>
+        <div className={styles.Projects}>
 
             {/* DTO accordion */}
-            <Accordion className={cn(styles.Content__accordion, {
-                [styles.Content__accordion_hidden]: isMenuOpen === true
+            <Accordion className={cn(styles.Projects__accordion, {
+                [styles.Projects__accordion_hidden]: isMenuOpen === true
             })}>
                 <AccordionSummary
                     expandIcon={<ExpandMoreIcon sx={{ color: theme.palette.primary.contrastText }} />}
-                    aria-controls='content-dto-preview-accordion-content'
-                    id='content-dto-preview-accordion-header'
+                    aria-controls='projects-dto-preview-accordion-content'
+                    id='projects-dto-preview-accordion-header'
                 >
                     <Typography component='h1' variant='h5'>Dto</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
                     <CodeBlock
-                        code={modelsCodeBlocks.content}
+                        code={modelsCodeBlocks.projects}
                         lang='typescript'
                     />
                 </AccordionDetails>
             </Accordion>
 
-            {/* All pages content accordion */}
-            <Accordion className={cn(styles.Content__accordion, {
-                [styles.Content__accordion_hidden]: isMenuOpen === true
+            {/* All projects accordion */}
+            <Accordion className={cn(styles.Projects__accordion, {
+                [styles.Projects__accordion_hidden]: isMenuOpen === true
             })}>
                 <AccordionSummary
                     expandIcon={<ExpandMoreIcon sx={{ color: theme.palette.primary.contrastText }} />}
-                    aria-controls='content-json-preview-accordion-content'
-                    id='content-json-preview-accordion-header'
+                    aria-controls='projects-json-preview-accordion-content'
+                    id='projects-json-preview-accordion-header'
                 >
-                    <Typography component='h1' variant='h5'>Pages content</Typography>
+                    <Typography component='h1' variant='h5'>All projects</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
                     {
@@ -175,8 +165,8 @@ export const Content = () => {
                             </Typography>
                             :
                             <JsonEditor
-                                data={content}
-                                className={styles.Content__jsonEditor}
+                                data={projects}
+                                className={styles.Projects__jsonEditor}
                                 theme='githubDark'
                                 restrictEdit={({ fullData }) => fullData !== null}
                                 restrictAdd={({ fullData }) => fullData !== null}
@@ -186,75 +176,73 @@ export const Content = () => {
                 </AccordionDetails>
             </Accordion>
 
-            {/* Add content accordion */}
-            <Accordion className={cn(styles.Content__accordion, {
-                [styles.Content__accordion_hidden]: isMenuOpen === true
+            {/* Add contact accordion */}
+            <Accordion className={cn(styles.Projects__accordion, {
+                [styles.Projects__accordion_hidden]: isMenuOpen === true
             })}>
                 <AccordionSummary
                     expandIcon={<ExpandMoreIcon sx={{ color: theme.palette.primary.contrastText }} />}
-                    aria-controls='add-content-json-editor-content'
-                    id='add-content-json-editor-header'
+                    aria-controls='add-project-json-editor-content'
+                    id='add-project-json-editor-header'
                 >
-                    <Typography component='h1' variant='h5'>Add page content</Typography>
+                    <Typography component='h1' variant='h5'>Add project</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
                     {
                         viewportWidth < VIEWPORT_MIN_WIDTH ?
-                            <Typography component='h2' variant='body1' >
+                            <Typography component='h2' variant='body1'>
                                 {JSON_EDITOR_WARN_MSG}
                             </Typography>
                             :
                             <JsonEditor
-                                data={newContent}
-                                className={styles.Content__jsonEditor}
+                                data={newProject}
+                                className={styles.Projects__jsonEditor}
                                 theme='githubDark'
                                 onUpdate={({ newData }) => {
-                                    setNewContent(newData);
+                                    setNewProject(newData);
                                 }}
                                 restrictAdd={({ fullData }) => fullData !== null}
-                                restrictDelete={({ key }) => contentModelKeys.includes(key as string)}
-                                restrictTypeSelection={({ path, value }) => {
-                                    if (path.includes('type')) return ['string'];
+                                restrictDelete={({ key }) => projectModelKeys.includes(key as string)}
+                                restrictTypeSelection={({ value }) => {
                                     if (typeof value === 'boolean') return false;
                                     if (typeof value === 'string') return ['string'];
-                                    return ['string', 'object'];
+                                    return ['string'];
                                 }}
                             />
                     }
-
-                    <div className={styles.Content__jsonEditorControls}>
+                    <div className={styles.Projects__jsonEditorControls}>
                         <Button onClick={() => handleSave('add')}>Save changes</Button>
                         <Button variant='outlined' onClick={() => handleReset('add')}>Reset state</Button>
                     </div>
                 </AccordionDetails>
             </Accordion>
 
-            {/* Edit content accordion */}
-            <Accordion className={cn(styles.Content__accordion, {
-                [styles.Content__accordion_hidden]: isMenuOpen === true
+            {/* Edit project accordion */}
+            <Accordion className={cn(styles.Projects__accordion, {
+                [styles.Projects__accordion_hidden]: isMenuOpen === true
             })}>
                 <AccordionSummary
                     expandIcon={<ExpandMoreIcon sx={{ color: theme.palette.primary.contrastText }} />}
-                    aria-controls='edit-content-json-editor-content'
-                    id='edit-content-json-editor-header'
+                    aria-controls='edit-projects-json-editor-content'
+                    id='edit-projects-json-editor-header'
                 >
-                    <Typography component='h1' variant='h5'>Edit content by type and language</Typography>
+                    <Typography component='h1' variant='h5'>Edit project</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
 
                     <SelectionForm
-                        values={contentTypes}
-                        label='Choose content type'
-                        selectId='content-select'
-                        labelId='content-select-label'
-                        id='content-select-form'
+                        values={projectsIds}
+                        label='Choose project id'
+                        selectId='projects-select'
+                        labelId='projects-select-label'
+                        id='projects-select-form'
                         onFind={handleFind}
                     />
 
                     {
-                        !editedContent ?
+                        !editedProject ?
                             <Typography component='h2' variant='h5' sx={{ textAlign: 'center', marginTop: '30px' }}>
-                                Content type is not selected
+                                Project ID is not selected
                             </Typography>
                             :
                             viewportWidth < VIEWPORT_MIN_WIDTH ?
@@ -262,65 +250,67 @@ export const Content = () => {
                                     {JSON_EDITOR_WARN_MSG}
                                 </Typography>
                                 :
+
                                 <Box component='div' sx={{ marginTop: '20px' }}>
                                     <JsonEditor
-                                        data={editedContent}
-                                        className={styles.Content__jsonEditor}
+                                        data={editedProject}
+                                        className={styles.Projects__jsonEditor}
                                         theme='githubDark'
                                         onUpdate={({ newData }) => {
-                                            setEditedContent(newData);
+                                            setEditedProject(newData);
                                         }}
-                                        restrictDelete={({ key }) => contentModelKeys.includes(key as string)}
+                                        restrictAdd={({ key }) => key !== 'technologies' && key !== 'tags'}
+                                        restrictDelete={({ key }) => projectModelKeys.includes(key as string)}
                                         restrictEdit={({ key }) => key === '_id'}
                                         restrictTypeSelection={({ value }) => {
                                             if (typeof value === 'boolean') return false;
-                                            return ['string', 'array'];
+                                            return ['string', 'object'];
                                         }}
                                         defaultValue={''}
                                     />
                                 </Box>
                     }
 
-                    <div className={styles.Content__jsonEditorControls}>
+                    <div className={styles.Projects__jsonEditorControls}>
                         <Button onClick={() => handleSave('edit')}>Save changes</Button>
                         <Button variant='outlined' onClick={() => handleReset('edit')}>Reset state</Button>
                     </div>
                 </AccordionDetails>
             </Accordion>
 
-            {/* Delete content accordion */}
-            <Accordion className={cn(styles.Content__accordion, {
-                [styles.Content__accordion_hidden]: isMenuOpen === true
+            {/* Delete project accordion */}
+            <Accordion className={cn(styles.Projects__accordion, {
+                [styles.Projects__accordion_hidden]: isMenuOpen === true
             })}>
                 <AccordionSummary
                     expandIcon={<ExpandMoreIcon sx={{ color: theme.palette.primary.contrastText }} />}
-                    aria-controls='delete-content-accordion-content'
-                    id='delete-content-accordion-header'
+                    aria-controls='delete-project-accordion-content'
+                    id='delete-project-accordion-header'
                 >
-                    <Typography component='h1' variant='h5'>Delete contact</Typography>
+                    <Typography component='h1' variant='h5'>Delete project</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
 
                     <SelectionForm
-                        values={contentIds}
-                        label='Choose contact id'
-                        selectId='content-select'
-                        labelId='content-select-label'
-                        id='content-select-form'
-                        onFind={setDeletedContentId}
+                        values={projectsIds}
+                        label='Choose project id'
+                        selectId='projects-select'
+                        labelId='projects-select-label'
+                        id='projects-select-form'
+                        onFind={setDeletedProjectId}
                         onDelete={handleDelete}
                     />
 
                     {
-                        !deletedContent
+                        !deletedProject
                             ?
                             <Typography component='h2' variant='h5' sx={{ textAlign: 'center', marginTop: '30px' }}>
-                                Contact ID is not selected
+                                Project ID is not selected
                             </Typography>
                             :
                             <Box component='div' sx={{ marginTop: '20px' }}>
                                 <CodeBlock
-                                    code={generateCodeBlock(deletedContent)}
+                                    code={generateCodeBlock(deletedProject)}
                                     lang='typescript'
                                 />
                             </Box>

@@ -204,11 +204,10 @@ export const Contacts = () => {
                                 }}
                                 restrictAdd={({ fullData }) => fullData !== null}
                                 restrictDelete={({ key }) => contactModelKeys.includes(key as string)}
-                                restrictTypeSelection={({ value }) => {
-                                    if (typeof value === 'boolean') return false;
-                                    if (typeof value === 'string') return ['string'];
+                                restrictTypeSelection={() => {
                                     return ['string'];
                                 }}
+                                defaultValue={''}
                             />
                     }
 

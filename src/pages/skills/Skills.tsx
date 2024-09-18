@@ -258,15 +258,12 @@ export const Skills = () => {
                                         onUpdate={({ newData }) => {
                                             setEditedSkill(newData);
                                         }}
-                                        restrictAdd={({ key }) => key in editSkill}
+                                        restrictAdd={({ fullData }) => fullData !== null}
                                         restrictDelete={({ key }) => skillModelKeys.includes(key as string)}
                                         restrictEdit={({ key }) => key === '_id'}
-                                        restrictTypeSelection={({ value }) => {
-                                            if (typeof value === 'boolean') return false;
-                                            if (typeof value === 'string') return ['string'];
+                                        restrictTypeSelection={() => {
                                             return ['string'];
                                         }}
-                                        defaultValue={''}
                                     />
                                 </Box>
                     }

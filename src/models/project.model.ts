@@ -5,6 +5,20 @@ export interface ProjectTechnology {
 
 export type ProjectTags = 'TypeScript' | 'React' | 'Next.js' | 'JavaScript' | 'SCSS';
 
+export const projectModelKeys: Array<string> = [
+    '_id',
+    'name',
+    'tags',
+    'description',
+    'link',
+    'repoLink',
+    'image',
+    'body',
+    'technologies',
+    'iconClass',
+    'label'
+];
+
 export interface ProjectModel {
     _id: string
     name: string
