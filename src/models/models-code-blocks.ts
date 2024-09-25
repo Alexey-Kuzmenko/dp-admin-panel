@@ -58,5 +58,16 @@ export const modelsCodeBlocks = {
         body: string
         technologies: Array<ProjectTechnology>
     }
+`,
+    user: `
+    interface CreateUserDto {
+        email: string
+        password: string
+    }
+
+    interface DeleteUserDto {
+        userEmail: string
+        userId: string
+    }
 `
 };

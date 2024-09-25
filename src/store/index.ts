@@ -4,6 +4,7 @@ import contactReducer from './contactSlice';
 import contentReducer from './contentSlice';
 import skillReducer from './skillSlice';
 import projectSlice from './projectSlice';
+import userSlice from './userSlice';
 
 const store = configureStore({
     reducer: {
@@ -11,7 +12,8 @@ const store = configureStore({
         contacts: contactReducer,
         content: contentReducer,
         skills: skillReducer,
-        projects: projectSlice
+        projects: projectSlice,
+        users: userSlice
     }
 });
 
