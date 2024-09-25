@@ -12,17 +12,17 @@ export const initialState: UserState = {
         {
             _id: '0192296c-c49d-71af-8770-bd9842122f56',
             email: 'example@gmail.com',
-            passwordHash: 'DYjj/qg+!cR)ibINTvN1'
+            password: 'DYjj/qg+!cR)ibINTvN1'
         },
         {
             _id: '0192296c-c49d-763d-8a8d-19e3c5d0ad47',
             email: 'example2@gmail.com',
-            passwordHash: 'heUFXTL)).+WuR?ZU.kF'
+            password: 'heUFXTL)).+WuR?ZU.kF'
         },
         {
             _id: '0192296c-c49d-7fb3-a08e-f653452999a4',
             email: 'example3@gmail.com',
-            passwordHash: 'vADVj/)+(0wnbmTuT.fB'
+            password: 'vADVj/)+(0wnbmTuT.fB'
         }
     ]
 };
@@ -49,5 +49,7 @@ const userSlice = createSlice({
 });
 
 export const { selectUsers } = userSlice.selectors;
+
+export const { addUser, deleteUser } = userSlice.actions;
 
 export default userSlice.reducer;
