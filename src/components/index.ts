@@ -7,3 +7,4 @@ export * from './SelectionForm/SelectionForm';
 export * from './Button/Button';
 export * from './Form/Form';
 export * from './Alert/Alert';
+export * from './MUI/StyledComponents';

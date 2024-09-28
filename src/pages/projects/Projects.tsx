@@ -176,7 +176,7 @@ export const Projects = () => {
                 </AccordionDetails>
             </Accordion>
 
-            {/* Add contact accordion */}
+            {/* Add projects accordion */}
             <Accordion className={cn(styles.Projects__accordion, {
                 [styles.Projects__accordion_hidden]: isMenuOpen === true
             })}>

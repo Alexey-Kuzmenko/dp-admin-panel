@@ -15,7 +15,7 @@ describe('userSlice', () => {
     it('should add new user with "addUser" action', () => {
         const newUser: Omit<UserModel, '_id'> = {
             email: 'test@gmail.com',
-            password: 'Qwerty0987'
+            passwordHash: 'Qwerty0987'
         };
         const action = { type: addUser.type, payload: newUser };
         const result = userReducer(initialState, action);
