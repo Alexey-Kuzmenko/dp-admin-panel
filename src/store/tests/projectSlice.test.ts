@@ -1,4 +1,6 @@
 import { ProjectModel } from '../../models/project.model';
+import { ProjectDto } from '../../dto/project.dto';
+
 import projectReducer, {
     addProject,
     deleteProject,
@@ -14,7 +16,7 @@ describe('projectSlice', () => {
     });
 
     it('should add new project item with "addProject" action', () => {
-        const newProject: Omit<ProjectModel, '_id'> = {
+        const newProject: ProjectDto = {
             name: 'Test',
             description: 'Test',
             tags: ['React', 'TypeScript'],

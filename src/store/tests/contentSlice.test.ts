@@ -1,4 +1,6 @@
-import { Content, ContentModel } from '../../models/content.model';
+import { Content } from '../../models/content.model';
+import { CreateContentDto } from '../../dto/content.dto';
+
 import contentReducer,
 {
     addPageContent,
@@ -16,7 +18,7 @@ describe('contentSlice', () => {
     });
 
     it('should add new page content item with "addPageContent"', () => {
-        const newContent: Omit<ContentModel, '_id'> = {
+        const newContent: CreateContentDto = {
             type: 'about',
             eng: {
                 title: 'Test',

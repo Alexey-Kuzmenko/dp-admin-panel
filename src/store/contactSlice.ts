@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { v4 as uuidv4 } from 'uuid';
 import { ContactModel } from '../models/contact.model';
+import { ContactDto } from '../dto/contact.dto';
 
 interface ContactState {
     contacts: Array<ContactModel>
@@ -48,7 +49,7 @@ const contactSlice = createSlice({
         selectContacts: (state) => state.contacts
     },
     reducers: (create) => ({
-        addContact: create.reducer((state, { payload }: PayloadAction<Omit<ContactModel, '_id'>>) => {
+        addContact: create.reducer((state, { payload }: PayloadAction<ContactDto>) => {
             const newContact: ContactModel = {
                 _id: uuidv4(),
                 ...payload

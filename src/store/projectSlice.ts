@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ProjectModel } from '../models/project.model';
 import { v4 as uuidv4 } from 'uuid';
+import { ProjectDto } from '../dto/project.dto';
 
 interface ProjectState {
     projects: Array<ProjectModel>
@@ -166,7 +167,7 @@ const projectSlice = createSlice({
         selectProjects: (state) => state.projects
     },
     reducers: (create) => ({
-        addProject: create.reducer((state, { payload }: PayloadAction<Omit<ProjectModel, '_id'>>) => {
+        addProject: create.reducer((state, { payload }: PayloadAction<ProjectDto>) => {
             const newProject: ProjectModel = {
                 _id: uuidv4(),
                 ...payload

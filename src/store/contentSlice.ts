@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Content, ContentModel } from '../models/content.model';
 import { v4 as uuidv4 } from 'uuid';
+import { CreateContentDto } from '../dto/content.dto';
 
 interface ContentSate {
     content: Array<ContentModel>
@@ -58,7 +59,7 @@ const contentSlice = createSlice({
         selectContent: (state) => state.content
     },
     reducers: (create) => ({
-        addPageContent: create.reducer((state, { payload }: PayloadAction<Omit<ContentModel, '_id'>>) => {
+        addPageContent: create.reducer((state, { payload }: PayloadAction<CreateContentDto>) => {
             const newContent: ContentModel = {
                 _id: uuidv4(),
                 ...payload

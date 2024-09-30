@@ -1,4 +1,6 @@
 import { ContactModel } from '../../models/contact.model';
+import { ContactDto } from '../../dto/contact.dto';
+
 import contactReducer, {
     addContact,
     editContact,
@@ -14,7 +16,7 @@ describe('contactSlice', () => {
     });
 
     it('should add new contact item with "addContact" action', () => {
-        const newContact: Omit<ContactModel, '_id'> = {
+        const newContact: ContactDto = {
             label: 'Test',
             body: 'User',
             href: 'https://link-example.com',

@@ -1,5 +1,5 @@
-import { v4 as uuidv4 } from 'uuid';
 import { SkillModel } from '../../models/skill.model';
+import { SkillDto } from '../../dto/skill.dto';
 import skillReducer, {
     addSkill,
     editSkill,
@@ -15,8 +15,7 @@ describe('SkillSlice', () => {
     });
 
     it('should added new skill item with "addSkill" action', () => {
-        const newSkill: SkillModel = {
-            _id: uuidv4(),
+        const newSkill: SkillDto = {
             slug: 'test',
             label: 'Test',
             iconClass: 'icon-class-test'
@@ -26,7 +25,9 @@ describe('SkillSlice', () => {
         const result = skillReducer(initialState, action);
         const index = result.skills.length - 1;
 
-        expect(result.skills[index]).toEqual(newSkill);
+        expect(result.skills[index].slug).toBe<string>(newSkill.slug);
+        expect(result.skills[index].label).toBe<string>(newSkill.label);
+        expect(result.skills[index].iconClass).toBe<string>(newSkill.iconClass);
     });
 
     it('should edit skill item with "editSkill" action', () => {

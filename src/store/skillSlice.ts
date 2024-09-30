@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { SkillModel } from '../models/skill.model';
 import { v4 as uuidv4 } from 'uuid';
+import { SkillDto } from '../dto/skill.dto';
 
 interface SkillState {
     skills: Array<SkillModel>
@@ -50,7 +51,7 @@ export const skillSlice = createSlice({
         selectSkills: (state) => state.skills
     },
     reducers: (create) => ({
-        addSkill: create.reducer((state, { payload }: PayloadAction<Omit<SkillModel, '_id'>>) => {
+        addSkill: create.reducer((state, { payload }: PayloadAction<SkillDto>) => {
             const newSkill: SkillModel = {
                 _id: uuidv4(),
                 ...payload
