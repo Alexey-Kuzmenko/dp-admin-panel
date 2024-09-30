@@ -12,7 +12,7 @@ import { useAppDispatch, useAppSelector } from '../../hooks/redux-hooks';
 import { addPageContent, deletePageContent, editContent, selectContent } from '../../store/contentSlice';
 import { selectMenuSlice } from '../../store/menuSlice';
 
-import { modelsCodeBlocks } from '../../models/models-code-blocks';
+import { dtoCodeBlocks } from '../../dto/dto-code-blocks';
 import { ContentModel, Content as SubContent } from '../../models/content.model';
 import { contentModelKeys } from '../../models/content.model';
 import { AlertState, AlertType } from '../../types/alert-state.type';
@@ -150,7 +150,7 @@ export const Content = () => {
                 </AccordionSummary>
                 <AccordionDetails>
                     <CodeBlock
-                        code={modelsCodeBlocks.content}
+                        code={dtoCodeBlocks.content}
                         lang='typescript'
                     />
                 </AccordionDetails>

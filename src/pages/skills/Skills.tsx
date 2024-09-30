@@ -15,7 +15,7 @@ import { useAppDispatch, useAppSelector } from '../../hooks/redux-hooks';
 import { addSkill, deleteSkill, editSkill, selectSkills } from '../../store/skillSlice';
 import { selectMenuSlice } from '../../store/menuSlice';
 
-import { modelsCodeBlocks } from '../../models/models-code-blocks';
+import { dtoCodeBlocks } from '../../dto/dto-code-blocks';
 import { AlertState, AlertType } from '../../types/alert-state.type';
 import { SkillModel, skillModelKeys } from '../../models/skill.model';
 
@@ -138,7 +138,7 @@ export const Skills = () => {
                 </AccordionSummary>
                 <AccordionDetails>
                     <CodeBlock
-                        code={modelsCodeBlocks.skills}
+                        code={dtoCodeBlocks.skills}
                         lang='typescript'
                     />
                 </AccordionDetails>

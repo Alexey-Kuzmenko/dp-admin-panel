@@ -15,7 +15,7 @@ import { useAppDispatch, useAppSelector } from '../../hooks/redux-hooks';
 import { addContact, deleteContact, editContact, selectContacts } from '../../store/contactSlice';
 import { selectMenuSlice } from '../../store/menuSlice';
 
-import { modelsCodeBlocks } from '../../models/models-code-blocks';
+import { dtoCodeBlocks } from '../../dto/dto-code-blocks';
 import { ContactModel, contactModelKeys } from '../../models/contact.model';
 import { AlertState, AlertType } from '../../types/alert-state.type';
 
@@ -141,7 +141,7 @@ export const Contacts = () => {
                 </AccordionSummary>
                 <AccordionDetails>
                     <CodeBlock
-                        code={modelsCodeBlocks.contacts}
+                        code={dtoCodeBlocks.contacts}
                         lang='typescript'
                     />
                 </AccordionDetails>

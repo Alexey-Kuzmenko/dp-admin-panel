@@ -23,7 +23,7 @@ import { useAppDispatch, useAppSelector } from '../../hooks/redux-hooks';
 import { addUser, deleteUser, selectUsers } from '../../store/userSlice';
 import { selectMenuSlice } from '../../store/menuSlice';
 
-import { modelsCodeBlocks } from '../../models/models-code-blocks';
+import { dtoCodeBlocks } from '../../dto/dto-code-blocks';
 import { AlertState, AlertType } from '../../types/alert-state.type';
 import { UserModel } from '../../models/user.model';
 import { CreateUserDto, createUserDtoKeys } from '../../dto/user.dto';
@@ -128,7 +128,7 @@ export const Users = () => {
                 </AccordionSummary>
                 <AccordionDetails>
                     <CodeBlock
-                        code={modelsCodeBlocks.user}
+                        code={dtoCodeBlocks.user}
                         lang='typescript'
                     />
                 </AccordionDetails>

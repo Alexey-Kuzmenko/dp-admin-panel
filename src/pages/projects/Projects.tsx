@@ -12,7 +12,7 @@ import { useAppSelector, useAppDispatch } from '../../hooks/redux-hooks';
 import { addProject, deleteProject, editProject, selectProjects } from '../../store/projectSlice';
 import { selectMenuSlice } from '../../store/menuSlice';
 
-import { modelsCodeBlocks } from '../../models/models-code-blocks';
+import { dtoCodeBlocks } from '../../dto/dto-code-blocks';
 import { AlertState, AlertType } from '../../types/alert-state.type';
 import { ProjectModel, projectModelKeys } from '../../models/project.model';
 
@@ -140,7 +140,7 @@ export const Projects = () => {
                 </AccordionSummary>
                 <AccordionDetails>
                     <CodeBlock
-                        code={modelsCodeBlocks.projects}
+                        code={dtoCodeBlocks.projects}
                         lang='typescript'
                     />
                 </AccordionDetails>
