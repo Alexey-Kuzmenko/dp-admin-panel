@@ -1,0 +1,18 @@
+@use '../../scss/utilities/variables' as vars;
+@use '../Button/Button.module.scss';
+
+.UploadForm {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    color: vars.$white;
+
+    &__input {
+        &::file-selector-button {
+            @extend .Button;
+            @extend .Button_contained;
+            font-family: "Nunito Sans", sans-serif;
+        }
+    }
+}
