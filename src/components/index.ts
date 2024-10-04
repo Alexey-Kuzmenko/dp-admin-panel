@@ -8,3 +8,4 @@ export * from './Button/Button';
 export * from './Form/Form';
 export * from './Alert/Alert';
 export * from './MUI/StyledComponents';
+export * from './UploadForm/UploadForm';

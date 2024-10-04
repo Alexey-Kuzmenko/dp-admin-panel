@@ -69,5 +69,10 @@ export const dtoCodeBlocks = {
         userEmail: string
         userId: string
     }
+`,
+    images: `
+    interface DeleteImageDto {
+        imgPath: string
+    }
 `
 };

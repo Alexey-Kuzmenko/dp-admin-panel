@@ -1,18 +1,26 @@
 @use '../../scss/utilities/variables' as vars;
+@use '../../scss/utilities/placeholders';
 @use '../Button/Button.module.scss';
 
 .UploadForm {
     display: flex;
-    width: 100%;
     align-items: center;
     justify-content: space-between;
+
+    width: 100%;
+
     color: vars.$white;
 
     &__input {
         &::file-selector-button {
+            font-family: "Nunito Sans", sans-serif;
+
             @extend .Button;
             @extend .Button_contained;
-            font-family: "Nunito Sans", sans-serif;
         }
+    }
+
+    &__controls {
+        @extend %controls
     }
 }
