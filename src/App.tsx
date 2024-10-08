@@ -10,7 +10,8 @@ import {
   Skills,
   Projects,
   Users,
-  Images
+  Images,
+  UserProfile
 } from './pages';
 
 import styles from './App.module.scss';
@@ -27,6 +28,7 @@ function App() {
         <Route path='projects' element={<Projects />} />
         <Route path='skills' element={<Skills />} />
         <Route path='users' element={<Users />} />
+        <Route path='user-profile' element={<UserProfile />} />
       </Route>
     </Routes>
   );

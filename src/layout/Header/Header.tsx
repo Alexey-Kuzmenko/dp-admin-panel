@@ -4,7 +4,7 @@ import PersonIcon from '@mui/icons-material/Person';
 import { Menu } from '../../components';
 import { MenuLinkModel } from '../../types/menu-link.type';
 import generatePageTitle from '../../utils/generatePageTitle';
-import { useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 import styles from './Header.module.scss';
 
@@ -61,7 +61,9 @@ export const Header = () => {
                         </Typography>
                     </Box>
 
-                    <PersonIcon className={styles.Header__profileIcon} sx={{ fontSize: '2rem' }} />
+                    <Link to='user-profile'>
+                        <PersonIcon className={styles.Header__profileIcon} sx={{ fontSize: '2rem' }} />
+                    </Link>
                 </div>
             </Container>
         </header>
