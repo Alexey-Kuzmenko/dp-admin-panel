@@ -23,7 +23,7 @@ import { extractImgDirName } from '../../utils/extractImgDirName';
 
 import styles from './Images.module.scss';
 
-export const Images = () => {
+const Images: React.FC = () => {
     const imagesList = useAppSelector(selectImages);
     const { isMenuOpen } = useAppSelector(selectMenuSlice);
     const dispatch = useAppDispatch();
@@ -220,3 +220,5 @@ export const Images = () => {
         </div>
     );
 };
+
+export default Images;

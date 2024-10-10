@@ -40,7 +40,7 @@ const projectTemplate: Omit<ProjectModel, '_id'> = {
     technologies: []
 };
 
-export const Projects = () => {
+const Projects: React.FC = () => {
     const projects = useAppSelector(selectProjects);
     const { isMenuOpen } = useAppSelector(selectMenuSlice);
     const dispatch = useAppDispatch();
@@ -330,3 +330,5 @@ export const Projects = () => {
         </div>
     );
 };
+
+export default Projects;

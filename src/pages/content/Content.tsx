@@ -47,7 +47,7 @@ const contentTemplate: Omit<ContentModel, '_id'> = {
     }
 };
 
-export const Content = () => {
+const Content: React.FC = () => {
     const { isMenuOpen } = useAppSelector(selectMenuSlice);
     const content = useAppSelector(selectContent);
     const dispatch = useAppDispatch();
@@ -340,3 +340,5 @@ export const Content = () => {
         </div>
     );
 };
+
+export default Content;

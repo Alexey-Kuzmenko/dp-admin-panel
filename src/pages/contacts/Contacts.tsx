@@ -40,7 +40,7 @@ const contactTemplate: Omit<ContactModel, '_id'> = {
     atl: ''
 };
 
-export const Contacts = () => {
+const Contacts: React.FC = () => {
     const contacts = useAppSelector(selectContacts);
     const { isMenuOpen } = useAppSelector(selectMenuSlice);
     const dispatch = useAppDispatch();
@@ -332,3 +332,5 @@ export const Contacts = () => {
         </div>
     );
 };
+
+export default Contacts;

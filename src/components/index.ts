@@ -10,3 +10,4 @@ export * from './Alert/Alert';
 export * from './MUI/StyledComponents';
 export * from './UploadForm/UploadForm';
 export * from './CopyField/CopyField';
+export * from './Loader/Loader';

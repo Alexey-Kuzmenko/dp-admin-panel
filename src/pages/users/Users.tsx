@@ -46,7 +46,7 @@ const userTemplate: CreateUserDto = {
     email: ''
 };
 
-export const Users = () => {
+const Users: React.FC = () => {
     const users = useAppSelector(selectUsers);
     const { isMenuOpen } = useAppSelector(selectMenuSlice);
     const dispatch = useAppDispatch();
@@ -286,3 +286,5 @@ export const Users = () => {
         </div>
     );
 };
+
+export default Users;

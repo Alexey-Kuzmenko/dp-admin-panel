@@ -38,7 +38,7 @@ const skillTemplate: Omit<SkillModel, '_id'> = {
     iconClass: ''
 };
 
-export const Skills = () => {
+const Skills: React.FC = () => {
     const skills = useAppSelector(selectSkills);
     const { isMenuOpen } = useAppSelector(selectMenuSlice);
     const dispatch = useAppDispatch();
@@ -327,3 +327,5 @@ export const Skills = () => {
         </div>
     );
 };
+
+export default Skills;

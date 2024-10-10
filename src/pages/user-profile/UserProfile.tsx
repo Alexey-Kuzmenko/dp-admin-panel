@@ -14,7 +14,7 @@ const userData = {
     jwtToken: 'Token'
 };
 
-export const UserProfile = () => {
+export const UserProfile: React.FC = () => {
     const [alertState, setAlertState] = useState<AlertState>({ type: 'info', message: ALERT_COPY_MSG, isOpen: false });
 
     useEffect(() => {

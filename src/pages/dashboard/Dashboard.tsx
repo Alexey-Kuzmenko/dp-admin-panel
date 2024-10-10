@@ -3,7 +3,7 @@ import checkStatusCode from '../../utils/checkStatusCode';
 
 import styles from './Dashboard.module.scss';
 
-export const Dashboard = () => {
+export const Dashboard: React.FC = () => {
     const swaggerDocsUrl = import.meta.env.VITE_SWAGGER_DOCS;
     // ! testing
     const test = checkStatusCode(207);
