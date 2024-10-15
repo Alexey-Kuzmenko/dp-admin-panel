@@ -1,3 +1,9 @@
+@use '../../scss/utilities/variables' as vars;
+
 .Main {
     padding-top: calc(160px + (120 - 160) * ((100vw - 320px) / (1440 - 320)));
+
+    @media (min-width: vars.$xxl) {
+        padding-top: 120px
+    }
 }
