@@ -9,9 +9,10 @@ import { JsonEditor } from 'json-edit-react';
 import cn from 'classnames';
 
 import { useAppDispatch, useAppSelector } from '../../hooks/redux-hooks';
-import { addPageContent, deletePageContent, editContent } from '../../store/contentSlice';
+import { addPageContent, deletePageContent, editContent, selectContent } from '../../store/contentSlice';
+import { selectMenuSlice } from '../../store/menuSlice';
 
-import { modelsCodeBlocks } from '../../models/models-code-blocks';
+import { dtoCodeBlocks } from '../../dto/dto-code-blocks';
 import { ContentModel, Content as SubContent } from '../../models/content.model';
 import { contentModelKeys } from '../../models/content.model';
 import { AlertState, AlertType } from '../../types/alert-state.type';
@@ -46,9 +47,9 @@ const contentTemplate: Omit<ContentModel, '_id'> = {
     }
 };
 
-export const Content = () => {
-    const isMenuOpen = useAppSelector((store) => store.menu.isMenuOpen);
-    const content = useAppSelector((store) => store.content.content);
+const Content: React.FC = () => {
+    const { isMenuOpen } = useAppSelector(selectMenuSlice);
+    const content = useAppSelector(selectContent);
     const dispatch = useAppDispatch();
     const contentTypes = generateContentFormValues(content);
     const contentIds = content.map((c) => c._id);
@@ -149,7 +150,7 @@ export const Content = () => {
                 </AccordionSummary>
                 <AccordionDetails>
                     <CodeBlock
-                        code={modelsCodeBlocks.content}
+                        code={dtoCodeBlocks.content}
                         lang='typescript'
                     />
                 </AccordionDetails>
@@ -269,14 +270,13 @@ export const Content = () => {
                                         onUpdate={({ newData }) => {
                                             setEditedContent(newData);
                                         }}
-                                        restrictAdd={({ key }) => key in editContent}
                                         restrictDelete={({ key }) => contentModelKeys.includes(key as string)}
                                         restrictEdit={({ key }) => key === '_id'}
                                         restrictTypeSelection={({ value }) => {
                                             if (typeof value === 'boolean') return false;
-                                            if (typeof value === 'string') return ['string'];
                                             return ['string', 'array'];
                                         }}
+                                        defaultValue={''}
                                     />
                                 </Box>
                     }
@@ -340,3 +340,5 @@ export const Content = () => {
         </div>
     );
 };
+
+export default Content;

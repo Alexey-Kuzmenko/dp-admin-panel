@@ -12,9 +12,10 @@ import cn from 'classnames';
 import { JsonEditor } from 'json-edit-react';
 
 import { useAppDispatch, useAppSelector } from '../../hooks/redux-hooks';
-import { addContact, deleteContact, editContact } from '../../store/contactSlice';
+import { addContact, deleteContact, editContact, selectContacts } from '../../store/contactSlice';
+import { selectMenuSlice } from '../../store/menuSlice';
 
-import { modelsCodeBlocks } from '../../models/models-code-blocks';
+import { dtoCodeBlocks } from '../../dto/dto-code-blocks';
 import { ContactModel, contactModelKeys } from '../../models/contact.model';
 import { AlertState, AlertType } from '../../types/alert-state.type';
 
@@ -39,9 +40,9 @@ const contactTemplate: Omit<ContactModel, '_id'> = {
     atl: ''
 };
 
-export const Contacts = () => {
-    const contacts = useAppSelector((store) => store.contacts.contacts);
-    const isMenuOpen = useAppSelector((store) => store.menu.isMenuOpen);
+const Contacts: React.FC = () => {
+    const contacts = useAppSelector(selectContacts);
+    const { isMenuOpen } = useAppSelector(selectMenuSlice);
     const dispatch = useAppDispatch();
     const contactsIds = contacts.map((c) => c._id);
 
@@ -123,8 +124,9 @@ export const Contacts = () => {
         }, timeout);
     }
 
+    // ! data attribute added for tests
     return (
-        <div className={styles.Contacts}>
+        <div className={styles.Contacts} data-testid="contacts-page">
 
             {/* DTO accordion */}
             <Accordion className={cn(styles.Contacts__accordion, {
@@ -139,7 +141,7 @@ export const Contacts = () => {
                 </AccordionSummary>
                 <AccordionDetails>
                     <CodeBlock
-                        code={modelsCodeBlocks.contacts}
+                        code={dtoCodeBlocks.contacts}
                         lang='typescript'
                     />
                 </AccordionDetails>
@@ -202,11 +204,10 @@ export const Contacts = () => {
                                 }}
                                 restrictAdd={({ fullData }) => fullData !== null}
                                 restrictDelete={({ key }) => contactModelKeys.includes(key as string)}
-                                restrictTypeSelection={({ value }) => {
-                                    if (typeof value === 'boolean') return false;
-                                    if (typeof value === 'string') return ['string'];
+                                restrictTypeSelection={() => {
                                     return ['string'];
                                 }}
+                                defaultValue={''}
                             />
                     }
 
@@ -331,3 +332,5 @@ export const Contacts = () => {
         </div>
     );
 };
+
+export default Contacts;

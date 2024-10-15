@@ -4,7 +4,7 @@ import { AlertState } from '../../types/alert-state.type';
 
 import styles from './Alert.module.scss';
 
-interface AlertProps extends AlertState {
+export interface AlertProps extends AlertState {
     onClose: () => void
 }
 

@@ -1,0 +1,21 @@
+@use '../../scss/utilities/placeholders';
+
+.Skills {
+    &__accordion {
+        &_hidden {
+            @extend %accordion-hidden;
+        }
+
+        @extend %accordion;
+    }
+
+    &__jsonEditor {
+        @extend %json-editor;
+    }
+
+    &__jsonEditorControls {
+        margin: 30px 0 0 auto;
+
+        @extend %controls;
+    }
+}

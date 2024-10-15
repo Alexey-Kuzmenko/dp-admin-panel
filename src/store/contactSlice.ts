@@ -1,13 +1,14 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { v4 as uuidv4 } from 'uuid';
 import { ContactModel } from '../models/contact.model';
+import { ContactDto } from '../dto/contact.dto';
 
 interface ContactState {
     contacts: Array<ContactModel>
 }
 
-// * state with temporary data
-const initialState: ContactState = {
+// * state with temporary data. This value exported for only for tests
+export const initialState: ContactState = {
     contacts: [
         {
             _id: '65f1899dd7226661102dede3',
@@ -44,19 +45,24 @@ const initialState: ContactState = {
 const contactSlice = createSlice({
     name: 'contacts',
     initialState,
-    reducers: {
-        addContact: (state, { payload }: PayloadAction<Omit<ContactModel, '_id'>>) => {
+    selectors: {
+        selectContacts: (state) => state.contacts
+    },
+    reducers: (create) => ({
+        addContact: create.reducer((state, { payload }: PayloadAction<ContactDto>) => {
             const newContact: ContactModel = {
                 _id: uuidv4(),
                 ...payload
             };
 
             state.contacts.push(newContact);
-        },
-        deleteContact: (state, { payload }: PayloadAction<string>) => {
+        }),
+
+        deleteContact: create.reducer((state, { payload }: PayloadAction<string>) => {
             state.contacts = state.contacts.filter((c) => c._id !== payload);
-        },
-        editContact: (state, { payload }: PayloadAction<ContactModel>) => {
+        }),
+
+        editContact: create.reducer((state, { payload }: PayloadAction<ContactModel>) => {
             const contact = state.contacts.find((c) => c._id === payload._id);
 
             if (contact) {
@@ -65,9 +71,11 @@ const contactSlice = createSlice({
                 contactsCopy[contactIndex] = payload;
                 state.contacts = contactsCopy;
             }
-        }
-    }
+        })
+    })
 });
+
+export const { selectContacts } = contactSlice.selectors;
 
 export const { addContact, deleteContact, editContact } = contactSlice.actions;
 

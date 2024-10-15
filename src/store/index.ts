@@ -1,13 +1,21 @@
 import { configureStore } from '@reduxjs/toolkit';
-import menuSlice from './menuSlice';
-import contactSlice from './contactSlice';
-import contentSlice from './contentSlice';
+import menuReducer from './menuSlice';
+import contactReducer from './contactSlice';
+import contentReducer from './contentSlice';
+import skillReducer from './skillSlice';
+import projectSlice from './projectSlice';
+import userSlice from './userSlice';
+import imageSlice from './imageSlice';
 
 const store = configureStore({
     reducer: {
-        menu: menuSlice,
-        contacts: contactSlice,
-        content: contentSlice,
+        menu: menuReducer,
+        contacts: contactReducer,
+        content: contentReducer,
+        skills: skillReducer,
+        projects: projectSlice,
+        users: userSlice,
+        image: imageSlice
     }
 });
 
