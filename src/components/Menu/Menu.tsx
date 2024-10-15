@@ -5,7 +5,7 @@ import { Backdrop, Box } from '@mui/material';
 import { MenuLink } from '../MenuLink/MenuLink';
 import { MenuLinkModel } from '../../types/menu-link.type';
 import { useAppSelector, useAppDispatch } from '../../hooks/redux-hooks';
-import { closeMenu } from '../../store/menuSlice';
+import { closeMenu, selectMenuSlice } from '../../store/menuSlice';
 import { v4 as uuidv4 } from 'uuid';
 
 import Logo from '../../assets/Logo.svg';
@@ -15,9 +15,12 @@ interface MenuProps {
     menuLinks: Array<MenuLinkModel>
 }
 
+const body = document.body;
+
 export const Menu: React.FC<MenuProps> = ({ menuLinks }) => {
     const dispatch = useAppDispatch();
-    const isMenuOpen = useAppSelector((store) => store.menu.isMenuOpen);
+    const { isMenuOpen } = useAppSelector(selectMenuSlice);
+    body.dataset.bodyScroll = String(!isMenuOpen);
 
     const handleBackdropClick = (): void => {
         dispatch(closeMenu());
