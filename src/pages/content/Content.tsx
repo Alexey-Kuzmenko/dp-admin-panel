@@ -116,7 +116,9 @@ const Content: React.FC = () => {
 
     const handleDelete = (): void => {
         dispatch(deletePageContent(deletedContentId));
-        setAlertState({ type: 'success', isOpen: true, message: 'Contact successfully deleted' });
+        setDeletedContentId('');
+
+        setAlertState({ type: 'success', isOpen: true, message: 'Content successfully deleted' });
         hideAlertAutomatically('success');
     };
 
@@ -297,13 +299,13 @@ const Content: React.FC = () => {
                     aria-controls='delete-content-accordion-content'
                     id='delete-content-accordion-header'
                 >
-                    <Typography component='h1' variant='h5'>Delete contact</Typography>
+                    <Typography component='h1' variant='h5'>Delete content</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
 
                     <SelectionForm
                         values={contentIds}
-                        label='Choose contact id'
+                        label='Choose content id'
                         selectId='content-select'
                         labelId='content-select-label'
                         id='content-select-form'
@@ -315,7 +317,7 @@ const Content: React.FC = () => {
                         !deletedContent
                             ?
                             <Typography component='h2' variant='h5' sx={{ textAlign: 'center', marginTop: '30px' }}>
-                                Contact ID is not selected
+                                Content ID is not selected
                             </Typography>
                             :
                             <Box component='div' sx={{ marginTop: '20px' }}>

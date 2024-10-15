@@ -104,6 +104,8 @@ const Skills: React.FC = () => {
 
     const handleDelete = (): void => {
         dispatch(deleteSkill(deletedSkillId));
+        setDeletedSkillId('');
+
         setAlertState({ type: 'success', isOpen: true, message: 'Skill successfully deleted' });
         hideAlertAutomatically('success');
     };

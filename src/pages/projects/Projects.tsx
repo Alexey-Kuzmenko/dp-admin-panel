@@ -106,7 +106,9 @@ const Projects: React.FC = () => {
 
     const handleDelete = (): void => {
         dispatch(deleteProject(deletedProjectId));
-        setAlertState({ type: 'success', isOpen: true, message: 'Contact successfully deleted' });
+        setDeletedProjectId('');
+
+        setAlertState({ type: 'success', isOpen: true, message: 'Project successfully deleted' });
         hideAlertAutomatically('success');
     };
 

@@ -106,6 +106,8 @@ const Contacts: React.FC = () => {
 
     const handleDelete = (): void => {
         dispatch(deleteContact(deletedContactId));
+        setDeletedContactId('');
+
         setAlertState({ type: 'success', isOpen: true, message: 'Contact successfully deleted' });
         hideAlertAutomatically('success');
     };

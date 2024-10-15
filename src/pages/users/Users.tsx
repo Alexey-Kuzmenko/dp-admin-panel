@@ -94,7 +94,9 @@ const Users: React.FC = () => {
 
     const handleDelete = (): void => {
         dispatch(deleteUser(deletedUserId));
-        setAlertState({ type: 'success', isOpen: true, message: 'Contact successfully deleted' });
+        setDeletedUserId('');
+
+        setAlertState({ type: 'success', isOpen: true, message: 'User successfully deleted' });
         hideAlertAutomatically('success');
     };
 
