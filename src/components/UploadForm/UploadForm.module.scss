@@ -5,6 +5,9 @@
 .UploadForm {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
+    row-gap: 30px;
+
     justify-content: space-between;
 
     width: 100%;
@@ -12,15 +15,21 @@
     color: vars.$white;
 
     &__input {
+        width: 100%;
+
         &::file-selector-button {
             font-family: "Nunito Sans", sans-serif;
 
             @extend .Button;
             @extend .Button_contained;
         }
+
+        @media (min-width: vars.$sm) {
+            width: auto;
+        }
     }
 
     &__controls {
-        @extend %controls
+        @extend %controls;
     }
 }
