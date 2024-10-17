@@ -197,26 +197,28 @@ const Contacts: React.FC = () => {
                                 {JSON_EDITOR_WARN_MSG}
                             </Typography>
                             :
-                            <JsonEditor
-                                data={newContact}
-                                className={styles.Contacts__jsonEditor}
-                                theme='githubDark'
-                                onUpdate={({ newData }) => {
-                                    setNewContact(newData);
-                                }}
-                                restrictAdd={({ fullData }) => fullData !== null}
-                                restrictDelete={({ key }) => contactModelKeys.includes(key as string)}
-                                restrictTypeSelection={() => {
-                                    return ['string'];
-                                }}
-                                defaultValue={''}
-                            />
-                    }
+                            <>
+                                <JsonEditor
+                                    data={newContact}
+                                    className={styles.Contacts__jsonEditor}
+                                    theme='githubDark'
+                                    onUpdate={({ newData }) => {
+                                        setNewContact(newData);
+                                    }}
+                                    restrictAdd={({ fullData }) => fullData !== null}
+                                    restrictDelete={({ key }) => contactModelKeys.includes(key as string)}
+                                    restrictTypeSelection={() => {
+                                        return ['string'];
+                                    }}
+                                    defaultValue={''}
+                                />
 
-                    <div className={styles.Contacts__jsonEditorControls}>
-                        <Button onClick={() => handleSave('add')}>Save changes</Button>
-                        <Button variant='outlined' onClick={() => handleReset('add')}>Reset state</Button>
-                    </div>
+                                <div className={styles.Contacts__jsonEditorControls}>
+                                    <Button onClick={() => handleSave('add')}>Save changes</Button>
+                                    <Button variant='outlined' onClick={() => handleReset('add')}>Reset state</Button>
+                                </div>
+                            </>
+                    }
                 </AccordionDetails>
             </Accordion>
 
@@ -253,32 +255,35 @@ const Contacts: React.FC = () => {
                                     {JSON_EDITOR_WARN_MSG}
                                 </Typography>
                                 :
+                                <>
+                                    <Box component='div' sx={{ marginTop: '20px' }}>
+                                        <JsonEditor
+                                            data={editedContact}
+                                            className={styles.Contacts__jsonEditor}
+                                            theme='githubDark'
+                                            onUpdate={({ newData }) => {
+                                                setEditedContact(newData);
+                                            }}
+                                            restrictAdd={({ key }) => key in editContact}
+                                            restrictDelete={({ key }) => contactModelKeys.includes(key as string)}
+                                            restrictEdit={({ key }) => key === '_id'}
+                                            restrictTypeSelection={({ value }) => {
+                                                if (typeof value === 'boolean') return false;
+                                                if (typeof value === 'string') return ['string'];
+                                                return ['string'];
+                                            }}
+                                            defaultValue={''}
+                                        />
+                                    </Box>
 
-                                <Box component='div' sx={{ marginTop: '20px' }}>
-                                    <JsonEditor
-                                        data={editedContact}
-                                        className={styles.Contacts__jsonEditor}
-                                        theme='githubDark'
-                                        onUpdate={({ newData }) => {
-                                            setEditedContact(newData);
-                                        }}
-                                        restrictAdd={({ key }) => key in editContact}
-                                        restrictDelete={({ key }) => contactModelKeys.includes(key as string)}
-                                        restrictEdit={({ key }) => key === '_id'}
-                                        restrictTypeSelection={({ value }) => {
-                                            if (typeof value === 'boolean') return false;
-                                            if (typeof value === 'string') return ['string'];
-                                            return ['string'];
-                                        }}
-                                        defaultValue={''}
-                                    />
-                                </Box>
+                                    <div className={styles.Contacts__jsonEditorControls}>
+                                        <Button onClick={() => handleSave('edit')}>Save changes</Button>
+                                        <Button variant='outlined' onClick={() => handleReset('edit')}>
+                                            Reset state
+                                        </Button>
+                                    </div>
+                                </>
                     }
-
-                    <div className={styles.Contacts__jsonEditorControls}>
-                        <Button onClick={() => handleSave('edit')}>Save changes</Button>
-                        <Button variant='outlined' onClick={() => handleReset('edit')}>Reset state</Button>
-                    </div>
                 </AccordionDetails>
             </Accordion>
 

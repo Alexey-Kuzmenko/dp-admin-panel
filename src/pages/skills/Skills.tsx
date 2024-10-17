@@ -194,27 +194,29 @@ const Skills: React.FC = () => {
                                 {JSON_EDITOR_WARN_MSG}
                             </Typography>
                             :
-                            <JsonEditor
-                                data={newSkill}
-                                className={styles.Skills__jsonEditor}
-                                theme='githubDark'
-                                onUpdate={({ newData }) => {
-                                    setNewSkill(newData);
-                                }}
-                                restrictAdd={({ fullData }) => fullData !== null}
-                                restrictDelete={({ key }) => skillModelKeys.includes(key as string)}
-                                restrictTypeSelection={({ value }) => {
-                                    if (typeof value === 'boolean') return false;
-                                    if (typeof value === 'string') return ['string'];
-                                    return ['string'];
-                                }}
-                            />
-                    }
+                            <>
+                                <JsonEditor
+                                    data={newSkill}
+                                    className={styles.Skills__jsonEditor}
+                                    theme='githubDark'
+                                    onUpdate={({ newData }) => {
+                                        setNewSkill(newData);
+                                    }}
+                                    restrictAdd={({ fullData }) => fullData !== null}
+                                    restrictDelete={({ key }) => skillModelKeys.includes(key as string)}
+                                    restrictTypeSelection={({ value }) => {
+                                        if (typeof value === 'boolean') return false;
+                                        if (typeof value === 'string') return ['string'];
+                                        return ['string'];
+                                    }}
+                                />
 
-                    <div className={styles.Skills__jsonEditorControls}>
-                        <Button onClick={() => handleSave('add')}>Save changes</Button>
-                        <Button variant='outlined' onClick={() => handleReset('add')}>Reset state</Button>
-                    </div>
+                                <div className={styles.Skills__jsonEditorControls}>
+                                    <Button onClick={() => handleSave('add')}>Save changes</Button>
+                                    <Button variant='outlined' onClick={() => handleReset('add')}>Reset state</Button>
+                                </div>
+                            </>
+                    }
                 </AccordionDetails>
             </Accordion>
 
@@ -251,29 +253,32 @@ const Skills: React.FC = () => {
                                     {JSON_EDITOR_WARN_MSG}
                                 </Typography>
                                 :
+                                <>
+                                    <Box component='div' sx={{ marginTop: '20px' }}>
+                                        <JsonEditor
+                                            data={editedSkill}
+                                            className={styles.Skills__jsonEditor}
+                                            theme='githubDark'
+                                            onUpdate={({ newData }) => {
+                                                setEditedSkill(newData);
+                                            }}
+                                            restrictAdd={({ fullData }) => fullData !== null}
+                                            restrictDelete={({ key }) => skillModelKeys.includes(key as string)}
+                                            restrictEdit={({ key }) => key === '_id'}
+                                            restrictTypeSelection={() => {
+                                                return ['string'];
+                                            }}
+                                        />
+                                    </Box>
 
-                                <Box component='div' sx={{ marginTop: '20px' }}>
-                                    <JsonEditor
-                                        data={editedSkill}
-                                        className={styles.Skills__jsonEditor}
-                                        theme='githubDark'
-                                        onUpdate={({ newData }) => {
-                                            setEditedSkill(newData);
-                                        }}
-                                        restrictAdd={({ fullData }) => fullData !== null}
-                                        restrictDelete={({ key }) => skillModelKeys.includes(key as string)}
-                                        restrictEdit={({ key }) => key === '_id'}
-                                        restrictTypeSelection={() => {
-                                            return ['string'];
-                                        }}
-                                    />
-                                </Box>
+                                    <div className={styles.Skills__jsonEditorControls}>
+                                        <Button onClick={() => handleSave('edit')}>Save changes</Button>
+                                        <Button variant='outlined' onClick={() => handleReset('edit')}>
+                                            Reset state
+                                        </Button>
+                                    </div>
+                                </>
                     }
-
-                    <div className={styles.Skills__jsonEditorControls}>
-                        <Button onClick={() => handleSave('edit')}>Save changes</Button>
-                        <Button variant='outlined' onClick={() => handleReset('edit')}>Reset state</Button>
-                    </div>
                 </AccordionDetails>
             </Accordion>
 

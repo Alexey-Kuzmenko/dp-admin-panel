@@ -213,26 +213,29 @@ const Users: React.FC = () => {
                                 {JSON_EDITOR_WARN_MSG}
                             </Typography>
                             :
-                            <JsonEditor
-                                data={newUser}
-                                className={styles.Users__jsonEditor}
-                                theme='githubDark'
-                                onUpdate={({ newData }) => {
-                                    setNewUser(newData);
-                                }}
-                                restrictAdd={({ fullData }) => fullData !== null}
-                                restrictDelete={({ key }) => createUserDtoKeys.includes(key as string)}
-                                restrictTypeSelection={({ value }) => {
-                                    if (typeof value === 'boolean') return false;
-                                    if (typeof value === 'string') return ['string'];
-                                    return ['string'];
-                                }}
-                            />
+                            <>
+                                <JsonEditor
+                                    data={newUser}
+                                    className={styles.Users__jsonEditor}
+                                    theme='githubDark'
+                                    onUpdate={({ newData }) => {
+                                        setNewUser(newData);
+                                    }}
+                                    restrictAdd={({ fullData }) => fullData !== null}
+                                    restrictDelete={({ key }) => createUserDtoKeys.includes(key as string)}
+                                    restrictTypeSelection={({ value }) => {
+                                        if (typeof value === 'boolean') return false;
+                                        if (typeof value === 'string') return ['string'];
+                                        return ['string'];
+                                    }}
+                                />
+
+                                <div className={styles.Users__jsonEditorControls}>
+                                    <Button onClick={() => handleSave()}>Save changes</Button>
+                                    <Button variant='outlined' onClick={() => handleReset()}>Reset state</Button>
+                                </div>
+                            </>
                     }
-                    <div className={styles.Users__jsonEditorControls}>
-                        <Button onClick={() => handleSave()}>Save changes</Button>
-                        <Button variant='outlined' onClick={() => handleReset()}>Reset state</Button>
-                    </div>
                 </AccordionDetails>
             </Accordion>
 

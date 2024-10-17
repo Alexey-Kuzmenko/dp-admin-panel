@@ -206,28 +206,30 @@ const Content: React.FC = () => {
                                 {JSON_EDITOR_WARN_MSG}
                             </Typography>
                             :
-                            <JsonEditor
-                                data={newContent}
-                                className={styles.Content__jsonEditor}
-                                theme='githubDark'
-                                onUpdate={({ newData }) => {
-                                    setNewContent(newData);
-                                }}
-                                restrictAdd={({ fullData }) => fullData !== null}
-                                restrictDelete={({ key }) => contentModelKeys.includes(key as string)}
-                                restrictTypeSelection={({ path, value }) => {
-                                    if (path.includes('type')) return ['string'];
-                                    if (typeof value === 'boolean') return false;
-                                    if (typeof value === 'string') return ['string'];
-                                    return ['string', 'object'];
-                                }}
-                            />
-                    }
+                            <>
+                                <JsonEditor
+                                    data={newContent}
+                                    className={styles.Content__jsonEditor}
+                                    theme='githubDark'
+                                    onUpdate={({ newData }) => {
+                                        setNewContent(newData);
+                                    }}
+                                    restrictAdd={({ fullData }) => fullData !== null}
+                                    restrictDelete={({ key }) => contentModelKeys.includes(key as string)}
+                                    restrictTypeSelection={({ path, value }) => {
+                                        if (path.includes('type')) return ['string'];
+                                        if (typeof value === 'boolean') return false;
+                                        if (typeof value === 'string') return ['string'];
+                                        return ['string', 'object'];
+                                    }}
+                                />
 
-                    <div className={styles.Content__jsonEditorControls}>
-                        <Button onClick={() => handleSave('add')}>Save changes</Button>
-                        <Button variant='outlined' onClick={() => handleReset('add')}>Reset state</Button>
-                    </div>
+                                <div className={styles.Content__jsonEditorControls}>
+                                    <Button onClick={() => handleSave('add')}>Save changes</Button>
+                                    <Button variant='outlined' onClick={() => handleReset('add')}>Reset state</Button>
+                                </div>
+                            </>
+                    }
                 </AccordionDetails>
             </Accordion>
 
@@ -264,29 +266,33 @@ const Content: React.FC = () => {
                                     {JSON_EDITOR_WARN_MSG}
                                 </Typography>
                                 :
-                                <Box component='div' sx={{ marginTop: '20px' }}>
-                                    <JsonEditor
-                                        data={editedContent}
-                                        className={styles.Content__jsonEditor}
-                                        theme='githubDark'
-                                        onUpdate={({ newData }) => {
-                                            setEditedContent(newData);
-                                        }}
-                                        restrictDelete={({ key }) => contentModelKeys.includes(key as string)}
-                                        restrictEdit={({ key }) => key === '_id'}
-                                        restrictTypeSelection={({ value }) => {
-                                            if (typeof value === 'boolean') return false;
-                                            return ['string', 'array'];
-                                        }}
-                                        defaultValue={''}
-                                    />
-                                </Box>
-                    }
+                                <>
+                                    <Box component='div' sx={{ marginTop: '20px' }}>
+                                        <JsonEditor
+                                            data={editedContent}
+                                            className={styles.Content__jsonEditor}
+                                            theme='githubDark'
+                                            onUpdate={({ newData }) => {
+                                                setEditedContent(newData);
+                                            }}
+                                            restrictDelete={({ key }) => contentModelKeys.includes(key as string)}
+                                            restrictEdit={({ key }) => key === '_id'}
+                                            restrictTypeSelection={({ value }) => {
+                                                if (typeof value === 'boolean') return false;
+                                                return ['string', 'array'];
+                                            }}
+                                            defaultValue={''}
+                                        />
+                                    </Box>
 
-                    <div className={styles.Content__jsonEditorControls}>
-                        <Button onClick={() => handleSave('edit')}>Save changes</Button>
-                        <Button variant='outlined' onClick={() => handleReset('edit')}>Reset state</Button>
-                    </div>
+                                    <div className={styles.Content__jsonEditorControls}>
+                                        <Button onClick={() => handleSave('edit')}>Save changes</Button>
+                                        <Button variant='outlined' onClick={() => handleReset('edit')}>
+                                            Reset state
+                                        </Button>
+                                    </div>
+                                </>
+                    }
                 </AccordionDetails>
             </Accordion>
 
