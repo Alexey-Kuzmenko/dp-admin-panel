@@ -47,6 +47,7 @@ const userSlice = createSlice({
         deleteUser: create.reducer((state, { payload }: PayloadAction<string>) => {
             const deletedUser = state.users.find((u) => u._id === payload);
             // ! debug
+            // eslint-disable-next-line no-console
             console.log(deletedUser?.email);
 
             state.users = state.users.filter((u) => u._id !== payload);

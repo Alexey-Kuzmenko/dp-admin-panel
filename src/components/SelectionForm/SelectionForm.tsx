@@ -11,7 +11,6 @@ interface SelectionFormProps extends DetailedHTMLProps<FormHTMLAttributes<HTMLFo
     selectId: string
     labelId: string
     onFind: (value: string) => void
-    // onDelete?: React.MouseEventHandler
     onDelete?: () => void
 }
 
