@@ -16,11 +16,12 @@ import { addSkill, deleteSkill, editSkill, selectSkills } from '../../store/skil
 import { selectMenuSlice } from '../../store/menuSlice';
 
 import { dtoCodeBlocks } from '../../dto/dto-code-blocks';
-import { AlertState, AlertType } from '../../types/alert-state.type';
+import { AlertState } from '../../types/alert-state.type';
 import { SkillModel, skillModelKeys } from '../../models/skill.model';
 
 import generateCodeBlock from '../../utils/generateCodeBlock';
-import { validateValue } from '../../utils/validateValue';
+import validateValue from '../../utils/validateValue';
+import hideAlertAutomatically from '../../utils/hideAlertAutomatically';
 
 import {
     VIEWPORT_MIN_WIDTH,
@@ -59,23 +60,23 @@ const Skills: React.FC = () => {
         if (action === 'add') {
             if (validateValue(newSkill) === false) {
                 setAlertState({ type: 'error', isOpen: true, message: ALERT_ERROR_MGS });
-                hideAlertAutomatically('error');
+                hideAlertAutomatically('error', alertState, setAlertState);
             } else {
                 dispatch(addSkill(newSkill as SkillModel));
                 setNewSkill(skillTemplate);
                 setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
-                hideAlertAutomatically('success');
+                hideAlertAutomatically('success', alertState, setAlertState);
             }
         }
 
         if (action === 'edit' && editedSkill) {
             if (validateValue(editedSkill) === false) {
                 setAlertState({ type: 'error', isOpen: true, message: ALERT_ERROR_MGS });
-                hideAlertAutomatically('error');
+                hideAlertAutomatically('error', alertState, setAlertState);
             } else {
                 dispatch(editSkill(editedSkill as SkillModel));
                 setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
-                hideAlertAutomatically('success');
+                hideAlertAutomatically('success', alertState, setAlertState);
             }
         }
     };
@@ -90,7 +91,7 @@ const Skills: React.FC = () => {
         }
 
         setAlertState({ type: 'warning', isOpen: true, message: ALERT_RESET_MGS });
-        hideAlertAutomatically('warning');
+        hideAlertAutomatically('warning', alertState, setAlertState);
     };
 
     const handleFind = (id: string): void => {
@@ -107,22 +108,12 @@ const Skills: React.FC = () => {
         setDeletedSkillId('');
 
         setAlertState({ type: 'success', isOpen: true, message: 'Skill successfully deleted' });
-        hideAlertAutomatically('success');
+        hideAlertAutomatically('success', alertState, setAlertState);
     };
 
     const handleAlertClose = () => {
         setAlertState({ ...alertState, isOpen: false });
     };
-
-    function hideAlertAutomatically(type: AlertType, timeout = 3_000): void {
-        setTimeout(() => {
-            setAlertState({
-                ...alertState,
-                type,
-                isOpen: false
-            });
-        }, timeout);
-    }
 
     return (
         <div className={styles.Skills}>

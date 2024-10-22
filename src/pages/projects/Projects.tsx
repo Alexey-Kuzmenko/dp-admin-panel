@@ -13,11 +13,12 @@ import { addProject, deleteProject, editProject, selectProjects } from '../../st
 import { selectMenuSlice } from '../../store/menuSlice';
 
 import { dtoCodeBlocks } from '../../dto/dto-code-blocks';
-import { AlertState, AlertType } from '../../types/alert-state.type';
+import { AlertState } from '../../types/alert-state.type';
 import { ProjectModel, projectModelKeys } from '../../models/project.model';
 
 import generateCodeBlock from '../../utils/generateCodeBlock';
-import { validateValue } from '../../utils/validateValue';
+import validateValue from '../../utils/validateValue';
+import hideAlertAutomatically from '../../utils/hideAlertAutomatically';
 
 import {
     ALERT_ERROR_MGS,
@@ -61,23 +62,23 @@ const Projects: React.FC = () => {
         if (action === 'add') {
             if (validateValue(newProject) === false) {
                 setAlertState({ type: 'error', isOpen: true, message: ALERT_ERROR_MGS });
-                hideAlertAutomatically('error');
+                hideAlertAutomatically('error', alertState, setAlertState);
             } else {
                 dispatch(addProject(newProject as ProjectModel));
                 setNewProject(projectTemplate);
                 setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
-                hideAlertAutomatically('success');
+                hideAlertAutomatically('success', alertState, setAlertState);
             }
         }
 
         if (action === 'edit' && editedProject) {
             if (validateValue(editedProject) === false) {
                 setAlertState({ type: 'error', isOpen: true, message: ALERT_ERROR_MGS });
-                hideAlertAutomatically('error');
+                hideAlertAutomatically('error', alertState, setAlertState);
             } else {
                 dispatch(editProject(editedProject as ProjectModel));
                 setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
-                hideAlertAutomatically('success');
+                hideAlertAutomatically('success', alertState, setAlertState);
             }
         }
     };
@@ -92,7 +93,7 @@ const Projects: React.FC = () => {
         }
 
         setAlertState({ type: 'warning', isOpen: true, message: ALERT_RESET_MGS });
-        hideAlertAutomatically('warning');
+        hideAlertAutomatically('warning', alertState, setAlertState);
     };
 
     const handleFind = (id: string): void => {
@@ -109,22 +110,12 @@ const Projects: React.FC = () => {
         setDeletedProjectId('');
 
         setAlertState({ type: 'success', isOpen: true, message: 'Project successfully deleted' });
-        hideAlertAutomatically('success');
+        hideAlertAutomatically('success', alertState, setAlertState);
     };
 
     const handleAlertClose = () => {
         setAlertState({ ...alertState, isOpen: false });
     };
-
-    function hideAlertAutomatically(type: AlertType, timeout = 3_000): void {
-        setTimeout(() => {
-            setAlertState({
-                ...alertState,
-                type,
-                isOpen: false
-            });
-        }, timeout);
-    }
 
     return (
         <div className={styles.Projects}>

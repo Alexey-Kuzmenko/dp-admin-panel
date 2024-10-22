@@ -1,4 +1,4 @@
-export function validateValue(obj: object): boolean {
+export default function validateValue(obj: object): boolean {
     let isValid = true;
 
     if (!Object.values(obj).length) {

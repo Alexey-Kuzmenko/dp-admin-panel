@@ -1,6 +1,6 @@
 import { Content, ContentModel } from '../models/content.model';
 
-export function findContent(content: Array<ContentModel>, fromValue: string): Content | undefined {
+export default function findContent(content: Array<ContentModel>, fromValue: string): Content | undefined {
     const [type, lang]: Array<string> = fromValue.replace(/\s+/g, '').split('|');
     const contentByType: ContentModel | undefined = content.find((c) => c.type === type);
 

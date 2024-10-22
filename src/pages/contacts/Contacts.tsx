@@ -17,10 +17,11 @@ import { selectMenuSlice } from '../../store/menuSlice';
 
 import { dtoCodeBlocks } from '../../dto/dto-code-blocks';
 import { ContactModel, contactModelKeys } from '../../models/contact.model';
-import { AlertState, AlertType } from '../../types/alert-state.type';
+import { AlertState } from '../../types/alert-state.type';
 
 import generateCodeBlock from '../../utils/generateCodeBlock';
-import { validateValue } from '../../utils/validateValue';
+import validateValue from '../../utils/validateValue';
+import hideAlertAutomatically from '../../utils/hideAlertAutomatically';
 
 import {
     VIEWPORT_MIN_WIDTH,
@@ -61,23 +62,23 @@ const Contacts: React.FC = () => {
         if (action === 'add') {
             if (validateValue(newContact) === false) {
                 setAlertState({ type: 'error', isOpen: true, message: ALERT_ERROR_MGS });
-                hideAlertAutomatically('error');
+                hideAlertAutomatically('error', alertState, setAlertState);
             } else {
                 dispatch(addContact(newContact as ContactModel));
                 setNewContact(contactTemplate);
                 setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
-                hideAlertAutomatically('success');
+                hideAlertAutomatically('success', alertState, setAlertState);
             }
         }
 
         if (action === 'edit' && editedContact) {
             if (validateValue(editedContact) === false) {
                 setAlertState({ type: 'error', isOpen: true, message: ALERT_ERROR_MGS });
-                hideAlertAutomatically('error');
+                hideAlertAutomatically('error', alertState, setAlertState);
             } else {
                 dispatch(editContact(editedContact as ContactModel));
                 setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
-                hideAlertAutomatically('success');
+                hideAlertAutomatically('success', alertState, setAlertState);
             }
         }
     };
@@ -92,7 +93,7 @@ const Contacts: React.FC = () => {
         }
 
         setAlertState({ type: 'warning', isOpen: true, message: ALERT_RESET_MGS });
-        hideAlertAutomatically('warning');
+        hideAlertAutomatically('warning', alertState, setAlertState);
     };
 
     const handleFind = (id: string): void => {
@@ -109,26 +110,15 @@ const Contacts: React.FC = () => {
         setDeletedContactId('');
 
         setAlertState({ type: 'success', isOpen: true, message: 'Contact successfully deleted' });
-        hideAlertAutomatically('success');
+        hideAlertAutomatically('success', alertState, setAlertState);
     };
 
     const handleAlertClose = () => {
         setAlertState({ ...alertState, isOpen: false });
     };
 
-    function hideAlertAutomatically(type: AlertType, timeout = 3_000): void {
-        setTimeout(() => {
-            setAlertState({
-                ...alertState,
-                type,
-                isOpen: false
-            });
-        }, timeout);
-    }
-
-    // ! data attribute added for tests
     return (
-        <div className={styles.Contacts} data-testid="contacts-page">
+        <div className={styles.Contacts}>
 
             {/* DTO accordion */}
             <Accordion className={cn(styles.Contacts__accordion, {

@@ -24,12 +24,13 @@ import { addUser, deleteUser, selectUsers } from '../../store/userSlice';
 import { selectMenuSlice } from '../../store/menuSlice';
 
 import { dtoCodeBlocks } from '../../dto/dto-code-blocks';
-import { AlertState, AlertType } from '../../types/alert-state.type';
+import { AlertState } from '../../types/alert-state.type';
 import { UserModel } from '../../models/user.model';
 import { CreateUserDto, createUserDtoKeys } from '../../dto/user.dto';
 
 import generateCodeBlock from '../../utils/generateCodeBlock';
-import { validateValue } from '../../utils/validateValue';
+import validateValue from '../../utils/validateValue';
+import hideAlertAutomatically from '../../utils/hideAlertAutomatically';
 
 import {
     ALERT_ERROR_MGS,
@@ -77,19 +78,19 @@ const Users: React.FC = () => {
     const handleSave = (): void => {
         if (validateValue(newUser) === false) {
             setAlertState({ type: 'error', isOpen: true, message: ALERT_ERROR_MGS });
-            hideAlertAutomatically('error');
+            hideAlertAutomatically('error', alertState, setAlertState);
         } else {
             dispatch(addUser(newUser as CreateUserDto));
             setNewUser(userTemplate);
             setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
-            hideAlertAutomatically('success');
+            hideAlertAutomatically('success', alertState, setAlertState);
         }
     };
 
     const handleReset = (): void => {
         setNewUser(userTemplate);
         setAlertState({ type: 'warning', isOpen: true, message: ALERT_RESET_MGS });
-        hideAlertAutomatically('warning');
+        hideAlertAutomatically('warning', alertState, setAlertState);
     };
 
     const handleDelete = (): void => {
@@ -97,22 +98,12 @@ const Users: React.FC = () => {
         setDeletedUserId('');
 
         setAlertState({ type: 'success', isOpen: true, message: 'User successfully deleted' });
-        hideAlertAutomatically('success');
+        hideAlertAutomatically('success', alertState, setAlertState);
     };
 
     const handleAlertClose = () => {
         setAlertState({ ...alertState, isOpen: false });
     };
-
-    function hideAlertAutomatically(type: AlertType, timeout = 3_000): void {
-        setTimeout(() => {
-            setAlertState({
-                ...alertState,
-                type,
-                isOpen: false
-            });
-        }, timeout);
-    }
 
     return (
         <div className={styles.Users}>

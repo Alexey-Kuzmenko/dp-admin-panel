@@ -15,12 +15,13 @@ import { selectMenuSlice } from '../../store/menuSlice';
 import { dtoCodeBlocks } from '../../dto/dto-code-blocks';
 import { ContentModel, Content as SubContent } from '../../models/content.model';
 import { contentModelKeys } from '../../models/content.model';
-import { AlertState, AlertType } from '../../types/alert-state.type';
+import { AlertState } from '../../types/alert-state.type';
 
-import { validateValue } from '../../utils/validateValue';
+import validateValue from '../../utils/validateValue';
 import generateCodeBlock from '../../utils/generateCodeBlock';
-import { generateContentFormValues } from '../../utils/generateContentFormValues';
-import { findContent } from '../../utils/findContent';
+import generateContentFormValues from '../../utils/generateContentFormValues';
+import findContent from '../../utils/findContent';
+import hideAlertAutomatically from '../../utils/hideAlertAutomatically';
 
 import {
     VIEWPORT_MIN_WIDTH,
@@ -70,23 +71,23 @@ const Content: React.FC = () => {
         if (action === 'add') {
             if (validateValue((newContent as ContentModel).eng) === false && ((newContent as ContentModel).ua)) {
                 setAlertState({ type: 'error', isOpen: true, message: ALERT_ERROR_MGS });
-                hideAlertAutomatically('error');
+                hideAlertAutomatically('error', alertState, setAlertState);
             } else {
                 dispatch(addPageContent(newContent as ContentModel));
                 setNewContent(contentTemplate);
                 setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
-                hideAlertAutomatically('success');
+                hideAlertAutomatically('success', alertState, setAlertState);
             }
         }
 
         if (action === 'edit' && editedContent && selectionFormValue.length) {
             if (validateValue(editedContent) === false) {
                 setAlertState({ type: 'error', isOpen: true, message: ALERT_ERROR_MGS });
-                hideAlertAutomatically('error');
+                hideAlertAutomatically('error', alertState, setAlertState);
             } else {
                 dispatch(editContent({ content: editedContent as SubContent, formValue: selectionFormValue }));
                 setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
-                hideAlertAutomatically('success');
+                hideAlertAutomatically('success', alertState, setAlertState);
             }
         }
     };
@@ -101,7 +102,7 @@ const Content: React.FC = () => {
         }
 
         setAlertState({ type: 'warning', isOpen: true, message: ALERT_RESET_MGS });
-        hideAlertAutomatically('warning');
+        hideAlertAutomatically('warning', alertState, setAlertState);
     };
 
     const handleFind = (value: string): void => {
@@ -119,22 +120,12 @@ const Content: React.FC = () => {
         setDeletedContentId('');
 
         setAlertState({ type: 'success', isOpen: true, message: 'Content successfully deleted' });
-        hideAlertAutomatically('success');
+        hideAlertAutomatically('success', alertState, setAlertState);
     };
 
     const handleAlertClose = () => {
         setAlertState({ ...alertState, isOpen: false });
     };
-
-    function hideAlertAutomatically(type: AlertType, timeout = 3_000): void {
-        setTimeout(() => {
-            setAlertState({
-                ...alertState,
-                type,
-                isOpen: false
-            });
-        }, timeout);
-    }
 
     return (
         <div className={styles.Content}>
