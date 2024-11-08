@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react';
+import React, { Suspense, useState } from 'react';
 import { Route, Routes } from 'react-router-dom';
 
 import { ThemeProvider } from '@mui/material';
@@ -6,7 +6,8 @@ import { theme } from './theme/ThemeRegistry';
 
 import { Layout } from './layout';
 import { Loader } from './components';
-import { Dashboard, UserProfile } from './pages';
+import { Dashboard, UserProfile, Login } from './pages';
+import { Register } from './pages/login/register/Register';
 
 import styles from './App.module.scss';
 
@@ -18,21 +19,34 @@ const Users = React.lazy<React.FC>(() => import('./pages/users/Users'));
 const Images = React.lazy<React.FC>(() => import('./pages/images/Images'));
 
 function App() {
+  // ! testing
+  const [isLogin, setIsLogin] = useState<boolean>(false);
 
-  const routes: JSX.Element = (
+  let routes: JSX.Element = (
     <Routes>
-      <Route path='/' element={<Layout />}>
-        <Route index element={<Dashboard />} />
-        <Route path='contacts' element={<Suspense fallback={<Loader />}><Contacts /></Suspense>} />
-        <Route path='content' element={<Suspense fallback={<Loader />}><Content /></Suspense>} />
-        <Route path='images' element={<Suspense fallback={<Loader />}><Images /></Suspense>} />
-        <Route path='projects' element={<Suspense fallback={<Loader />}><Projects /></Suspense>} />
-        <Route path='skills' element={<Suspense fallback={<Loader />}><Skills /></Suspense>} />
-        <Route path='users' element={<Suspense fallback={<Loader />}><Users /></Suspense>} />
-        <Route path='user-profile' element={<UserProfile />} />
+      <Route path='/'>
+        <Route index element={<Login />}></Route>
+        <Route path='login/register' element={<Register />} />
       </Route>
     </Routes>
   );
+
+  if (isLogin) {
+    routes = (
+      <Routes>
+        <Route path='/' element={<Layout />}>
+          <Route index element={<Dashboard />} />
+          <Route path='contacts' element={<Suspense fallback={<Loader />}><Contacts /></Suspense>} />
+          <Route path='content' element={<Suspense fallback={<Loader />}><Content /></Suspense>} />
+          <Route path='images' element={<Suspense fallback={<Loader />}><Images /></Suspense>} />
+          <Route path='projects' element={<Suspense fallback={<Loader />}><Projects /></Suspense>} />
+          <Route path='skills' element={<Suspense fallback={<Loader />}><Skills /></Suspense>} />
+          <Route path='users' element={<Suspense fallback={<Loader />}><Users /></Suspense>} />
+          <Route path='user-profile' element={<UserProfile />} />
+        </Route>
+      </Routes>
+    );
+  }
 
   return (
     <ThemeProvider theme={theme}>

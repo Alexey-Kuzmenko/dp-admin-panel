@@ -65,6 +65,7 @@ const themeOptions: ThemeOptions = {
                     '& .MuiInputLabel-root.Mui-focused.Mui-error': {
                         color: '#d32f2f'
                     },
+                    '.MuiFormHelperText-root': { color: '#FFFF' },
                     textarea: { color: '#FFFF' },
                     input: { color: '#FFFF' },
                 }
