@@ -13,11 +13,12 @@ import { addProject, deleteProject, editProject, selectProjects } from '../../st
 import { selectMenuSlice } from '../../store/menuSlice';
 
 import { dtoCodeBlocks } from '../../dto/dto-code-blocks';
-import { AlertState, AlertType } from '../../types/alert-state.type';
+import { AlertState } from '../../types/alert-state.type';
 import { ProjectModel, projectModelKeys } from '../../models/project.model';
 
 import generateCodeBlock from '../../utils/generateCodeBlock';
-import { validateValue } from '../../utils/validateValue';
+import validateValue from '../../utils/validateValue';
+import hideAlertAutomatically from '../../utils/hideAlertAutomatically';
 
 import {
     ALERT_ERROR_MGS,
@@ -61,23 +62,23 @@ const Projects: React.FC = () => {
         if (action === 'add') {
             if (validateValue(newProject) === false) {
                 setAlertState({ type: 'error', isOpen: true, message: ALERT_ERROR_MGS });
-                hideAlertAutomatically('error');
+                hideAlertAutomatically('error', alertState, setAlertState);
             } else {
                 dispatch(addProject(newProject as ProjectModel));
                 setNewProject(projectTemplate);
                 setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
-                hideAlertAutomatically('success');
+                hideAlertAutomatically('success', alertState, setAlertState);
             }
         }
 
         if (action === 'edit' && editedProject) {
             if (validateValue(editedProject) === false) {
                 setAlertState({ type: 'error', isOpen: true, message: ALERT_ERROR_MGS });
-                hideAlertAutomatically('error');
+                hideAlertAutomatically('error', alertState, setAlertState);
             } else {
                 dispatch(editProject(editedProject as ProjectModel));
                 setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
-                hideAlertAutomatically('success');
+                hideAlertAutomatically('success', alertState, setAlertState);
             }
         }
     };
@@ -92,7 +93,7 @@ const Projects: React.FC = () => {
         }
 
         setAlertState({ type: 'warning', isOpen: true, message: ALERT_RESET_MGS });
-        hideAlertAutomatically('warning');
+        hideAlertAutomatically('warning', alertState, setAlertState);
     };
 
     const handleFind = (id: string): void => {
@@ -106,23 +107,15 @@ const Projects: React.FC = () => {
 
     const handleDelete = (): void => {
         dispatch(deleteProject(deletedProjectId));
-        setAlertState({ type: 'success', isOpen: true, message: 'Contact successfully deleted' });
-        hideAlertAutomatically('success');
+        setDeletedProjectId('');
+
+        setAlertState({ type: 'success', isOpen: true, message: 'Project successfully deleted' });
+        hideAlertAutomatically('success', alertState, setAlertState);
     };
 
     const handleAlertClose = () => {
         setAlertState({ ...alertState, isOpen: false });
     };
-
-    function hideAlertAutomatically(type: AlertType, timeout = 3_000): void {
-        setTimeout(() => {
-            setAlertState({
-                ...alertState,
-                type,
-                isOpen: false
-            });
-        }, timeout);
-    }
 
     return (
         <div className={styles.Projects}>
@@ -194,26 +187,29 @@ const Projects: React.FC = () => {
                                 {JSON_EDITOR_WARN_MSG}
                             </Typography>
                             :
-                            <JsonEditor
-                                data={newProject}
-                                className={styles.Projects__jsonEditor}
-                                theme='githubDark'
-                                onUpdate={({ newData }) => {
-                                    setNewProject(newData);
-                                }}
-                                restrictAdd={({ fullData }) => fullData !== null}
-                                restrictDelete={({ key }) => projectModelKeys.includes(key as string)}
-                                restrictTypeSelection={({ value }) => {
-                                    if (typeof value === 'boolean') return false;
-                                    if (typeof value === 'string') return ['string'];
-                                    return ['string'];
-                                }}
-                            />
+                            <>
+                                <JsonEditor
+                                    data={newProject}
+                                    className={styles.Projects__jsonEditor}
+                                    theme='githubDark'
+                                    onUpdate={({ newData }) => {
+                                        setNewProject(newData);
+                                    }}
+                                    restrictAdd={({ fullData }) => fullData !== null}
+                                    restrictDelete={({ key }) => projectModelKeys.includes(key as string)}
+                                    restrictTypeSelection={({ value }) => {
+                                        if (typeof value === 'boolean') return false;
+                                        if (typeof value === 'string') return ['string'];
+                                        return ['string'];
+                                    }}
+                                />
+
+                                <div className={styles.Projects__jsonEditorControls}>
+                                    <Button onClick={() => handleSave('add')}>Save changes</Button>
+                                    <Button variant='outlined' onClick={() => handleReset('add')}>Reset state</Button>
+                                </div>
+                            </>
                     }
-                    <div className={styles.Projects__jsonEditorControls}>
-                        <Button onClick={() => handleSave('add')}>Save changes</Button>
-                        <Button variant='outlined' onClick={() => handleReset('add')}>Reset state</Button>
-                    </div>
                 </AccordionDetails>
             </Accordion>
 
@@ -250,31 +246,34 @@ const Projects: React.FC = () => {
                                     {JSON_EDITOR_WARN_MSG}
                                 </Typography>
                                 :
+                                <>
+                                    <Box component='div' sx={{ marginTop: '20px' }}>
+                                        <JsonEditor
+                                            data={editedProject}
+                                            className={styles.Projects__jsonEditor}
+                                            theme='githubDark'
+                                            onUpdate={({ newData }) => {
+                                                setEditedProject(newData);
+                                            }}
+                                            restrictAdd={({ key }) => key !== 'technologies' && key !== 'tags'}
+                                            restrictDelete={({ key }) => projectModelKeys.includes(key as string)}
+                                            restrictEdit={({ key }) => key === '_id'}
+                                            restrictTypeSelection={({ value }) => {
+                                                if (typeof value === 'boolean') return false;
+                                                return ['string', 'object'];
+                                            }}
+                                            defaultValue={''}
+                                        />
+                                    </Box>
 
-                                <Box component='div' sx={{ marginTop: '20px' }}>
-                                    <JsonEditor
-                                        data={editedProject}
-                                        className={styles.Projects__jsonEditor}
-                                        theme='githubDark'
-                                        onUpdate={({ newData }) => {
-                                            setEditedProject(newData);
-                                        }}
-                                        restrictAdd={({ key }) => key !== 'technologies' && key !== 'tags'}
-                                        restrictDelete={({ key }) => projectModelKeys.includes(key as string)}
-                                        restrictEdit={({ key }) => key === '_id'}
-                                        restrictTypeSelection={({ value }) => {
-                                            if (typeof value === 'boolean') return false;
-                                            return ['string', 'object'];
-                                        }}
-                                        defaultValue={''}
-                                    />
-                                </Box>
+                                    <div className={styles.Projects__jsonEditorControls}>
+                                        <Button onClick={() => handleSave('edit')}>Save changes</Button>
+                                        <Button variant='outlined' onClick={() => handleReset('edit')}>
+                                            Reset state
+                                        </Button>
+                                    </div>
+                                </>
                     }
-
-                    <div className={styles.Projects__jsonEditorControls}>
-                        <Button onClick={() => handleSave('edit')}>Save changes</Button>
-                        <Button variant='outlined' onClick={() => handleReset('edit')}>Reset state</Button>
-                    </div>
                 </AccordionDetails>
             </Accordion>
 

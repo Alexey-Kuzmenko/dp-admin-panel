@@ -7,6 +7,7 @@ export const Dashboard: React.FC = () => {
     const swaggerDocsUrl = import.meta.env.VITE_SWAGGER_DOCS;
     // ! testing
     const test = checkStatusCode(207);
+    // eslint-disable-next-line no-console
     console.log(test);
 
     return (

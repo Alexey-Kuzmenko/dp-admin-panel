@@ -1,3 +1,7 @@
+// * form inputs helper text
+export const PASSWORD_INPUT_HELPER_TEXT = `*Password must contain a capital letter, symbols 
+such as "#$%&" and be 8-20 characters long`;
+
 // * viewport width on which the JSON editor works
 export const VIEWPORT_MIN_WIDTH = 425;
 

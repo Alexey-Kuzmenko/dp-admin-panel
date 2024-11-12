@@ -11,7 +11,7 @@ interface SelectionFormProps extends DetailedHTMLProps<FormHTMLAttributes<HTMLFo
     selectId: string
     labelId: string
     onFind: (value: string) => void
-    onDelete?: React.MouseEventHandler
+    onDelete?: () => void
 }
 
 interface FormValues {
@@ -42,6 +42,13 @@ export const SelectionForm: React.FC<SelectionFormProps> =
 
             onFind(searchValue);
             reset();
+        };
+
+        const handleClick = (): void => {
+            setIsValid(false);
+            if (onDelete) {
+                onDelete();
+            }
         };
 
         const renderMenuItem = (): JSX.Element[] => {
@@ -82,7 +89,7 @@ export const SelectionForm: React.FC<SelectionFormProps> =
                             ?
                             null
                             :
-                            <Button role='link' variant='contained' onClick={onDelete} disabled={!isValid}>
+                            <Button role='link' variant='contained' onClick={handleClick} disabled={!isValid}>
                                 Delete
                             </Button>
                     }

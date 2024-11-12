@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ProjectModel } from '../models/project.model';
 import { v4 as uuidv4 } from 'uuid';

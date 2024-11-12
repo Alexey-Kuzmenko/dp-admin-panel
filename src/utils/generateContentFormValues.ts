@@ -1,6 +1,6 @@
 import { ContentModel } from '../models/content.model';
 
-export function generateContentFormValues(content: Array<ContentModel>): Array<string> {
+export default function generateContentFormValues(content: Array<ContentModel>): Array<string> {
     const formValues: Array<string> = [];
 
     if (!content.length) {

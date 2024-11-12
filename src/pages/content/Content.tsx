@@ -15,12 +15,13 @@ import { selectMenuSlice } from '../../store/menuSlice';
 import { dtoCodeBlocks } from '../../dto/dto-code-blocks';
 import { ContentModel, Content as SubContent } from '../../models/content.model';
 import { contentModelKeys } from '../../models/content.model';
-import { AlertState, AlertType } from '../../types/alert-state.type';
+import { AlertState } from '../../types/alert-state.type';
 
-import { validateValue } from '../../utils/validateValue';
+import validateValue from '../../utils/validateValue';
 import generateCodeBlock from '../../utils/generateCodeBlock';
-import { generateContentFormValues } from '../../utils/generateContentFormValues';
-import { findContent } from '../../utils/findContent';
+import generateContentFormValues from '../../utils/generateContentFormValues';
+import findContent from '../../utils/findContent';
+import hideAlertAutomatically from '../../utils/hideAlertAutomatically';
 
 import {
     VIEWPORT_MIN_WIDTH,
@@ -70,23 +71,23 @@ const Content: React.FC = () => {
         if (action === 'add') {
             if (validateValue((newContent as ContentModel).eng) === false && ((newContent as ContentModel).ua)) {
                 setAlertState({ type: 'error', isOpen: true, message: ALERT_ERROR_MGS });
-                hideAlertAutomatically('error');
+                hideAlertAutomatically('error', alertState, setAlertState);
             } else {
                 dispatch(addPageContent(newContent as ContentModel));
                 setNewContent(contentTemplate);
                 setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
-                hideAlertAutomatically('success');
+                hideAlertAutomatically('success', alertState, setAlertState);
             }
         }
 
         if (action === 'edit' && editedContent && selectionFormValue.length) {
             if (validateValue(editedContent) === false) {
                 setAlertState({ type: 'error', isOpen: true, message: ALERT_ERROR_MGS });
-                hideAlertAutomatically('error');
+                hideAlertAutomatically('error', alertState, setAlertState);
             } else {
                 dispatch(editContent({ content: editedContent as SubContent, formValue: selectionFormValue }));
                 setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
-                hideAlertAutomatically('success');
+                hideAlertAutomatically('success', alertState, setAlertState);
             }
         }
     };
@@ -101,7 +102,7 @@ const Content: React.FC = () => {
         }
 
         setAlertState({ type: 'warning', isOpen: true, message: ALERT_RESET_MGS });
-        hideAlertAutomatically('warning');
+        hideAlertAutomatically('warning', alertState, setAlertState);
     };
 
     const handleFind = (value: string): void => {
@@ -116,23 +117,15 @@ const Content: React.FC = () => {
 
     const handleDelete = (): void => {
         dispatch(deletePageContent(deletedContentId));
-        setAlertState({ type: 'success', isOpen: true, message: 'Contact successfully deleted' });
-        hideAlertAutomatically('success');
+        setDeletedContentId('');
+
+        setAlertState({ type: 'success', isOpen: true, message: 'Content successfully deleted' });
+        hideAlertAutomatically('success', alertState, setAlertState);
     };
 
     const handleAlertClose = () => {
         setAlertState({ ...alertState, isOpen: false });
     };
-
-    function hideAlertAutomatically(type: AlertType, timeout = 3_000): void {
-        setTimeout(() => {
-            setAlertState({
-                ...alertState,
-                type,
-                isOpen: false
-            });
-        }, timeout);
-    }
 
     return (
         <div className={styles.Content}>
@@ -204,28 +197,30 @@ const Content: React.FC = () => {
                                 {JSON_EDITOR_WARN_MSG}
                             </Typography>
                             :
-                            <JsonEditor
-                                data={newContent}
-                                className={styles.Content__jsonEditor}
-                                theme='githubDark'
-                                onUpdate={({ newData }) => {
-                                    setNewContent(newData);
-                                }}
-                                restrictAdd={({ fullData }) => fullData !== null}
-                                restrictDelete={({ key }) => contentModelKeys.includes(key as string)}
-                                restrictTypeSelection={({ path, value }) => {
-                                    if (path.includes('type')) return ['string'];
-                                    if (typeof value === 'boolean') return false;
-                                    if (typeof value === 'string') return ['string'];
-                                    return ['string', 'object'];
-                                }}
-                            />
-                    }
+                            <>
+                                <JsonEditor
+                                    data={newContent}
+                                    className={styles.Content__jsonEditor}
+                                    theme='githubDark'
+                                    onUpdate={({ newData }) => {
+                                        setNewContent(newData);
+                                    }}
+                                    restrictAdd={({ fullData }) => fullData !== null}
+                                    restrictDelete={({ key }) => contentModelKeys.includes(key as string)}
+                                    restrictTypeSelection={({ path, value }) => {
+                                        if (path.includes('type')) return ['string'];
+                                        if (typeof value === 'boolean') return false;
+                                        if (typeof value === 'string') return ['string'];
+                                        return ['string', 'object'];
+                                    }}
+                                />
 
-                    <div className={styles.Content__jsonEditorControls}>
-                        <Button onClick={() => handleSave('add')}>Save changes</Button>
-                        <Button variant='outlined' onClick={() => handleReset('add')}>Reset state</Button>
-                    </div>
+                                <div className={styles.Content__jsonEditorControls}>
+                                    <Button onClick={() => handleSave('add')}>Save changes</Button>
+                                    <Button variant='outlined' onClick={() => handleReset('add')}>Reset state</Button>
+                                </div>
+                            </>
+                    }
                 </AccordionDetails>
             </Accordion>
 
@@ -262,29 +257,33 @@ const Content: React.FC = () => {
                                     {JSON_EDITOR_WARN_MSG}
                                 </Typography>
                                 :
-                                <Box component='div' sx={{ marginTop: '20px' }}>
-                                    <JsonEditor
-                                        data={editedContent}
-                                        className={styles.Content__jsonEditor}
-                                        theme='githubDark'
-                                        onUpdate={({ newData }) => {
-                                            setEditedContent(newData);
-                                        }}
-                                        restrictDelete={({ key }) => contentModelKeys.includes(key as string)}
-                                        restrictEdit={({ key }) => key === '_id'}
-                                        restrictTypeSelection={({ value }) => {
-                                            if (typeof value === 'boolean') return false;
-                                            return ['string', 'array'];
-                                        }}
-                                        defaultValue={''}
-                                    />
-                                </Box>
-                    }
+                                <>
+                                    <Box component='div' sx={{ marginTop: '20px' }}>
+                                        <JsonEditor
+                                            data={editedContent}
+                                            className={styles.Content__jsonEditor}
+                                            theme='githubDark'
+                                            onUpdate={({ newData }) => {
+                                                setEditedContent(newData);
+                                            }}
+                                            restrictDelete={({ key }) => contentModelKeys.includes(key as string)}
+                                            restrictEdit={({ key }) => key === '_id'}
+                                            restrictTypeSelection={({ value }) => {
+                                                if (typeof value === 'boolean') return false;
+                                                return ['string', 'array'];
+                                            }}
+                                            defaultValue={''}
+                                        />
+                                    </Box>
 
-                    <div className={styles.Content__jsonEditorControls}>
-                        <Button onClick={() => handleSave('edit')}>Save changes</Button>
-                        <Button variant='outlined' onClick={() => handleReset('edit')}>Reset state</Button>
-                    </div>
+                                    <div className={styles.Content__jsonEditorControls}>
+                                        <Button onClick={() => handleSave('edit')}>Save changes</Button>
+                                        <Button variant='outlined' onClick={() => handleReset('edit')}>
+                                            Reset state
+                                        </Button>
+                                    </div>
+                                </>
+                    }
                 </AccordionDetails>
             </Accordion>
 
@@ -297,13 +296,13 @@ const Content: React.FC = () => {
                     aria-controls='delete-content-accordion-content'
                     id='delete-content-accordion-header'
                 >
-                    <Typography component='h1' variant='h5'>Delete contact</Typography>
+                    <Typography component='h1' variant='h5'>Delete content</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
 
                     <SelectionForm
                         values={contentIds}
-                        label='Choose contact id'
+                        label='Choose content id'
                         selectId='content-select'
                         labelId='content-select-label'
                         id='content-select-form'
@@ -315,7 +314,7 @@ const Content: React.FC = () => {
                         !deletedContent
                             ?
                             <Typography component='h2' variant='h5' sx={{ textAlign: 'center', marginTop: '30px' }}>
-                                Contact ID is not selected
+                                Content ID is not selected
                             </Typography>
                             :
                             <Box component='div' sx={{ marginTop: '20px' }}>

@@ -16,11 +16,12 @@ import { addSkill, deleteSkill, editSkill, selectSkills } from '../../store/skil
 import { selectMenuSlice } from '../../store/menuSlice';
 
 import { dtoCodeBlocks } from '../../dto/dto-code-blocks';
-import { AlertState, AlertType } from '../../types/alert-state.type';
+import { AlertState } from '../../types/alert-state.type';
 import { SkillModel, skillModelKeys } from '../../models/skill.model';
 
 import generateCodeBlock from '../../utils/generateCodeBlock';
-import { validateValue } from '../../utils/validateValue';
+import validateValue from '../../utils/validateValue';
+import hideAlertAutomatically from '../../utils/hideAlertAutomatically';
 
 import {
     VIEWPORT_MIN_WIDTH,
@@ -59,23 +60,23 @@ const Skills: React.FC = () => {
         if (action === 'add') {
             if (validateValue(newSkill) === false) {
                 setAlertState({ type: 'error', isOpen: true, message: ALERT_ERROR_MGS });
-                hideAlertAutomatically('error');
+                hideAlertAutomatically('error', alertState, setAlertState);
             } else {
                 dispatch(addSkill(newSkill as SkillModel));
                 setNewSkill(skillTemplate);
                 setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
-                hideAlertAutomatically('success');
+                hideAlertAutomatically('success', alertState, setAlertState);
             }
         }
 
         if (action === 'edit' && editedSkill) {
             if (validateValue(editedSkill) === false) {
                 setAlertState({ type: 'error', isOpen: true, message: ALERT_ERROR_MGS });
-                hideAlertAutomatically('error');
+                hideAlertAutomatically('error', alertState, setAlertState);
             } else {
                 dispatch(editSkill(editedSkill as SkillModel));
                 setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
-                hideAlertAutomatically('success');
+                hideAlertAutomatically('success', alertState, setAlertState);
             }
         }
     };
@@ -90,7 +91,7 @@ const Skills: React.FC = () => {
         }
 
         setAlertState({ type: 'warning', isOpen: true, message: ALERT_RESET_MGS });
-        hideAlertAutomatically('warning');
+        hideAlertAutomatically('warning', alertState, setAlertState);
     };
 
     const handleFind = (id: string): void => {
@@ -104,23 +105,15 @@ const Skills: React.FC = () => {
 
     const handleDelete = (): void => {
         dispatch(deleteSkill(deletedSkillId));
+        setDeletedSkillId('');
+
         setAlertState({ type: 'success', isOpen: true, message: 'Skill successfully deleted' });
-        hideAlertAutomatically('success');
+        hideAlertAutomatically('success', alertState, setAlertState);
     };
 
     const handleAlertClose = () => {
         setAlertState({ ...alertState, isOpen: false });
     };
-
-    function hideAlertAutomatically(type: AlertType, timeout = 3_000): void {
-        setTimeout(() => {
-            setAlertState({
-                ...alertState,
-                type,
-                isOpen: false
-            });
-        }, timeout);
-    }
 
     return (
         <div className={styles.Skills}>
@@ -192,27 +185,29 @@ const Skills: React.FC = () => {
                                 {JSON_EDITOR_WARN_MSG}
                             </Typography>
                             :
-                            <JsonEditor
-                                data={newSkill}
-                                className={styles.Skills__jsonEditor}
-                                theme='githubDark'
-                                onUpdate={({ newData }) => {
-                                    setNewSkill(newData);
-                                }}
-                                restrictAdd={({ fullData }) => fullData !== null}
-                                restrictDelete={({ key }) => skillModelKeys.includes(key as string)}
-                                restrictTypeSelection={({ value }) => {
-                                    if (typeof value === 'boolean') return false;
-                                    if (typeof value === 'string') return ['string'];
-                                    return ['string'];
-                                }}
-                            />
-                    }
+                            <>
+                                <JsonEditor
+                                    data={newSkill}
+                                    className={styles.Skills__jsonEditor}
+                                    theme='githubDark'
+                                    onUpdate={({ newData }) => {
+                                        setNewSkill(newData);
+                                    }}
+                                    restrictAdd={({ fullData }) => fullData !== null}
+                                    restrictDelete={({ key }) => skillModelKeys.includes(key as string)}
+                                    restrictTypeSelection={({ value }) => {
+                                        if (typeof value === 'boolean') return false;
+                                        if (typeof value === 'string') return ['string'];
+                                        return ['string'];
+                                    }}
+                                />
 
-                    <div className={styles.Skills__jsonEditorControls}>
-                        <Button onClick={() => handleSave('add')}>Save changes</Button>
-                        <Button variant='outlined' onClick={() => handleReset('add')}>Reset state</Button>
-                    </div>
+                                <div className={styles.Skills__jsonEditorControls}>
+                                    <Button onClick={() => handleSave('add')}>Save changes</Button>
+                                    <Button variant='outlined' onClick={() => handleReset('add')}>Reset state</Button>
+                                </div>
+                            </>
+                    }
                 </AccordionDetails>
             </Accordion>
 
@@ -249,29 +244,32 @@ const Skills: React.FC = () => {
                                     {JSON_EDITOR_WARN_MSG}
                                 </Typography>
                                 :
+                                <>
+                                    <Box component='div' sx={{ marginTop: '20px' }}>
+                                        <JsonEditor
+                                            data={editedSkill}
+                                            className={styles.Skills__jsonEditor}
+                                            theme='githubDark'
+                                            onUpdate={({ newData }) => {
+                                                setEditedSkill(newData);
+                                            }}
+                                            restrictAdd={({ fullData }) => fullData !== null}
+                                            restrictDelete={({ key }) => skillModelKeys.includes(key as string)}
+                                            restrictEdit={({ key }) => key === '_id'}
+                                            restrictTypeSelection={() => {
+                                                return ['string'];
+                                            }}
+                                        />
+                                    </Box>
 
-                                <Box component='div' sx={{ marginTop: '20px' }}>
-                                    <JsonEditor
-                                        data={editedSkill}
-                                        className={styles.Skills__jsonEditor}
-                                        theme='githubDark'
-                                        onUpdate={({ newData }) => {
-                                            setEditedSkill(newData);
-                                        }}
-                                        restrictAdd={({ fullData }) => fullData !== null}
-                                        restrictDelete={({ key }) => skillModelKeys.includes(key as string)}
-                                        restrictEdit={({ key }) => key === '_id'}
-                                        restrictTypeSelection={() => {
-                                            return ['string'];
-                                        }}
-                                    />
-                                </Box>
+                                    <div className={styles.Skills__jsonEditorControls}>
+                                        <Button onClick={() => handleSave('edit')}>Save changes</Button>
+                                        <Button variant='outlined' onClick={() => handleReset('edit')}>
+                                            Reset state
+                                        </Button>
+                                    </div>
+                                </>
                     }
-
-                    <div className={styles.Skills__jsonEditorControls}>
-                        <Button onClick={() => handleSave('edit')}>Save changes</Button>
-                        <Button variant='outlined' onClick={() => handleReset('edit')}>Reset state</Button>
-                    </div>
                 </AccordionDetails>
             </Accordion>
 

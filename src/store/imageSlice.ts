@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ImageModel } from '../models/image.model';
 

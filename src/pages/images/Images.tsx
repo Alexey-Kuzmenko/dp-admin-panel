@@ -16,10 +16,11 @@ import { addImage, deleteDir, deleteImage, selectImages } from '../../store/imag
 import { selectMenuSlice } from '../../store/menuSlice';
 
 import { dtoCodeBlocks } from '../../dto/dto-code-blocks';
-import { AlertState, AlertType } from '../../types/alert-state.type';
+import { AlertState } from '../../types/alert-state.type';
 
 import { ALERT_SUCCESS_MGS } from '../../constants/constants';
 import { extractImgDirName } from '../../utils/extractImgDirName';
+import hideAlertAutomatically from '../../utils/hideAlertAutomatically';
 
 import styles from './Images.module.scss';
 
@@ -37,7 +38,7 @@ const Images: React.FC = () => {
     const handleImageDelete = (imgUrl: string): void => {
         dispatch(deleteImage(imgUrl));
         setAlertState({ type: 'success', isOpen: true, message: 'Image successfully deleted' });
-        hideAlertAutomatically('success');
+        hideAlertAutomatically('success', alertState, setAlertState);
     };
 
     const handelSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
@@ -47,12 +48,12 @@ const Images: React.FC = () => {
         uploadForm.current?.reset();
 
         setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
-        hideAlertAutomatically('success');
+        hideAlertAutomatically('success', alertState, setAlertState);
     };
 
     const handelReset = (): void => {
         setAlertState({ type: 'warning', isOpen: true, message: 'Input value was reset' });
-        hideAlertAutomatically('warning');
+        hideAlertAutomatically('warning', alertState, setAlertState);
     };
 
     const handleDirDelete = (): void => {
@@ -62,21 +63,11 @@ const Images: React.FC = () => {
         setDeletedDirName('');
 
         setAlertState({ type: 'success', isOpen: true, message: 'Directory successfully deleted' });
-        hideAlertAutomatically('success');
+        hideAlertAutomatically('success', alertState, setAlertState);
     };
 
     const handleAlertClose = (): void => {
         setAlertState({ ...alertState, isOpen: false });
-    };
-
-    const hideAlertAutomatically = (type: AlertType, timeout = 3_000): void => {
-        setTimeout(() => {
-            setAlertState({
-                ...alertState,
-                type,
-                isOpen: false
-            });
-        }, timeout);
     };
 
     return (
