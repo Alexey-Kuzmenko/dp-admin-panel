@@ -3,11 +3,13 @@ import { DetailedHTMLProps, FormHTMLAttributes, useState } from 'react';
 import { Controller } from 'react-hook-form';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
+import { theme } from '../../theme/ThemeRegistry';
 import { IconButton, TextField, Typography } from '@mui/material';
-import { Button } from '../Button/Button';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import { Button } from '../Button/Button';
 
+import extractSecrets from '../../utils/extractSecrets';
 import { PASSWORD_INPUT_HELPER_TEXT, SECRET_INPUT_HELPER_TEXT } from '../../constants/constants';
 
 import Logo from '../../assets/Logo.svg';
@@ -24,6 +26,9 @@ interface FromValues {
     secret: string
 }
 
+const secrets = extractSecrets(import.meta.env.VITE_SECRET_WORDS);
+const { palette } = theme;
+
 export const Form: React.FC<FormProps> = ({ title, type, ...props }) => {
     const [showSecret, setShowSecret] = useState<boolean>(false);
 
@@ -34,7 +39,8 @@ export const Form: React.FC<FormProps> = ({ title, type, ...props }) => {
             isValid
         },
         handleSubmit,
-        reset
+        reset,
+        getValues
     } = useForm<FromValues>({
         defaultValues: {
             email: '',
@@ -60,6 +66,7 @@ export const Form: React.FC<FormProps> = ({ title, type, ...props }) => {
         }
 
         reset();
+        setShowSecret(false);
     };
 
     const handleShowSecretClick = (): void => {
@@ -133,7 +140,10 @@ export const Form: React.FC<FormProps> = ({ title, type, ...props }) => {
                             name='secret'
                             control={control}
                             rules={{
-                                required: { value: true, message: 'This field is required' }
+                                required: { value: true, message: 'This field is required' },
+                                validate: () => {
+                                    return secrets.includes(getValues('secret'));
+                                }
                             }}
                             render={({ field }) =>
                                 <div className={styles.Form__inputWrapper}>
@@ -156,9 +166,9 @@ export const Form: React.FC<FormProps> = ({ title, type, ...props }) => {
                                     >
                                         {
                                             showSecret ?
-                                                <VisibilityOffIcon sx={{ color: '#FFF' }} />
+                                                <VisibilityOffIcon sx={{ color: palette.primary.contrastText }} />
                                                 :
-                                                <VisibilityIcon sx={{ color: '#FFF' }} />
+                                                <VisibilityIcon sx={{ color: palette.primary.contrastText }} />
                                         }
                                     </IconButton>
                                 </div>
