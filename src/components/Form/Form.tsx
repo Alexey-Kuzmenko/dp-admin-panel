@@ -31,6 +31,7 @@ const { palette } = theme;
 
 export const Form: React.FC<FormProps> = ({ title, type, ...props }) => {
     const [showSecret, setShowSecret] = useState<boolean>(false);
+    const [showPassword, setShowPassword] = useState<boolean>(false);
 
     const {
         control,
@@ -56,6 +57,7 @@ export const Form: React.FC<FormProps> = ({ title, type, ...props }) => {
             console.group('login from values');
             console.log(`email: ${email}, password: ${password}`);
             console.groupEnd();
+            setShowPassword(false);
         }
 
         if (type === 'register') {
@@ -63,14 +65,18 @@ export const Form: React.FC<FormProps> = ({ title, type, ...props }) => {
             console.group('register from values');
             console.log(`email: ${email}, password: ${password}, secret: ${secret}`);
             console.groupEnd();
+            setShowSecret(false);
         }
 
         reset();
-        setShowSecret(false);
     };
 
     const handleShowSecretClick = (): void => {
         setShowSecret((show) => !show);
+    };
+
+    const handleShowPasswordClick = (): void => {
+        setShowPassword((show) => !show);
     };
 
     return (
@@ -117,19 +123,33 @@ export const Form: React.FC<FormProps> = ({ title, type, ...props }) => {
                         }
                     }}
                     render={({ field }) =>
-                        <TextField
-                            FormHelperTextProps={{ className: styles.HelperText }}
-                            sx={{ width: '100%' }}
-                            InputProps={{ disableUnderline: true }}
-                            id='user-password'
-                            label='Password'
-                            variant='filled'
-                            type='password'
-                            helperText={errors.password?.message ?
-                                errors.password?.message : PASSWORD_INPUT_HELPER_TEXT}
-                            error={errors.password ? true : false}
-                            {...field}
-                        />
+                        <div className={styles.Form__inputWrapper}>
+                            <TextField
+                                FormHelperTextProps={{ className: styles.HelperText }}
+                                sx={{ width: '100%' }}
+                                InputProps={{ disableUnderline: true }}
+                                id='user-password'
+                                label='Password'
+                                variant='filled'
+                                type={showPassword ? 'text' : 'password'}
+                                helperText={errors.password?.message ?
+                                    errors.password?.message : PASSWORD_INPUT_HELPER_TEXT}
+                                error={errors.password ? true : false}
+                                {...field}
+                            />
+
+                            <IconButton
+                                aria-label={showSecret ? 'hide the password' : 'display the password'}
+                                onClick={handleShowPasswordClick}
+                            >
+                                {
+                                    showPassword ?
+                                        <VisibilityOffIcon sx={{ color: palette.primary.contrastText }} />
+                                        :
+                                        <VisibilityIcon sx={{ color: palette.primary.contrastText }} />
+                                }
+                            </IconButton>
+                        </div>
                     }
                 />
 
