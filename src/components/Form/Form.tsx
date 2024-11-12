@@ -1,11 +1,16 @@
-import { DetailedHTMLProps, FormHTMLAttributes } from 'react';
+import { DetailedHTMLProps, FormHTMLAttributes, useState } from 'react';
 
 import { Controller } from 'react-hook-form';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
-import { TextField, Typography } from '@mui/material';
+import { theme } from '../../theme/ThemeRegistry';
+import { IconButton, TextField, Typography } from '@mui/material';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { Button } from '../Button/Button';
-import { PASSWORD_INPUT_HELPER_TEXT } from '../../constants/constants';
+
+import extractSecrets from '../../utils/extractSecrets';
+import { PASSWORD_INPUT_HELPER_TEXT, SECRET_INPUT_HELPER_TEXT } from '../../constants/constants';
 
 import Logo from '../../assets/Logo.svg';
 import styles from './Form.module.scss';
@@ -18,9 +23,16 @@ interface FormProps extends DetailedHTMLProps<FormHTMLAttributes<HTMLFormElement
 interface FromValues {
     email: string
     password: string
+    secret: string
 }
 
+const secrets = extractSecrets(import.meta.env.VITE_SECRET_WORDS);
+const { palette } = theme;
+
 export const Form: React.FC<FormProps> = ({ title, type, ...props }) => {
+    const [showSecret, setShowSecret] = useState<boolean>(false);
+    const [showPassword, setShowPassword] = useState<boolean>(false);
+
     const {
         control,
         formState: {
@@ -28,31 +40,43 @@ export const Form: React.FC<FormProps> = ({ title, type, ...props }) => {
             isValid
         },
         handleSubmit,
-        reset
+        reset,
+        getValues
     } = useForm<FromValues>({
         defaultValues: {
             email: '',
-            password: ''
+            password: '',
+            secret: ''
         },
         mode: 'onBlur'
     });
 
-    const handleFromSubmit: SubmitHandler<FromValues> = ({ email, password }): void => {
+    const handleFromSubmit: SubmitHandler<FromValues> = ({ email, password, secret }): void => {
         if (type === 'login') {
-            // ! testing solution
+            // ! temporary solution
             console.group('login from values');
             console.log(`email: ${email}, password: ${password}`);
             console.groupEnd();
+            setShowPassword(false);
         }
 
         if (type === 'register') {
-            // ! testing solution
+            // ! temporary solution
             console.group('register from values');
-            console.log(`email: ${email}, password: ${password}`);
+            console.log(`email: ${email}, password: ${password}, secret: ${secret}`);
             console.groupEnd();
+            setShowSecret(false);
         }
 
         reset();
+    };
+
+    const handleShowSecretClick = (): void => {
+        setShowSecret((show) => !show);
+    };
+
+    const handleShowPasswordClick = (): void => {
+        setShowPassword((show) => !show);
     };
 
     return (
@@ -99,21 +123,80 @@ export const Form: React.FC<FormProps> = ({ title, type, ...props }) => {
                         }
                     }}
                     render={({ field }) =>
-                        <TextField
-                            FormHelperTextProps={{ className: styles.HelperText }}
-                            sx={{ width: '100%' }}
-                            InputProps={{ disableUnderline: true }}
-                            id='user-password'
-                            label='Password'
-                            variant='filled'
-                            type='password'
-                            helperText={errors.password?.message ?
-                                errors.password?.message : PASSWORD_INPUT_HELPER_TEXT}
-                            error={errors.password ? true : false}
-                            {...field}
-                        />
+                        <div className={styles.Form__inputWrapper}>
+                            <TextField
+                                FormHelperTextProps={{ className: styles.HelperText }}
+                                sx={{ width: '100%' }}
+                                InputProps={{ disableUnderline: true }}
+                                id='user-password'
+                                label='Password'
+                                variant='filled'
+                                type={showPassword ? 'text' : 'password'}
+                                helperText={errors.password?.message ?
+                                    errors.password?.message : PASSWORD_INPUT_HELPER_TEXT}
+                                error={errors.password ? true : false}
+                                {...field}
+                            />
+
+                            <IconButton
+                                aria-label={showSecret ? 'hide the password' : 'display the password'}
+                                onClick={handleShowPasswordClick}
+                            >
+                                {
+                                    showPassword ?
+                                        <VisibilityOffIcon sx={{ color: palette.primary.contrastText }} />
+                                        :
+                                        <VisibilityIcon sx={{ color: palette.primary.contrastText }} />
+                                }
+                            </IconButton>
+                        </div>
                     }
                 />
+
+                {/* Secret word input */}
+                {
+                    type === 'register' ?
+                        <Controller
+                            name='secret'
+                            control={control}
+                            rules={{
+                                required: { value: true, message: 'This field is required' },
+                                validate: () => {
+                                    return secrets.includes(getValues('secret'));
+                                }
+                            }}
+                            render={({ field }) =>
+                                <div className={styles.Form__inputWrapper}>
+                                    <TextField
+                                        FormHelperTextProps={{ className: styles.HelperText }}
+                                        sx={{ width: '100%' }}
+                                        InputProps={{ disableUnderline: true }}
+                                        id='secret-word'
+                                        label='Secret word'
+                                        variant='filled'
+                                        type={showSecret ? 'text' : 'password'}
+                                        helperText={errors.secret?.message ?
+                                            errors.secret?.message : SECRET_INPUT_HELPER_TEXT}
+                                        error={errors.secret ? true : false}
+                                        {...field}
+                                    />
+                                    <IconButton
+                                        aria-label={showSecret ? 'hide the secret' : 'display the secret'}
+                                        onClick={handleShowSecretClick}
+                                    >
+                                        {
+                                            showSecret ?
+                                                <VisibilityOffIcon sx={{ color: palette.primary.contrastText }} />
+                                                :
+                                                <VisibilityIcon sx={{ color: palette.primary.contrastText }} />
+                                        }
+                                    </IconButton>
+                                </div>
+                            }
+                        />
+                        :
+                        null
+                }
             </div>
 
             {/* From controls */}
