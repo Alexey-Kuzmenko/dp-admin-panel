@@ -15,7 +15,8 @@ import { PASSWORD_INPUT_HELPER_TEXT, SECRET_INPUT_HELPER_TEXT } from '../../cons
 import Logo from '../../assets/Logo.svg';
 import styles from './Form.module.scss';
 
-interface FormProps extends DetailedHTMLProps<FormHTMLAttributes<HTMLFormElement>, HTMLFormElement> {
+// * this interface exported for unit tests
+export interface FormProps extends DetailedHTMLProps<FormHTMLAttributes<HTMLFormElement>, HTMLFormElement> {
     title: string
     type: 'login' | 'register'
 }
