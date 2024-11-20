@@ -12,6 +12,9 @@ export const ALERT_ERROR_MGS = 'Rejected! Object values can\'t be empty';
 export const ALERT_RESET_MGS = 'State was reset';
 export const ALERT_COPY_MSG = 'Copied to clipboard';
 
+// * api response error messages
+export const ERROR_MSG_TEMPLATE = 'An error has occurred in:';
+
 // * JSON editor
 export const JSON_EDITOR_WARN_MSG = `
 *JSON editor not available on current screen width. Please rotate

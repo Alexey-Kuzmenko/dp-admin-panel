@@ -1,4 +1,4 @@
-import React, { Suspense, useState } from 'react';
+import React, { Suspense } from 'react';
 import { Route, Routes } from 'react-router-dom';
 
 import { ThemeProvider } from '@mui/material';
@@ -20,7 +20,7 @@ const Images = React.lazy<React.FC>(() => import('./pages/images/Images'));
 
 function App() {
   // ! testing
-  const [isLogin, setIsLogin] = useState<boolean>(false);
+  const isLogin = true;
 
   let routes: JSX.Element = (
     <Routes>

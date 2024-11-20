@@ -1,82 +1,165 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { v4 as uuidv4 } from 'uuid';
+import { asyncThunkCreator, buildCreateSlice, PayloadAction } from '@reduxjs/toolkit';
+import axios, { AxiosResponse } from 'axios';
+
 import { ContactModel } from '../models/contact.model';
 import { ContactDto } from '../dto/contact.dto';
+import { ResponseError } from '../types/response-error.type';
+import { ERROR_MSG_TEMPLATE } from '../constants/constants';
+import excludeObjectValues from '../utils/excludeObjectValues';
+
+const API_URL = import.meta.env.VITE_API_URL;
+const JWT_TOKEN = import.meta.env.VITE_JWT_TOKEN;
+
+const createContactSlice = buildCreateSlice({
+    creators: { asyncThunk: asyncThunkCreator }
+});
 
 interface ContactState {
     contacts: Array<ContactModel>
+    loading: boolean | null
+    error: ResponseError
 }
 
-// * state with temporary data. This value exported for only for tests
+// * This value exported for only for tests
 export const initialState: ContactState = {
-    contacts: [
-        {
-            _id: '65f1899dd7226661102dede3',
-            label: 'Telegram',
-            body: '@test_ua',
-            href: 'https://t.me/test',
-            iconType: 'telegram',
-        },
-        {
-            _id: '65f18a39d7226661102dede6',
-            label: 'Email',
-            body: 'o.kuzmenko@ok-dev.pp.ua',
-            href: 'o.kuzmenko@ok-dev.pp.ua',
-            iconType: 'email',
-
-        },
-        {
-            _id: '65f18ac9d7226661102dede9',
-            label: 'LinkedIn',
-            body: 'Oleksii Kuzmenko',
-            href: 'https://www.linkedin.com/',
-            iconType: 'linkedIn',
-        },
-        {
-            _id: '65f18e2ed7226661102dedf4',
-            label: 'Instagram',
-            body: 'user',
-            href: 'https://www.instagram.com/',
-            iconType: 'instagram',
-        }
-    ]
+    contacts: [],
+    loading: null,
+    error: {
+        exists: null,
+        message: null
+    }
 };
 
-const contactSlice = createSlice({
+const contactSlice = createContactSlice({
     name: 'contacts',
     initialState,
     selectors: {
-        selectContacts: (state) => state.contacts
+        selectContacts: (state) => state.contacts,
+        selectLoading: (state) => state.loading,
+        selectError: (state) => state.error
     },
     reducers: (create) => ({
-        addContact: create.reducer((state, { payload }: PayloadAction<ContactDto>) => {
-            const newContact: ContactModel = {
-                _id: uuidv4(),
-                ...payload
-            };
-
-            state.contacts.push(newContact);
-        }),
-
-        deleteContact: create.reducer((state, { payload }: PayloadAction<string>) => {
+        deleteContactLocally: create.reducer((state, { payload }: PayloadAction<string>) => {
             state.contacts = state.contacts.filter((c) => c._id !== payload);
         }),
+        fetchContacts: create.asyncThunk(async () => {
+            const response: AxiosResponse<ContactModel[]> = await axios.get(`${API_URL}/contacts`, {
+                headers: {
+                    'Api-key': import.meta.env.VITE_API_KEY
+                }
+            });
 
-        editContact: create.reducer((state, { payload }: PayloadAction<ContactModel>) => {
-            const contact = state.contacts.find((c) => c._id === payload._id);
-
-            if (contact) {
-                const contactIndex = state.contacts.indexOf(contact);
-                const contactsCopy = [...state.contacts];
-                contactsCopy[contactIndex] = payload;
-                state.contacts = contactsCopy;
+            return response.data;
+        },
+            {
+                pending: (state) => {
+                    state.loading = true;
+                },
+                fulfilled: (state, { payload }) => {
+                    const data = excludeObjectValues<ContactModel>(['createdAt', 'updatedAt', '__v'], payload);
+                    state.contacts.push(...data);
+                },
+                rejected: (state, { error }) => {
+                    state.error.exists = true;
+                    state.error.message = error.message ? error.message : `${ERROR_MSG_TEMPLATE} Contacts slice`;
+                },
+                settled: (state) => {
+                    state.loading = false;
+                }
             }
-        })
+        ),
+        addContact: create.asyncThunk(async (dto: ContactDto) => {
+            const response: AxiosResponse<ContactModel> = await axios.post(`${API_URL}/contacts`, dto, {
+                headers: {
+                    'Authorization': `Bearer ${JWT_TOKEN}`
+                }
+            });
+
+            return response.data;
+        },
+            {
+                pending: (state) => {
+                    state.loading = true;
+                },
+                fulfilled: (state, { payload }) => {
+                    const data = excludeObjectValues<ContactModel>(['createdAt', 'updatedAt', '__v'], [payload]);
+                    state.contacts.push(...data);
+                },
+                rejected: (state, { error }) => {
+                    state.error.exists = true;
+                    state.error.message = error.message ? error.message : `${ERROR_MSG_TEMPLATE} Contacts slice`;
+                },
+                settled: (state) => {
+                    state.loading = false;
+                }
+            }
+        ),
+        deleteContact: create.asyncThunk(async (id: string, thunkApi) => {
+            await axios.delete(`${API_URL}/contacts/${id}`, {
+                headers: {
+                    'Authorization': `Bearer ${JWT_TOKEN}`
+                }
+            });
+
+            thunkApi.dispatch(deleteContactLocally(id));
+        },
+            {
+                pending: (state) => {
+                    state.loading = true;
+                },
+                rejected: (state, { error }) => {
+                    state.error.exists = true;
+                    state.error.message = error.message ? error.message : `${ERROR_MSG_TEMPLATE} Contacts slice`;
+                },
+                settled: (state) => {
+                    state.loading = false;
+                }
+            }
+        ),
+        editContact: create.asyncThunk(async (contact: ContactModel) => {
+            const response = await axios.patch(`${API_URL}/contacts/${contact._id}`, contact, {
+                headers: {
+                    'Authorization': `Bearer ${JWT_TOKEN}`
+                }
+            });
+
+            return response.data;
+        },
+            {
+                pending: (state) => {
+                    state.loading = true;
+                },
+                fulfilled: (state, { payload }) => {
+                    const contact = state.contacts.find((c) => c._id === payload._id);
+                    const [data] = excludeObjectValues<ContactModel>(['createdAt', 'updatedAt', '__v'], [payload]);
+
+                    if (contact) {
+                        const contactIndex = state.contacts.indexOf(contact);
+                        const contactsCopy = [...state.contacts];
+                        contactsCopy[contactIndex] = data;
+                        state.contacts = contactsCopy;
+                    }
+                },
+                rejected: (state, { error }) => {
+                    state.error.exists = true;
+                    state.error.message = error.message ? error.message : `${ERROR_MSG_TEMPLATE} Contacts slice`;
+                },
+                settled: (state) => {
+                    state.loading = false;
+                }
+            }
+        )
     })
 });
 
-export const { selectContacts } = contactSlice.selectors;
+export const { selectContacts, selectLoading, selectError } = contactSlice.selectors;
 
-export const { addContact, deleteContact, editContact } = contactSlice.actions;
+export const {
+    deleteContactLocally,
+    fetchContacts,
+    addContact,
+    deleteContact,
+    editContact
+} = contactSlice.actions;
 
 export default contactSlice.reducer;
