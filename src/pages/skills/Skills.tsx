@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import Accordion from '@mui/material/Accordion';
 import AccordionDetails from '@mui/material/AccordionDetails';
@@ -6,13 +6,21 @@ import AccordionSummary from '@mui/material/AccordionSummary';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Typography, Box } from '@mui/material';
 import { theme } from '../../theme/ThemeRegistry';
-import { Alert, Button, CodeBlock, SelectionForm } from '../../components';
+import { Alert, Button, CodeBlock, Loader, SelectionForm } from '../../components';
 
 import cn from 'classnames';
 import { JsonEditor } from 'json-edit-react';
 
 import { useAppDispatch, useAppSelector } from '../../hooks/redux-hooks';
-import { addSkill, deleteSkill, editSkill, selectSkills } from '../../store/skillSlice';
+import {
+    addSkill,
+    deleteSkill,
+    editSkill,
+    fetchSkills,
+    selectError,
+    selectLoading,
+    selectSkills
+} from '../../store/skillSlice';
 import { selectMenuSlice } from '../../store/menuSlice';
 
 import { dtoCodeBlocks } from '../../dto/dto-code-blocks';
@@ -40,9 +48,17 @@ const skillTemplate: Omit<SkillModel, '_id'> = {
 };
 
 const Skills: React.FC = () => {
-    const skills = useAppSelector(selectSkills);
-    const { isMenuOpen } = useAppSelector(selectMenuSlice);
     const dispatch = useAppDispatch();
+
+    useEffect(() => {
+        dispatch(fetchSkills());
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    const skills = useAppSelector(selectSkills);
+    const loading = useAppSelector(selectLoading);
+    const { exists, message } = useAppSelector(selectError);
+    const { isMenuOpen } = useAppSelector(selectMenuSlice);
     const skillsIds = skills.map((s) => s._id);
 
     const [alertState, setAlertState] = useState<AlertState>({ type: 'success', isOpen: false, message: '' });
@@ -56,13 +72,13 @@ const Skills: React.FC = () => {
 
     const viewportWidth = window.innerWidth;
 
-    const handleSave = (action: 'edit' | 'add'): void => {
+    const handleSave = async (action: 'edit' | 'add'): Promise<void> => {
         if (action === 'add') {
             if (validateValue(newSkill) === false) {
                 setAlertState({ type: 'error', isOpen: true, message: ALERT_ERROR_MGS });
                 hideAlertAutomatically('error', alertState, setAlertState);
             } else {
-                dispatch(addSkill(newSkill as SkillModel));
+                await dispatch(addSkill(newSkill as SkillModel));
                 setNewSkill(skillTemplate);
                 setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
                 hideAlertAutomatically('success', alertState, setAlertState);
@@ -74,7 +90,7 @@ const Skills: React.FC = () => {
                 setAlertState({ type: 'error', isOpen: true, message: ALERT_ERROR_MGS });
                 hideAlertAutomatically('error', alertState, setAlertState);
             } else {
-                dispatch(editSkill(editedSkill as SkillModel));
+                await dispatch(editSkill(editedSkill as SkillModel));
                 setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
                 hideAlertAutomatically('success', alertState, setAlertState);
             }
@@ -103,8 +119,8 @@ const Skills: React.FC = () => {
         }
     };
 
-    const handleDelete = (): void => {
-        dispatch(deleteSkill(deletedSkillId));
+    const handleDelete = async (): Promise<void> => {
+        await dispatch(deleteSkill(deletedSkillId));
         setDeletedSkillId('');
 
         setAlertState({ type: 'success', isOpen: true, message: 'Skill successfully deleted' });
@@ -316,11 +332,13 @@ const Skills: React.FC = () => {
 
             {/* Alerts */}
             <Alert
-                type={alertState.type}
-                message={alertState.message}
-                isOpen={alertState.isOpen}
+                type={exists ? 'error' : alertState.type}
+                message={message ? message : alertState.message}
+                isOpen={exists ? true : alertState.isOpen}
                 onClose={handleAlertClose}
             />
+
+            {loading ? <Loader /> : null}
 
         </div>
     );

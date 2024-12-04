@@ -1,84 +1,160 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { asyncThunkCreator, buildCreateSlice, PayloadAction } from '@reduxjs/toolkit';
 import { SkillModel } from '../models/skill.model';
-import { v4 as uuidv4 } from 'uuid';
 import { SkillDto } from '../dto/skill.dto';
+import { ResponseError } from '../types/response-error.type';
+import axios, { AxiosResponse } from 'axios';
+import excludeObjectValues from '../utils/excludeObjectValues';
+import { ERROR_MSG_TEMPLATE } from '../constants/constants';
+
+const API_URL = import.meta.env.VITE_API_URL;
+const API_KEY = import.meta.env.VITE_API_KEY;
+const JWT_TOKEN = import.meta.env.VITE_JWT_TOKEN;
+
+const createSkillSlice = buildCreateSlice({
+    creators: { asyncThunk: asyncThunkCreator }
+});
 
 interface SkillState {
     skills: Array<SkillModel>
+    loading: boolean | null,
+    error: ResponseError
 }
 
-// * temporary data
 export const initialState: SkillState = {
-    skills: [
-        {
-            _id: '65eb2cb67060abb0080a5797',
-            slug: 'html5',
-            label: 'HTML',
-            iconClass: 'devicon-html5-plain',
-        },
-        {
-            _id: '65eb2ce97060abb0080a579a',
-            slug: 'sass',
-            label: 'SASS(SCSS)',
-            iconClass: 'devicon-sass-original',
-        },
-        {
-            _id: '65eb2d057060abb0080a579d',
-            slug: 'javascript',
-            label: 'JavaScript',
-            iconClass: 'devicon-javascript-plain',
-        },
-        {
-            _id: '65eb2d227060abb0080a57a0',
-            slug: 'typescript',
-            label: 'TypeScript',
-            iconClass: 'devicon-typescript-plain',
-
-        },
-        {
-            _id: '65eb2d367060abb0080a57a3',
-            slug: 'react',
-            label: 'React',
-            iconClass: 'devicon-react-original',
-        }
-    ]
+    skills: [],
+    loading: null,
+    error: {
+        exists: null,
+        message: null
+    }
 };
 
-export const skillSlice = createSlice({
+export const skillSlice = createSkillSlice({
     name: 'skills',
     initialState,
     selectors: {
-        selectSkills: (state) => state.skills
+        selectSkills: (state) => state.skills,
+        selectLoading: (state) => state.loading,
+        selectError: (state) => state.error,
     },
     reducers: (create) => ({
-        addSkill: create.reducer((state, { payload }: PayloadAction<SkillDto>) => {
-            const newSkill: SkillModel = {
-                _id: uuidv4(),
-                ...payload
-            };
-
-            state.skills.push(newSkill);
-        }),
-
-        deleteSkill: create.reducer((state, { payload }: PayloadAction<string>) => {
+        deleteSkillLocally: create.reducer((state, { payload }: PayloadAction<string>) => {
             state.skills = state.skills.filter((s) => s._id !== payload);
         }),
 
-        editSkill: create.reducer((state, { payload }: PayloadAction<SkillModel>) => {
-            const skill = state.skills.find((s) => s._id === payload._id);
+        fetchSkills: create.asyncThunk(async () => {
+            const response: AxiosResponse<SkillModel[]> = await axios.get(`${API_URL}/skills`, {
+                headers: {
+                    'Api-key': API_KEY
+                }
+            });
 
-            if (skill) {
-                const skillIndex = state.skills.indexOf(skill);
-                const skillsCopy = [...state.skills];
-                skillsCopy[skillIndex] = payload;
-                state.skills = skillsCopy;
+            return response.data;
+        },
+            {
+                pending: (state) => {
+                    state.loading = true;
+                },
+                fulfilled: (state, { payload }) => {
+                    const data = excludeObjectValues<SkillModel>(['createdAt', 'updatedAt', '__v'], payload);
+                    state.skills.push(...data);
+                },
+                rejected: (state, { error }) => {
+                    state.error.exists = true;
+                    state.error.message = error.message ? error.message : `${ERROR_MSG_TEMPLATE} Skills slice`;
+                },
+                settled: (state) => {
+                    state.loading = false;
+                }
             }
-        })
+        ),
+        addSkill: create.asyncThunk(async (dto: SkillDto) => {
+            const response: AxiosResponse<SkillModel> = await axios.post(`${API_URL}/skills`, dto, {
+                headers: {
+                    'Authorization': `Bearer ${JWT_TOKEN}`
+                }
+            });
+
+            return response.data;
+        },
+            {
+                pending: (state) => {
+                    state.loading = true;
+                },
+                fulfilled: (state, { payload }) => {
+                    const data = excludeObjectValues<SkillModel>(['createdAt', 'updatedAt', '__v'], [payload]);
+                    state.skills.push(...data);
+                },
+                rejected: (state, { error }) => {
+                    state.error.exists = true;
+                    state.error.message = error.message ? error.message : `${ERROR_MSG_TEMPLATE} Skills slice`;
+                },
+                settled: (state) => {
+                    state.loading = false;
+                }
+            }
+        ),
+        deleteSkill: create.asyncThunk(async (id: string, thunkApi) => {
+            await axios.delete(`${API_URL}/skills/${id}`, {
+                headers: {
+                    'Authorization': `Bearer ${JWT_TOKEN}`
+                }
+            });
+
+            thunkApi.dispatch(deleteSkillLocally(id));
+        },
+            {
+                pending: (state) => {
+                    state.loading = true;
+                },
+                rejected: (state, { error }) => {
+                    state.error.exists = true;
+                    state.error.message = error.message ? error.message : `${ERROR_MSG_TEMPLATE} Skills slice`;
+                },
+                settled: (state) => {
+                    state.loading = false;
+                }
+            }
+        ),
+
+        editSkill: create.asyncThunk(async (skill: SkillModel) => {
+            const response: AxiosResponse<SkillModel> = await axios.patch(`${API_URL}/skills/${skill._id}`, skill, {
+                headers: {
+                    'Authorization': `Bearer ${JWT_TOKEN}`
+                }
+            });
+
+            return response.data;
+        },
+            {
+                pending: (state) => {
+                    state.loading = true;
+                },
+                fulfilled: (state, { payload }) => {
+                    const skill = state.skills.find((s) => s._id === payload._id);
+                    const [data] = excludeObjectValues<SkillModel>(['createdAt', 'updatedAt', '__v'], [payload]);
+
+                    if (skill) {
+                        const skillIndex = state.skills.indexOf(skill);
+                        const skillsCopy = [...state.skills];
+                        skillsCopy[skillIndex] = data;
+                        state.skills = skillsCopy;
+                    }
+                },
+                rejected: (state, { error }) => {
+                    state.error.exists = true;
+                    state.error.message = error.message ? error.message : `${ERROR_MSG_TEMPLATE} Skills slice`;
+                },
+                settled: (state) => {
+                    state.loading = false;
+                }
+            }
+        )
     })
 });
 
-export const { selectSkills } = skillSlice.selectors;
+export const { selectSkills, selectLoading, selectError } = skillSlice.selectors;
 
-export const { addSkill, deleteSkill, editSkill } = skillSlice.actions;
+export const { deleteSkillLocally, fetchSkills, addSkill, deleteSkill, editSkill } = skillSlice.actions;
 
 export default skillSlice.reducer;
