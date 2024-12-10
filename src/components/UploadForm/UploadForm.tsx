@@ -1,4 +1,4 @@
-import React, { ChangeEventHandler, DetailedHTMLProps, FormHTMLAttributes, useState } from 'react';
+import React, { ChangeEventHandler, DetailedHTMLProps, FormHTMLAttributes } from 'react';
 import styles from './UploadForm.module.scss';
 import { Button } from '../Button/Button';
 
