@@ -1,10 +1,11 @@
 import { asyncThunkCreator, buildCreateSlice, PayloadAction } from '@reduxjs/toolkit';
+import axios, { AxiosResponse } from 'axios';
+
 import { SkillModel } from '../models/skill.model';
 import { SkillDto } from '../dto/skill.dto';
 import { ResponseError } from '../types/response-error.type';
-import axios, { AxiosResponse } from 'axios';
-import excludeObjectValues from '../utils/excludeObjectValues';
 import { ERROR_MSG_TEMPLATE } from '../constants/constants';
+import excludeObjectValues from '../utils/excludeObjectValues';
 
 const API_URL = import.meta.env.VITE_API_URL;
 const API_KEY = import.meta.env.VITE_API_KEY;
@@ -41,7 +42,6 @@ export const skillSlice = createSkillSlice({
         deleteSkillLocally: create.reducer((state, { payload }: PayloadAction<string>) => {
             state.skills = state.skills.filter((s) => s._id !== payload);
         }),
-
         fetchSkills: create.asyncThunk(async () => {
             const response: AxiosResponse<SkillModel[]> = await axios.get(`${API_URL}/skills`, {
                 headers: {
@@ -116,7 +116,6 @@ export const skillSlice = createSkillSlice({
                 }
             }
         ),
-
         editSkill: create.asyncThunk(async (skill: SkillModel) => {
             const response: AxiosResponse<SkillModel> = await axios.patch(`${API_URL}/skills/${skill._id}`, skill, {
                 headers: {

@@ -1,10 +1,11 @@
 import { asyncThunkCreator, buildCreateSlice, PayloadAction } from '@reduxjs/toolkit';
+import axios, { AxiosResponse } from 'axios';
+
 import { ProjectModel } from '../models/project.model';
 import { ProjectDto } from '../dto/project.dto';
 import { ResponseError } from '../types/response-error.type';
-import axios, { AxiosResponse } from 'axios';
-import excludeObjectValues from '../utils/excludeObjectValues';
 import { ERROR_MSG_TEMPLATE } from '../constants/constants';
+import excludeObjectValues from '../utils/excludeObjectValues';
 
 const API_URL = import.meta.env.VITE_API_URL;
 const API_KEY = import.meta.env.VITE_API_KEY;

@@ -1,9 +1,10 @@
 import { asyncThunkCreator, buildCreateSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ImageModel } from '../models/image.model';
-import { ResponseError } from '../types/response-error.type';
 import axios, { AxiosResponse } from 'axios';
-import { ERROR_MSG_TEMPLATE } from '../constants/constants';
+
+import { ImageModel } from '../models/image.model';
 import { DeleteImageDto } from '../dto/image.dto';
+import { ResponseError } from '../types/response-error.type';
+import { ERROR_MSG_TEMPLATE } from '../constants/constants';
 import { extractImgDirName } from '../utils/extractImgDirName';
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -44,7 +45,6 @@ const imageSlice = createImageSlice({
         deleteImageLocally: create.reducer((state, { payload }: PayloadAction<string>) => {
             state.imagesList = state.imagesList.filter((img) => img.url !== payload);
         }),
-
         fetchImages: create.asyncThunk(async () => {
             const response: AxiosResponse<ImageModel[]> = await axios.get(`${API_URL}/images`, {
                 headers: {
@@ -73,7 +73,6 @@ const imageSlice = createImageSlice({
                 }
             }
         ),
-
         addImage: create.asyncThunk(async (img: FormData) => {
             const response: AxiosResponse<ImageModel[]> = await axios.post(`${API_URL}/images/upload`, img, {
                 headers: {
@@ -130,7 +129,6 @@ const imageSlice = createImageSlice({
                 }
             }
         ),
-
         deleteDir: create.asyncThunk(async (dirName: string) => {
             await axios.delete(`${API_URL}/images/delete/${dirName}`, {
                 headers: {

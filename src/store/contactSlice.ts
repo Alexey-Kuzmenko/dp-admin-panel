@@ -20,7 +20,6 @@ interface ContactState {
     error: ResponseError
 }
 
-// * This value exported for only for tests
 export const initialState: ContactState = {
     contacts: [],
     loading: null,
