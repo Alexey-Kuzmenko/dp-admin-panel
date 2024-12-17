@@ -1,15 +1,23 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { Accordion, AccordionSummary, Typography, AccordionDetails, Box } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { theme } from '../../theme/ThemeRegistry';
-import { Alert, Button, CodeBlock, SelectionForm } from '../../components';
+import { Alert, Button, CodeBlock, Loader, SelectionForm } from '../../components';
 
 import cn from 'classnames';
 import { JsonEditor } from 'json-edit-react';
 
 import { useAppSelector, useAppDispatch } from '../../hooks/redux-hooks';
-import { addProject, deleteProject, editProject, selectProjects } from '../../store/projectSlice';
+import {
+    addProject,
+    deleteProject,
+    editProject,
+    fetchProjects,
+    selectError,
+    selectLoading,
+    selectProjects
+} from '../../store/projectSlice';
 import { selectMenuSlice } from '../../store/menuSlice';
 
 import { dtoCodeBlocks } from '../../dto/dto-code-blocks';
@@ -42,9 +50,17 @@ const projectTemplate: Omit<ProjectModel, '_id'> = {
 };
 
 const Projects: React.FC = () => {
-    const projects = useAppSelector(selectProjects);
-    const { isMenuOpen } = useAppSelector(selectMenuSlice);
     const dispatch = useAppDispatch();
+
+    useEffect(() => {
+        dispatch(fetchProjects());
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    const projects = useAppSelector(selectProjects);
+    const loading = useAppSelector(selectLoading);
+    const { exists, message } = useAppSelector(selectError);
+    const { isMenuOpen } = useAppSelector(selectMenuSlice);
     const projectsIds = projects.map((p) => p._id);
 
     const [alertState, setAlertState] = useState<AlertState>({ type: 'success', isOpen: false, message: '' });
@@ -58,13 +74,13 @@ const Projects: React.FC = () => {
 
     const viewportWidth = window.innerWidth;
 
-    const handleSave = (action: 'edit' | 'add'): void => {
+    const handleSave = async (action: 'edit' | 'add'): Promise<void> => {
         if (action === 'add') {
             if (validateValue(newProject) === false) {
                 setAlertState({ type: 'error', isOpen: true, message: ALERT_ERROR_MGS });
                 hideAlertAutomatically('error', alertState, setAlertState);
             } else {
-                dispatch(addProject(newProject as ProjectModel));
+                await dispatch(addProject(newProject as ProjectModel));
                 setNewProject(projectTemplate);
                 setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
                 hideAlertAutomatically('success', alertState, setAlertState);
@@ -76,7 +92,7 @@ const Projects: React.FC = () => {
                 setAlertState({ type: 'error', isOpen: true, message: ALERT_ERROR_MGS });
                 hideAlertAutomatically('error', alertState, setAlertState);
             } else {
-                dispatch(editProject(editedProject as ProjectModel));
+                await dispatch(editProject(editedProject as ProjectModel));
                 setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
                 hideAlertAutomatically('success', alertState, setAlertState);
             }
@@ -97,7 +113,7 @@ const Projects: React.FC = () => {
     };
 
     const handleFind = (id: string): void => {
-        const jsonEditorData = projects.find((f) => f._id === id);
+        const jsonEditorData = projects.find((p) => p._id === id);
 
         if (jsonEditorData) {
             setEditedProject(jsonEditorData);
@@ -105,8 +121,8 @@ const Projects: React.FC = () => {
         }
     };
 
-    const handleDelete = (): void => {
-        dispatch(deleteProject(deletedProjectId));
+    const handleDelete = async (): Promise<void> => {
+        await dispatch(deleteProject(deletedProjectId));
         setDeletedProjectId('');
 
         setAlertState({ type: 'success', isOpen: true, message: 'Project successfully deleted' });
@@ -320,11 +336,14 @@ const Projects: React.FC = () => {
 
             {/* Alerts */}
             <Alert
-                type={alertState.type}
-                message={alertState.message}
-                isOpen={alertState.isOpen}
+                type={exists ? 'error' : alertState.type}
+                message={message ? message : alertState.message}
+                isOpen={exists ? true : alertState.isOpen}
                 onClose={handleAlertClose}
             />
+
+            {/* Loader */}
+            {loading ? <Loader /> : null}
 
         </div>
     );
