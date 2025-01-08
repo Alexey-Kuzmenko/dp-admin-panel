@@ -1,82 +1,165 @@
-/* eslint-disable no-console */
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ImageModel } from '../models/image.model';
+import { asyncThunkCreator, buildCreateSlice, PayloadAction } from '@reduxjs/toolkit';
+import axios, { AxiosResponse } from 'axios';
 
-const staticFilesUrl = import.meta.env.VITE_STATIC_FILES_URL;
+import { ImageModel } from '../models/image.model';
+import { DeleteImageDto } from '../dto/image.dto';
+import { ResponseError } from '../types/response-error.type';
+import { ERROR_MSG_TEMPLATE } from '../constants/constants';
+import { extractImgDirName } from '../utils/extractImgDirName';
+
+const API_URL = import.meta.env.VITE_API_URL;
+const API_KEY = import.meta.env.VITE_API_KEY;
+const JWT_TOKEN = import.meta.env.VITE_JWT_TOKEN;
+
+const createImageSlice = buildCreateSlice({
+    creators: { asyncThunk: asyncThunkCreator }
+});
 
 interface ImageSate {
     imagesList: Array<ImageModel>
+    dirList: Array<string>,
+    loading: boolean | null,
+    error: ResponseError
 }
 
-// * temporary data
 const initialState: ImageSate = {
-    imagesList: [
-        {
-            url: `${staticFilesUrl}/quiz-app/quiz-app_img.svg`,
-            name: 'quiz-app_img.svg'
-        },
-        {
-            url: `${staticFilesUrl}/quiz-app/quiz-app_img.webp`,
-            name: 'quiz-app_img.webp'
-        },
-        {
-            url: `${staticFilesUrl}/budget-app/budget-app_img.svg`,
-            name: 'budget-app_img.svg'
-        },
-        {
-            url: `${staticFilesUrl}/budget-app/budget-app_img.webp`,
-            name: 'budget-app_img.webp'
-        },
-        {
-            url: `${staticFilesUrl}/cleaning-x/cleaning-x_img.svg`,
-            name: 'cleaning-x_img.svg'
-        },
-        {
-            url: `${staticFilesUrl}/cleaning-x/cleaning-x_img.webp`,
-            name: 'cleaning-x_img.webp'
-        },
-        {
-            url: `${staticFilesUrl}/home-page/home-page_oleksii_kuzmenko.svg`,
-            name: 'home-page_oleksii_kuzmenko.svg'
-        },
-        {
-            url: `${staticFilesUrl}/home-page/home-page_oleksii_kuzmenko.webp`,
-            name: 'home-page_oleksii_kuzmenko.webp'
-        },
-        {
-            url: `${staticFilesUrl}/home-page/home-page_github_preview.svg`,
-            name: 'home-page_github_preview.svg'
-        },
-        {
-            url: `${staticFilesUrl}/home-page/home-page_github_preview.webp`,
-            name: 'home-page_github_preview.webp'
-        },
-    ],
+    imagesList: [],
+    dirList: [],
+    loading: null,
+    error: {
+        exists: null,
+        message: null
+    }
 };
 
-const imageSlice = createSlice({
+const imageSlice = createImageSlice({
     name: 'image',
     initialState,
     selectors: {
-        selectImages: (state) => state.imagesList
+        selectImages: (state) => state.imagesList,
+        selectDirectories: (state) => state.dirList,
+        selectLoading: (state) => state.loading,
+        selectError: (state) => state.error
     },
     reducers: (create) => ({
-        addImage: create.reducer((state, { payload }: PayloadAction<string>) => {
-            // * temporary solution
-            console.log(payload);
-        }),
-        deleteImage: create.reducer((state, { payload }: PayloadAction<string>) => {
+        deleteImageLocally: create.reducer((state, { payload }: PayloadAction<string>) => {
             state.imagesList = state.imagesList.filter((img) => img.url !== payload);
         }),
-        deleteDir: create.reducer((state, { payload }: PayloadAction<string>) => {
-            // * temporary solution
-            console.log(payload);
-        })
-    }),
+        fetchImages: create.asyncThunk(async () => {
+            const response: AxiosResponse<ImageModel[]> = await axios.get(`${API_URL}/images`, {
+                headers: {
+                    'Api-key': API_KEY
+                }
+            });
+
+            return response.data;
+        },
+            {
+                pending: (state) => {
+                    state.loading = true;
+                },
+                fulfilled: (state, { payload }) => {
+                    state.imagesList.push(...payload);
+
+                    const directories = extractImgDirName(payload);
+                    state.dirList.push(...directories);
+                },
+                rejected: (state, { error }) => {
+                    state.error.exists = true;
+                    state.error.message = error.message ? error.message : `${ERROR_MSG_TEMPLATE} Image slice`;
+                },
+                settled: (state) => {
+                    state.loading = false;
+                }
+            }
+        ),
+        addImage: create.asyncThunk(async (img: FormData) => {
+            const response: AxiosResponse<ImageModel[]> = await axios.post(`${API_URL}/images/upload`, img, {
+                headers: {
+                    'Authorization': `Bearer ${JWT_TOKEN}`,
+                    'Content-Type': 'multipart/form-data',
+                }
+            });
+
+            return response.data;
+        },
+            {
+                pending: (state) => {
+                    state.loading = true;
+                },
+                fulfilled: (state, { payload }) => {
+                    state.imagesList.push(...payload);
+
+                    const directory = extractImgDirName(payload);
+                    state.dirList.push(...directory);
+                },
+                rejected: (state, { error }) => {
+                    state.error.exists = true;
+                    state.error.message = error.message ? error.message : `${ERROR_MSG_TEMPLATE} Image slice`;
+                },
+                settled: (state) => {
+                    state.loading = false;
+                }
+            }
+        ),
+        deleteImage: create.asyncThunk(async (imgUrl: string, thunkApi) => {
+            const dto: DeleteImageDto = {
+                imgPath: imgUrl
+            };
+
+            await axios.delete(`${API_URL}/images/delete`, {
+                data: dto,
+                headers: {
+                    'Authorization': `Bearer ${JWT_TOKEN}`
+                }
+            });
+
+            thunkApi.dispatch(deleteImageLocally(imgUrl));
+        },
+            {
+                pending: (state) => {
+                    state.loading = true;
+                },
+                rejected: (state, { error }) => {
+                    state.error.exists = true;
+                    state.error.message = error.message ? error.message : `${ERROR_MSG_TEMPLATE} Image slice`;
+                },
+                settled: (state) => {
+                    state.loading = false;
+                }
+            }
+        ),
+        deleteDir: create.asyncThunk(async (dirName: string) => {
+            await axios.delete(`${API_URL}/images/delete/${dirName}`, {
+                headers: {
+                    'Authorization': `Bearer ${JWT_TOKEN}`
+                }
+            });
+
+            return dirName;
+        },
+            {
+                pending: (state) => {
+                    state.loading = true;
+                },
+                fulfilled: (state, { payload }) => {
+                    state.dirList = state.dirList.filter((d) => d !== payload);
+                    state.imagesList = state.imagesList.filter((i) => !i.name.includes(payload));
+                },
+                rejected: (state, { error }) => {
+                    state.error.exists = true;
+                    state.error.message = error.message ? error.message : `${ERROR_MSG_TEMPLATE} Image slice`;
+                },
+                settled: (state) => {
+                    state.loading = false;
+                }
+            }
+        )
+    })
 });
 
-export const { selectImages } = imageSlice.selectors;
+export const { selectImages, selectDirectories, selectLoading, selectError } = imageSlice.selectors;
 
-export const { addImage, deleteImage, deleteDir } = imageSlice.actions;
+export const { deleteImageLocally, fetchImages, addImage, deleteImage, deleteDir } = imageSlice.actions;
 
 export default imageSlice.reducer;

@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { DetailedHTMLProps, FormHTMLAttributes, useState } from 'react';
 
 import { Controller } from 'react-hook-form';

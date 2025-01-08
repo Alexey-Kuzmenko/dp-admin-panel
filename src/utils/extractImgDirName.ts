@@ -5,7 +5,7 @@ export function extractImgDirName(imgList: Array<ImageModel>): Array<string> {
 
     for (let i = 0; i < imgList.length; i++) {
         const imgData = imgList[i];
-        const dirName: string = imgData.url.split('/')[4];
+        const dirName: string = imgData.url.split('/')[0];
 
         if (dirList.includes(dirName)) {
             continue;

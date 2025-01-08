@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import Accordion from '@mui/material/Accordion';
 import AccordionDetails from '@mui/material/AccordionDetails';
@@ -7,59 +7,83 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Typography, IconButton, ImageList, ImageListItem, ImageListItemBar } from '@mui/material';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import { theme } from '../../theme/ThemeRegistry';
-import { Alert, CodeBlock, SelectionForm, UploadForm } from '../../components';
+import { Alert, CodeBlock, Loader, SelectionForm, UploadForm } from '../../components';
 
 import cn from 'classnames';
 
 import { useAppDispatch, useAppSelector } from '../../hooks/redux-hooks';
-import { addImage, deleteDir, deleteImage, selectImages } from '../../store/imageSlice';
+import {
+    addImage,
+    deleteDir,
+    deleteImage,
+    fetchImages,
+    selectDirectories,
+    selectError,
+    selectImages,
+    selectLoading
+} from '../../store/imageSlice';
 import { selectMenuSlice } from '../../store/menuSlice';
 
 import { dtoCodeBlocks } from '../../dto/dto-code-blocks';
 import { AlertState } from '../../types/alert-state.type';
 
 import { ALERT_SUCCESS_MGS } from '../../constants/constants';
-import { extractImgDirName } from '../../utils/extractImgDirName';
 import hideAlertAutomatically from '../../utils/hideAlertAutomatically';
 
 import styles from './Images.module.scss';
 
-const Images: React.FC = () => {
-    const imagesList = useAppSelector(selectImages);
-    const { isMenuOpen } = useAppSelector(selectMenuSlice);
-    const dispatch = useAppDispatch();
-    const uploadForm = useRef<HTMLFormElement>(null);
+const STATIC_FILES_URL = import.meta.env.VITE_STATIC_FILES_URL;
 
-    const [newImgUrl, setNewImgUrl] = useState<string>('');
-    const [dirList, setDirList] = useState<string[]>(extractImgDirName(imagesList));
+const Images: React.FC = () => {
+    const dispatch = useAppDispatch();
+
+    useEffect(() => {
+        dispatch(fetchImages());
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    const imagesList = useAppSelector(selectImages);
+    const dirList = useAppSelector(selectDirectories);
+    const loading = useAppSelector(selectLoading);
+    const { exists, message } = useAppSelector(selectError);
+    const { isMenuOpen } = useAppSelector(selectMenuSlice);
+
+    const uploadForm = useRef<HTMLFormElement>(null);
+    const [isFormValid, setIsFormValid] = useState<boolean>(false);
+    const [selectedImg, setSelectedImg] = useState<File>();
     const [deletedDirName, setDeletedDirName] = useState<string>('');
     const [alertState, setAlertState] = useState<AlertState>({ type: 'success', isOpen: false, message: '' });
 
-    const handleImageDelete = (imgUrl: string): void => {
-        dispatch(deleteImage(imgUrl));
+    const handleImageDelete = async (imgUrl: string): Promise<void> => {
+        await dispatch(deleteImage(imgUrl));
         setAlertState({ type: 'success', isOpen: true, message: 'Image successfully deleted' });
         hideAlertAutomatically('success', alertState, setAlertState);
     };
 
-    const handelSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
+    const handelSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
         event.preventDefault();
-        dispatch(addImage(newImgUrl));
-        setNewImgUrl('');
-        uploadForm.current?.reset();
+        const formData = new FormData();
 
-        setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
-        hideAlertAutomatically('success', alertState, setAlertState);
+        if (selectedImg) {
+            formData.append('image', selectedImg);
+            await dispatch(addImage(formData));
+
+            uploadForm.current?.reset();
+            setIsFormValid(false);
+
+            setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
+            hideAlertAutomatically('success', alertState, setAlertState);
+        }
     };
 
     const handelReset = (): void => {
+        setIsFormValid(false);
         setAlertState({ type: 'warning', isOpen: true, message: 'Input value was reset' });
         hideAlertAutomatically('warning', alertState, setAlertState);
     };
 
-    const handleDirDelete = (): void => {
-        // * temporary solution
-        setDirList(dirList.filter((d) => d !== deletedDirName));
-        dispatch(deleteDir(deletedDirName));
+    const handleDirDelete = async (): Promise<void> => {
+        await dispatch(deleteDir(deletedDirName));
         setDeletedDirName('');
 
         setAlertState({ type: 'success', isOpen: true, message: 'Directory successfully deleted' });
@@ -115,7 +139,7 @@ const Images: React.FC = () => {
                                 {imagesList.map((img) => (
                                     <ImageListItem key={img.name}>
                                         <img
-                                            src={img.url}
+                                            src={`${STATIC_FILES_URL}/${img.url}`}
                                             alt={img.name}
                                             loading='lazy'
                                         />
@@ -154,8 +178,10 @@ const Images: React.FC = () => {
                 <AccordionDetails>
                     <UploadForm
                         id='upload-image-form'
-                        reference={uploadForm}
-                        setValue={setNewImgUrl}
+                        formRef={uploadForm}
+                        setValue={setSelectedImg}
+                        isValid={isFormValid}
+                        setIsValid={setIsFormValid}
                         onSubmit={handelSubmit}
                         onReset={handelReset}
                     />
@@ -202,11 +228,13 @@ const Images: React.FC = () => {
 
             {/* Alerts */}
             <Alert
-                type={alertState.type}
-                message={alertState.message}
-                isOpen={alertState.isOpen}
+                type={exists ? 'error' : alertState.type}
+                message={message ? message : alertState.message}
+                isOpen={exists ? true : alertState.isOpen}
                 onClose={handleAlertClose}
             />
+
+            {loading ? <Loader /> : null}
 
         </div>
     );

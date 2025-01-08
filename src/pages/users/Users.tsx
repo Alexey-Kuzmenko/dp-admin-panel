@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import {
     Accordion,
@@ -14,13 +14,13 @@ import {
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { theme } from '../../theme/ThemeRegistry';
-import { Alert, Button, CodeBlock, SelectionForm, StyledTableCell, StyledTableRow } from '../../components';
+import { Alert, Button, CodeBlock, Loader, SelectionForm, StyledTableCell, StyledTableRow } from '../../components';
 
 import cn from 'classnames';
 import { JsonEditor } from 'json-edit-react';
 
 import { useAppDispatch, useAppSelector } from '../../hooks/redux-hooks';
-import { addUser, deleteUser, selectUsers } from '../../store/userSlice';
+import { addUser, deleteUser, fetchUsers, selectError, selectLoading, selectUsers } from '../../store/userSlice';
 import { selectMenuSlice } from '../../store/menuSlice';
 
 import { dtoCodeBlocks } from '../../dto/dto-code-blocks';
@@ -43,14 +43,22 @@ import {
 import styles from './Users.module.scss';
 
 const userTemplate: CreateUserDto = {
-    password: '',
-    email: ''
+    email: '',
+    password: ''
 };
 
 const Users: React.FC = () => {
-    const users = useAppSelector(selectUsers);
-    const { isMenuOpen } = useAppSelector(selectMenuSlice);
     const dispatch = useAppDispatch();
+
+    useEffect(() => {
+        dispatch(fetchUsers());
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    const users = useAppSelector(selectUsers);
+    const loading = useAppSelector(selectLoading);
+    const { exists, message } = useAppSelector(selectError);
+    const { isMenuOpen } = useAppSelector(selectMenuSlice);
     const usersIds = users.map((u) => u._id);
 
     const [alertState, setAlertState] = useState<AlertState>({ type: 'success', isOpen: false, message: '' });
@@ -62,25 +70,24 @@ const Users: React.FC = () => {
     const viewportWidth = window.innerWidth;
 
     const renderTableRows = (users: Array<UserModel>): JSX.Element[] => {
-        return users.map(({ _id, email, passwordHash }) => {
+        return users.map(({ _id, email }) => {
             return (
                 <StyledTableRow
                     key={_id}
                 >
                     <StyledTableCell>{_id}</StyledTableCell>
                     <StyledTableCell content='th' scope='row' align='right'>{email}</StyledTableCell>
-                    <StyledTableCell content='th' scope='row' align='right'>{passwordHash}</StyledTableCell>
                 </StyledTableRow>
             );
         });
     };
 
-    const handleSave = (): void => {
+    const handleSave = async (): Promise<void> => {
         if (validateValue(newUser) === false) {
             setAlertState({ type: 'error', isOpen: true, message: ALERT_ERROR_MGS });
             hideAlertAutomatically('error', alertState, setAlertState);
         } else {
-            dispatch(addUser(newUser as CreateUserDto));
+            await dispatch(addUser(newUser as CreateUserDto));
             setNewUser(userTemplate);
             setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
             hideAlertAutomatically('success', alertState, setAlertState);
@@ -93,8 +100,8 @@ const Users: React.FC = () => {
         hideAlertAutomatically('warning', alertState, setAlertState);
     };
 
-    const handleDelete = (): void => {
-        dispatch(deleteUser(deletedUserId));
+    const handleDelete = async (): Promise<void> => {
+        await dispatch(deleteUser(deletedUserId));
         setDeletedUserId('');
 
         setAlertState({ type: 'success', isOpen: true, message: 'User successfully deleted' });
@@ -145,7 +152,6 @@ const Users: React.FC = () => {
                                 <StyledTableRow>
                                     <StyledTableCell>User ID</StyledTableCell>
                                     <StyledTableCell align='right'>User email</StyledTableCell>
-                                    <StyledTableCell align='right'>Password hash</StyledTableCell>
                                 </StyledTableRow>
                             </TableHead>
                             <TableBody>
@@ -273,11 +279,14 @@ const Users: React.FC = () => {
 
             {/* Alerts */}
             <Alert
-                type={alertState.type}
-                message={alertState.message}
-                isOpen={alertState.isOpen}
+                type={exists ? 'error' : alertState.type}
+                message={message ? message : alertState.message}
+                isOpen={exists ? true : alertState.isOpen}
                 onClose={handleAlertClose}
             />
+
+            {/* Loader */}
+            {loading ? <Loader /> : null}
 
         </div>
     );

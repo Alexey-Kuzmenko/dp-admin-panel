@@ -1,15 +1,23 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 import { Accordion, AccordionSummary, Typography, AccordionDetails, Box } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { theme } from '../../theme/ThemeRegistry';
-import { Alert, Button, CodeBlock, SelectionForm } from '../../components';
+import { Alert, Button, CodeBlock, Loader, SelectionForm } from '../../components';
 
 import { JsonEditor } from 'json-edit-react';
 import cn from 'classnames';
 
 import { useAppDispatch, useAppSelector } from '../../hooks/redux-hooks';
-import { addPageContent, deletePageContent, editContent, selectContent } from '../../store/contentSlice';
+import {
+    addPageContent,
+    deletePageContent,
+    editContent,
+    fetchPagesContent,
+    selectContent,
+    selectError,
+    selectLoading
+} from '../../store/contentSlice';
 import { selectMenuSlice } from '../../store/menuSlice';
 
 import { dtoCodeBlocks } from '../../dto/dto-code-blocks';
@@ -49,9 +57,17 @@ const contentTemplate: Omit<ContentModel, '_id'> = {
 };
 
 const Content: React.FC = () => {
-    const { isMenuOpen } = useAppSelector(selectMenuSlice);
-    const content = useAppSelector(selectContent);
     const dispatch = useAppDispatch();
+
+    useEffect(() => {
+        dispatch(fetchPagesContent());
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    const content = useAppSelector(selectContent);
+    const loading = useAppSelector(selectLoading);
+    const { exists, message } = useAppSelector(selectError);
+    const { isMenuOpen } = useAppSelector(selectMenuSlice);
     const contentTypes = generateContentFormValues(content);
     const contentIds = content.map((c) => c._id);
 
@@ -67,13 +83,13 @@ const Content: React.FC = () => {
 
     const viewportWidth = window.innerWidth;
 
-    const handleSave = (action: 'edit' | 'add'): void => {
+    const handleSave = async (action: 'edit' | 'add'): Promise<void> => {
         if (action === 'add') {
             if (validateValue((newContent as ContentModel).eng) === false && ((newContent as ContentModel).ua)) {
                 setAlertState({ type: 'error', isOpen: true, message: ALERT_ERROR_MGS });
                 hideAlertAutomatically('error', alertState, setAlertState);
             } else {
-                dispatch(addPageContent(newContent as ContentModel));
+                await dispatch(addPageContent(newContent as ContentModel));
                 setNewContent(contentTemplate);
                 setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
                 hideAlertAutomatically('success', alertState, setAlertState);
@@ -115,8 +131,8 @@ const Content: React.FC = () => {
         }
     };
 
-    const handleDelete = (): void => {
-        dispatch(deletePageContent(deletedContentId));
+    const handleDelete = async (): Promise<void> => {
+        await dispatch(deletePageContent(deletedContentId));
         setDeletedContentId('');
 
         setAlertState({ type: 'success', isOpen: true, message: 'Content successfully deleted' });
@@ -330,11 +346,14 @@ const Content: React.FC = () => {
 
             {/* Alerts */}
             <Alert
-                type={alertState.type}
-                message={alertState.message}
-                isOpen={alertState.isOpen}
+                type={exists ? 'error' : alertState.type}
+                message={message ? message : alertState.message}
+                isOpen={exists ? true : alertState.isOpen}
                 onClose={handleAlertClose}
             />
+
+            {/* Loader */}
+            {loading ? <Loader /> : null}
 
         </div>
     );

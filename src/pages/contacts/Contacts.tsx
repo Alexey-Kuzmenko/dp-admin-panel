@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import Accordion from '@mui/material/Accordion';
 import AccordionDetails from '@mui/material/AccordionDetails';
@@ -6,13 +6,21 @@ import AccordionSummary from '@mui/material/AccordionSummary';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Box, Typography } from '@mui/material';
 import { theme } from '../../theme/ThemeRegistry';
-import { CodeBlock, SelectionForm, Button, Alert } from '../../components';
+import { CodeBlock, SelectionForm, Button, Alert, Loader } from '../../components';
 
 import cn from 'classnames';
 import { JsonEditor } from 'json-edit-react';
 
 import { useAppDispatch, useAppSelector } from '../../hooks/redux-hooks';
-import { addContact, deleteContact, editContact, selectContacts } from '../../store/contactSlice';
+import {
+    addContact,
+    deleteContact,
+    editContact,
+    fetchContacts,
+    selectContacts,
+    selectError,
+    selectLoading
+} from '../../store/contactSlice';
 import { selectMenuSlice } from '../../store/menuSlice';
 
 import { dtoCodeBlocks } from '../../dto/dto-code-blocks';
@@ -42,9 +50,17 @@ const contactTemplate: Omit<ContactModel, '_id'> = {
 };
 
 const Contacts: React.FC = () => {
-    const contacts = useAppSelector(selectContacts);
-    const { isMenuOpen } = useAppSelector(selectMenuSlice);
     const dispatch = useAppDispatch();
+
+    useEffect(() => {
+        dispatch(fetchContacts());
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    const contacts = useAppSelector(selectContacts);
+    const loading = useAppSelector(selectLoading);
+    const { exists, message } = useAppSelector(selectError);
+    const { isMenuOpen } = useAppSelector(selectMenuSlice);
     const contactsIds = contacts.map((c) => c._id);
 
     const [alertState, setAlertState] = useState<AlertState>({ type: 'success', isOpen: false, message: '' });
@@ -58,13 +74,13 @@ const Contacts: React.FC = () => {
 
     const viewportWidth = window.innerWidth;
 
-    const handleSave = (action: 'edit' | 'add'): void => {
+    const handleSave = async (action: 'edit' | 'add'): Promise<void> => {
         if (action === 'add') {
             if (validateValue(newContact) === false) {
                 setAlertState({ type: 'error', isOpen: true, message: ALERT_ERROR_MGS });
                 hideAlertAutomatically('error', alertState, setAlertState);
             } else {
-                dispatch(addContact(newContact as ContactModel));
+                await dispatch(addContact(newContact as ContactModel));
                 setNewContact(contactTemplate);
                 setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
                 hideAlertAutomatically('success', alertState, setAlertState);
@@ -76,7 +92,7 @@ const Contacts: React.FC = () => {
                 setAlertState({ type: 'error', isOpen: true, message: ALERT_ERROR_MGS });
                 hideAlertAutomatically('error', alertState, setAlertState);
             } else {
-                dispatch(editContact(editedContact as ContactModel));
+                await dispatch(editContact(editedContact as ContactModel));
                 setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
                 hideAlertAutomatically('success', alertState, setAlertState);
             }
@@ -105,8 +121,8 @@ const Contacts: React.FC = () => {
         }
     };
 
-    const handleDelete = (): void => {
-        dispatch(deleteContact(deletedContactId));
+    const handleDelete = async (): Promise<void> => {
+        await dispatch(deleteContact(deletedContactId));
         setDeletedContactId('');
 
         setAlertState({ type: 'success', isOpen: true, message: 'Contact successfully deleted' });
@@ -320,11 +336,15 @@ const Contacts: React.FC = () => {
 
             {/* Alerts */}
             <Alert
-                type={alertState.type}
-                message={alertState.message}
-                isOpen={alertState.isOpen}
+                type={exists ? 'error' : alertState.type}
+                message={message ? message : alertState.message}
+                isOpen={exists ? true : alertState.isOpen}
                 onClose={handleAlertClose}
             />
+
+            {
+                loading ? <Loader /> : null
+            }
 
         </div>
     );
