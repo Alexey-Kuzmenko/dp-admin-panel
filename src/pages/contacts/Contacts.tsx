@@ -342,6 +342,7 @@ const Contacts: React.FC = () => {
                 onClose={handleAlertClose}
             />
 
+            {/* Loader */}
             {
                 loading ? <Loader /> : null
             }
