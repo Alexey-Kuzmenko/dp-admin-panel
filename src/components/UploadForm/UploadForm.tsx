@@ -10,8 +10,6 @@ interface UploadFormProps extends DetailedHTMLProps<FormHTMLAttributes<HTMLFormE
 }
 
 export const UploadForm: React.FC<UploadFormProps> = ({ setValue, formRef, isValid, setIsValid, ...props }) => {
-    // const [isValid, setIsValid] = useState<boolean>(false);
-
     const handleChange: ChangeEventHandler<HTMLInputElement> = async (event) => {
         const file = event.target.files as FileList;
 
