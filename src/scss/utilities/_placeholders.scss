@@ -27,3 +27,17 @@
 
     width: fit-content;
 }
+
+%logout-button {
+    color: vars.$white;
+    text-decoration: none;
+
+    @media (min-width: vars.$xl) {
+        transition: color .3s ease;
+
+        &:hover {
+            transition: color .3s ease;
+            color: vars.$accent;
+        }
+    }
+}

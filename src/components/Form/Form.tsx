@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { DetailedHTMLProps, FormHTMLAttributes, useState } from 'react';
 
 import { Controller } from 'react-hook-form';
@@ -13,11 +12,13 @@ import { Button } from '../Button/Button';
 import extractSecrets from '../../utils/extractSecrets';
 import { PASSWORD_INPUT_HELPER_TEXT, SECRET_INPUT_HELPER_TEXT } from '../../constants/constants';
 
+import { useAppDispatch } from '../../hooks/redux-hooks';
+import { login, register } from '../../store/authSlice';
+
 import Logo from '../../assets/Logo.svg';
 import styles from './Form.module.scss';
 
-// * this interface exported for unit tests
-export interface FormProps extends DetailedHTMLProps<FormHTMLAttributes<HTMLFormElement>, HTMLFormElement> {
+interface FormProps extends DetailedHTMLProps<FormHTMLAttributes<HTMLFormElement>, HTMLFormElement> {
     title: string
     type: 'login' | 'register'
 }
@@ -34,6 +35,7 @@ const { palette } = theme;
 export const Form: React.FC<FormProps> = ({ title, type, ...props }) => {
     const [showSecret, setShowSecret] = useState<boolean>(false);
     const [showPassword, setShowPassword] = useState<boolean>(false);
+    const dispatch = useAppDispatch();
 
     const {
         control,
@@ -53,20 +55,14 @@ export const Form: React.FC<FormProps> = ({ title, type, ...props }) => {
         mode: 'onBlur'
     });
 
-    const handleFromSubmit: SubmitHandler<FromValues> = ({ email, password, secret }): void => {
+    const handleFromSubmit: SubmitHandler<FromValues> = ({ email, password }): void => {
         if (type === 'login') {
-            // ! temporary solution
-            console.group('login from values');
-            console.log(`email: ${email}, password: ${password}`);
-            console.groupEnd();
+            dispatch(login({ email, password }));
             setShowPassword(false);
         }
 
         if (type === 'register') {
-            // ! temporary solution
-            console.group('register from values');
-            console.log(`email: ${email}, password: ${password}, secret: ${secret}`);
-            console.groupEnd();
+            dispatch(register({ email, password }));
             setShowSecret(false);
         }
 
@@ -208,9 +204,8 @@ export const Form: React.FC<FormProps> = ({ title, type, ...props }) => {
                     :
                     <div className={styles.Form__controls}>
                         <Button variant='outlined' type='submit' disabled={!isValid}>Login</Button>
-                        <Button variant='contained' role='link' href='login/register' target='_self'>Register</Button>
+                        <Button variant='contained' role='link' href='/register' target='_self'>Register</Button>
                     </div>
-
             }
         </form>
     );

@@ -1,8 +1,10 @@
 import React from 'react';
+
 import { BurgerMenuIcon } from '../BurgerMenuIcon/BurgerMenuIcon';
 import cn from 'classnames';
 import { Backdrop, Box } from '@mui/material';
 import { MenuLink } from '../MenuLink/MenuLink';
+import { Link } from 'react-router-dom';
 import { MenuLinkModel } from '../../types/menu-link.type';
 import { useAppSelector, useAppDispatch } from '../../hooks/redux-hooks';
 import { closeMenu, selectMenuSlice } from '../../store/menuSlice';
@@ -57,7 +59,7 @@ export const Menu: React.FC<MenuProps> = ({ menuLinks }) => {
                         </ul>
                     </Box>
 
-                    <p className={styles.Menu__logoutBtn}>Log out</p>
+                    <Link className={styles.Menu__logoutBtn} to='logout'>Log out</Link>
                 </nav>
             </div>
 
