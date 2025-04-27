@@ -136,8 +136,6 @@ const authSlice = createAuthSlice({
                     }
                 }
             }
-
-
         }),
         saveSession: create.reducer((state, { payload }: PayloadAction<
             { token: string, email: string, password: string }
