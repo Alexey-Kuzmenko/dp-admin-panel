@@ -3,9 +3,10 @@ import menuReducer from './menuSlice';
 import contactReducer from './contactSlice';
 import contentReducer from './contentSlice';
 import skillReducer from './skillSlice';
-import projectSlice from './projectSlice';
-import userSlice from './userSlice';
-import imageSlice from './imageSlice';
+import projectReducer from './projectSlice';
+import userReducer from './userSlice';
+import imageReducer from './imageSlice';
+import authReducer from './authSlice';
 
 const store = configureStore({
     reducer: {
@@ -13,9 +14,10 @@ const store = configureStore({
         contacts: contactReducer,
         content: contentReducer,
         skills: skillReducer,
-        projects: projectSlice,
-        users: userSlice,
-        image: imageSlice
+        projects: projectReducer,
+        users: userReducer,
+        image: imageReducer,
+        authentication: authReducer,
     }
 });
 

@@ -47,7 +47,7 @@ const skillTemplate: Omit<SkillModel, '_id'> = {
     iconClass: ''
 };
 
-const Skills: React.FC = () => {
+export const Skills: React.FC = () => {
     const dispatch = useAppDispatch();
 
     useEffect(() => {
@@ -343,5 +343,3 @@ const Skills: React.FC = () => {
         </div>
     );
 };
-
-export default Skills;

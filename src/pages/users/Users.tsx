@@ -47,7 +47,7 @@ const userTemplate: CreateUserDto = {
     password: ''
 };
 
-const Users: React.FC = () => {
+export const Users: React.FC = () => {
     const dispatch = useAppDispatch();
 
     useEffect(() => {
@@ -291,5 +291,3 @@ const Users: React.FC = () => {
         </div>
     );
 };
-
-export default Users;

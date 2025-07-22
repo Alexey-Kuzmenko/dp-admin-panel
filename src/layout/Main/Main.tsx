@@ -3,11 +3,14 @@ import styles from './Main.module.scss';
 
 interface MainProps {
     children: React.ReactNode | React.ReactNode[]
+    customClassName?: string
 }
 
-export const Main: React.FC<MainProps> = ({ children }) => {
+export const Main: React.FC<MainProps> = ({ children, customClassName }) => {
+    const stylesClass = customClassName || styles.Main;
+
     return (
-        <main className={styles.Main}>
+        <main className={stylesClass}>
             <Container>
                 {children}
             </Container>

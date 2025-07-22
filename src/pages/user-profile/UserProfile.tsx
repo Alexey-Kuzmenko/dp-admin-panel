@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 
 import { Typography } from '@mui/material';
-import { CopyFiled, Alert, Button } from '../../components';
+import { CopyFiled, Alert } from '../../components';
 import { AlertState } from '../../types/alert-state.type';
 import { ALERT_COPY_MSG } from '../../constants/constants';
+import { Link } from 'react-router-dom';
 
 import styles from './UserProfile.module.scss';
 
@@ -67,7 +68,8 @@ export const UserProfile: React.FC = () => {
                                 setAlertState={setAlertState}
                             />
                         </div>
-                        <Button variant='text' role='link' href='/'>Logout</Button>
+
+                        <Link to='/logout' className={styles.UserProfile__logoutBtn}>Logout</Link>
                     </div>
 
                 </div>

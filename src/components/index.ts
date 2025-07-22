@@ -11,3 +11,4 @@ export * from './MUI/StyledComponents';
 export * from './UploadForm/UploadForm';
 export * from './CopyField/CopyField';
 export * from './Loader/Loader';
+export * from './Logout/Logout';

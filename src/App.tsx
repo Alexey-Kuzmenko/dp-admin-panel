@@ -1,52 +1,60 @@
-import React, { Suspense } from 'react';
+import { useEffect } from 'react';
 import { Route, Routes } from 'react-router-dom';
+
+import { useAppDispatch } from './hooks/redux-hooks';
+import { keepSession } from './store/authSlice';
 
 import { ThemeProvider } from '@mui/material';
 import { theme } from './theme/ThemeRegistry';
 
-import { Layout } from './layout';
-import { Loader } from './components';
-import { Dashboard, UserProfile, Login } from './pages';
+import { AuthLayout, ProtectedLayout } from './layout';
+import { Logout } from './components';
+import {
+  Contacts,
+  Content,
+  Dashboard,
+  Images,
+  Login,
+  Projects,
+  Skills,
+  UserProfile,
+  Users
+} from './pages';
+
 import { Register } from './pages/login/register/Register';
 
 import styles from './App.module.scss';
 
-const Contacts = React.lazy<React.FC>(() => import('./pages/contacts/Contacts'));
-const Content = React.lazy<React.FC>(() => import('./pages/content/Content'));
-const Skills = React.lazy<React.FC>(() => import('./pages/skills/Skills'));
-const Projects = React.lazy<React.FC>(() => import('./pages/projects/Projects'));
-const Users = React.lazy<React.FC>(() => import('./pages/users/Users'));
-const Images = React.lazy<React.FC>(() => import('./pages/images/Images'));
-
 function App() {
-  // ! testing
-  const isLogin = true;
+  const dispatch = useAppDispatch();
 
-  let routes: JSX.Element = (
+  useEffect(() => {
+    dispatch(keepSession());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const routes: JSX.Element = (
     <Routes>
-      <Route path='/'>
-        <Route index element={<Login />}></Route>
-        <Route path='login/register' element={<Register />} />
+      {/* Public routes */}
+      <Route path='/auth' element={<AuthLayout />}>
+        <Route path='login' element={<Login />} />
+        <Route path='register' element={<Register />} />
+      </Route>
+
+      {/* Protected routes */}
+      <Route path='/' element={<ProtectedLayout />}>
+        <Route index element={<Dashboard />} />
+        <Route path='contacts' element={<Contacts />} />
+        <Route path='content' element={<Content />} />
+        <Route path='images' element={<Images />} />
+        <Route path='projects' element={<Projects />} />
+        <Route path='skills' element={<Skills />} />
+        <Route path='users' element={<Users />} />
+        <Route path='user-profile' element={<UserProfile />} />
+        <Route path='logout' element={<Logout />} />
       </Route>
     </Routes>
   );
-
-  if (isLogin) {
-    routes = (
-      <Routes>
-        <Route path='/' element={<Layout />}>
-          <Route index element={<Dashboard />} />
-          <Route path='contacts' element={<Suspense fallback={<Loader />}><Contacts /></Suspense>} />
-          <Route path='content' element={<Suspense fallback={<Loader />}><Content /></Suspense>} />
-          <Route path='images' element={<Suspense fallback={<Loader />}><Images /></Suspense>} />
-          <Route path='projects' element={<Suspense fallback={<Loader />}><Projects /></Suspense>} />
-          <Route path='skills' element={<Suspense fallback={<Loader />}><Skills /></Suspense>} />
-          <Route path='users' element={<Suspense fallback={<Loader />}><Users /></Suspense>} />
-          <Route path='user-profile' element={<UserProfile />} />
-        </Route>
-      </Routes>
-    );
-  }
 
   return (
     <ThemeProvider theme={theme}>

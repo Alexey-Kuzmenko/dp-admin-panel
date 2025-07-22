@@ -56,7 +56,7 @@ const contentTemplate: Omit<ContentModel, '_id'> = {
     }
 };
 
-const Content: React.FC = () => {
+export const Content: React.FC = () => {
     const dispatch = useAppDispatch();
 
     useEffect(() => {
@@ -358,5 +358,3 @@ const Content: React.FC = () => {
         </div>
     );
 };
-
-export default Content;
