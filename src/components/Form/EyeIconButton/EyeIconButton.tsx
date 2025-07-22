@@ -3,7 +3,7 @@ import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { theme } from '../../../theme/ThemeRegistry';
 
-interface IconButtonProps {
+interface EyeIconButtonProps {
     isValueShown: boolean
     onClick: React.MouseEventHandler
     ariaLabelValues: {
@@ -15,7 +15,7 @@ interface IconButtonProps {
 
 const whiteColor = theme.palette.primary.contrastText;
 
-export const EyeIconButton: React.FC<IconButtonProps> = ({
+export const EyeIconButton: React.FC<EyeIconButtonProps> = ({
     isValueShown,
     onClick,
     ariaLabelValues,

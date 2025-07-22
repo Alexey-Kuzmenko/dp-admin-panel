@@ -85,14 +85,14 @@ const authSlice = createAuthSlice({
             const { access_token } = login.data;
 
             dispatch(saveSession({ token: access_token, email: dto.email }));
-            return access_token;
         },
             {
                 pending: (state) => {
                     state.loading = true;
                 },
-                fulfilled: (state, { payload }) => {
-                    state.token = payload;
+                fulfilled: (state) => {
+                    state.error.exists = null;
+                    state.error.message = null;
                 },
                 rejected: (state, { error }) => {
                     state.error.exists = true;
