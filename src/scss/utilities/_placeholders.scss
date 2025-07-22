@@ -29,14 +29,16 @@
 }
 
 %logout-button {
-    color: vars.$white;
     text-decoration: none;
+
+    color: vars.$white;
 
     @media (min-width: vars.$xl) {
         transition: color .3s ease;
 
         &:hover {
             transition: color .3s ease;
+
             color: vars.$accent;
         }
     }

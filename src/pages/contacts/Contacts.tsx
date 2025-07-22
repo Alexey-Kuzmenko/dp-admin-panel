@@ -49,7 +49,7 @@ const contactTemplate: Omit<ContactModel, '_id'> = {
     atl: ''
 };
 
-const Contacts: React.FC = () => {
+export const Contacts: React.FC = () => {
     const dispatch = useAppDispatch();
 
     useEffect(() => {
@@ -350,5 +350,3 @@ const Contacts: React.FC = () => {
         </div>
     );
 };
-
-export default Contacts;

@@ -200,7 +200,7 @@ export const Form: React.FC<FormProps> = ({ title, type, ...props }) => {
                     :
                     <div className={styles.Form__controls}>
                         <Button variant='outlined' type='submit' disabled={!isValid}>Login</Button>
-                        <Button variant='contained' role='link' href='/register' target='_self'>Register</Button>
+                        <Button variant='contained' role='link' href='/auth/register' target='_self'>Register</Button>
                     </div>
             }
         </form>

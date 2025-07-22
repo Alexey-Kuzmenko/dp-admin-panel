@@ -49,7 +49,7 @@ const projectTemplate: Omit<ProjectModel, '_id'> = {
     technologies: []
 };
 
-const Projects: React.FC = () => {
+export const Projects: React.FC = () => {
     const dispatch = useAppDispatch();
 
     useEffect(() => {
@@ -348,5 +348,3 @@ const Projects: React.FC = () => {
         </div>
     );
 };
-
-export default Projects;

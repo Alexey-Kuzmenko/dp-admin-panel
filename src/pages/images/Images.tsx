@@ -34,7 +34,7 @@ import styles from './Images.module.scss';
 
 const STATIC_FILES_URL = import.meta.env.VITE_STATIC_FILES_URL;
 
-const Images: React.FC = () => {
+export const Images: React.FC = () => {
     const dispatch = useAppDispatch();
 
     useEffect(() => {
@@ -239,5 +239,3 @@ const Images: React.FC = () => {
         </div>
     );
 };
-
-export default Images;

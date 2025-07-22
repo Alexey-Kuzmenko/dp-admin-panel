@@ -23,7 +23,6 @@ export const EyeIconButton: React.FC<IconButtonProps> = ({
 }) => {
     return (
         <IconButton
-            // aria-label={isValueShown ? 'hide the password' : 'display the password'}
             aria-label={isValueShown ? ariaLabelValues.shown : ariaLabelValues.hidden}
             onClick={onClick}
         >

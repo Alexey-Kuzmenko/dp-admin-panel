@@ -2,13 +2,22 @@ import { asyncThunkCreator, buildCreateSlice, PayloadAction } from '@reduxjs/too
 import { CreateUserDto } from '../dto/user.dto';
 import axios, { AxiosResponse } from 'axios';
 import { ResponseError } from '../types/response-error.type';
-import { ERROR_MSG_TEMPLATE } from '../constants/constants';
+import { ENV_VAR_IS_NOT_DEFINED, ERROR_MSG_TEMPLATE } from '../constants/constants';
 import { UserModel } from '../models/user.model';
 import { LoginModel } from '../models/login.model';
-import { AppDispatch, RootState } from '.';
+import { AppDispatch } from '.';
 
 const API_URL = import.meta.env.VITE_API_URL;
-const SESSION_EXPIRATION = Number.parseInt(import.meta.env.VITE_SESSION_EXPIRATION);
+const SESSION_EXPIRATION_TIME = import.meta.env.VITE_SESSION_EXPIRATION;
+const SESSION_EXPIRATION_DATE = new Date(new Date().getTime() + Number(SESSION_EXPIRATION_TIME) * 1_000);
+
+if (!API_URL) {
+    throw new Error(`API_URL ${ENV_VAR_IS_NOT_DEFINED} authSlice`);
+}
+
+if (!SESSION_EXPIRATION_TIME) {
+    throw new Error(`SESSION_EXPIRATION_TIME ${ENV_VAR_IS_NOT_DEFINED} authSlice`);
+}
 
 const createAuthSlice = buildCreateSlice({
     creators: { asyncThunk: asyncThunkCreator }
@@ -17,8 +26,6 @@ const createAuthSlice = buildCreateSlice({
 interface AuthState {
     token: string | null
     userEmail: string
-    password: string
-    expiresIn: number
     loading: boolean | null
     error: ResponseError
 }
@@ -26,8 +33,6 @@ interface AuthState {
 const initialState: AuthState = {
     token: null,
     userEmail: '',
-    password: '',
-    expiresIn: SESSION_EXPIRATION,
     loading: null,
     error: {
         exists: null,
@@ -40,8 +45,7 @@ const authSlice = createAuthSlice({
     initialState,
     selectors: {
         selectJwtToken: (state) => state.token,
-        selectUserData: ({ userEmail, password }) => ({ email: userEmail, password }),
-        selectExpiration: (state) => state.expiresIn,
+        selectUserData: ({ userEmail }) => ({ email: userEmail }),
         selectLoading: (state) => state.loading,
         selectError: (state) => state.error
     },
@@ -49,8 +53,9 @@ const authSlice = createAuthSlice({
         login: create.asyncThunk(async (dto: CreateUserDto, thunkApi) => {
             const dispatch = thunkApi.dispatch as AppDispatch;
             const response: AxiosResponse<LoginModel> = await axios.post(`${API_URL}/auth/login`, dto);
+            const { access_token } = response.data;
 
-            dispatch(saveSession({ token: response.data.access_token, email: dto.email, password: dto.password }));
+            dispatch(saveSession({ token: access_token, email: dto.email }));
         },
             {
                 pending: (state) => {
@@ -69,22 +74,25 @@ const authSlice = createAuthSlice({
                 }
             }
         ),
-        register: create.asyncThunk(async (dto: CreateUserDto) => {
+        register: create.asyncThunk(async (dto: CreateUserDto, thunkApi) => {
+            const dispatch = thunkApi.dispatch as AppDispatch;
             const register: AxiosResponse<UserModel> = await axios.post(`${API_URL}/auth/register`, dto);
             const { email } = register.data;
             const login: AxiosResponse<LoginModel> = await axios.post(
                 `${API_URL}/auth/login`,
                 { email, password: dto.password }
             );
+            const { access_token } = login.data;
 
-            return login.data;
+            dispatch(saveSession({ token: access_token, email: dto.email }));
+            return access_token;
         },
             {
                 pending: (state) => {
                     state.loading = true;
                 },
                 fulfilled: (state, { payload }) => {
-                    state.token = payload.access_token;
+                    state.token = payload;
                 },
                 rejected: (state, { error }) => {
                     state.error.exists = true;
@@ -95,58 +103,51 @@ const authSlice = createAuthSlice({
                 }
             }
         ),
-        autoLogout: create.asyncThunk(async (_, thunkApi) => {
-            const state = thunkApi.getState() as RootState;
-            const dispatch = thunkApi.dispatch as AppDispatch;
-            const expiresIn = state.authentication.expiresIn;
+        saveSession: create.reducer((state, { payload }: PayloadAction<
+            { token: string, email: string }
+        >) => {
+            localStorage.setItem('token', payload.token);
+            localStorage.setItem('email', payload.email);
 
-            setTimeout(() => {
-                dispatch(logout());
-            }, 10_000);
+            state.token = payload.token;
+            state.userEmail = payload.email;
         }),
         logout: create.reducer((state) => {
             state.token = null;
             state.userEmail = '';
-            state.password = '';
 
             localStorage.removeItem('token');
             localStorage.removeItem('email');
-            localStorage.removeItem('password');
+        }),
+        autoLogout: create.asyncThunk(async (_, thunkApi) => {
+            const dispatch = thunkApi.dispatch as AppDispatch;
+            const expiresInTimeout = +SESSION_EXPIRATION_TIME * 1_000;
+
+            setTimeout(() => {
+                dispatch(logout());
+            }, expiresInTimeout);
         }),
         keepSession: create.asyncThunk(async (_, thunkApi) => {
-            const { authentication } = thunkApi.getState() as RootState;
             const dispatch = thunkApi.dispatch as AppDispatch;
-
-            const { expiresIn } = authentication;
             const token = localStorage.getItem('token');
             const userEmail = localStorage.getItem('email');
-            const password = localStorage.getItem('password');
 
             if (!token && !userEmail) {
                 dispatch(logout());
-            } else {
-                const expirationDate = new Date(String(expiresIn));
 
-                if (expirationDate <= new Date()) {
-                    dispatch(logout());
-                } else {
-                    if (token && userEmail && password) {
-                        dispatch(saveSession({ token, email: userEmail, password }));
-                        dispatch(autoLogout());
-                    }
-                }
+                return;
             }
-        }),
-        saveSession: create.reducer((state, { payload }: PayloadAction<
-            { token: string, email: string, password: string }
-        >) => {
-            localStorage.setItem('token', payload.token);
-            localStorage.setItem('email', payload.email);
-            localStorage.setItem('password', payload.password);
 
-            state.token = payload.token;
-            state.userEmail = payload.email;
-            state.password = payload.password;
+            if (SESSION_EXPIRATION_DATE <= new Date()) {
+                dispatch(logout());
+
+                return;
+            }
+
+            if (token && userEmail) {
+                dispatch(saveSession({ token, email: userEmail }));
+                dispatch(autoLogout());
+            }
         }),
         resetResponseError: create.reducer(({ error }) => {
             error.exists = false;
@@ -155,7 +156,7 @@ const authSlice = createAuthSlice({
     }),
 });
 
-export const { selectJwtToken, selectUserData, selectExpiration, selectLoading, selectError } = authSlice.selectors;
+export const { selectJwtToken, selectUserData, selectLoading, selectError } = authSlice.selectors;
 
 export const { login, register, autoLogout, logout, keepSession, saveSession, resetResponseError } = authSlice.actions;
 

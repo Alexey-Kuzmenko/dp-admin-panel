@@ -1,4 +1,3 @@
-import { Main } from '../../../layout';
 import { Alert, Form, Loader } from '../../../components';
 import { useAppDispatch, useAppSelector } from '../../../hooks/redux-hooks';
 import { resetResponseError, selectError, selectLoading } from '../../../store/authSlice';
@@ -13,7 +12,7 @@ export const Register: React.FC = () => {
     };
 
     return (
-        <Main>
+        <>
             <Form title='Create new account' type='register' id='register-form' name='register-form' />
 
             {/* Alert */}
@@ -25,6 +24,6 @@ export const Register: React.FC = () => {
             />
             {/* Loading */}
             {loading ? <Loader /> : null}
-        </Main>
+        </>
     );
 };

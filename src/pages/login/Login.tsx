@@ -1,4 +1,3 @@
-import { Main } from '../../layout';
 import { Alert, Form, Loader } from '../../components';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux-hooks';
 import { selectError, selectLoading, resetResponseError } from '../../store/authSlice';
@@ -13,7 +12,7 @@ export const Login: React.FC = () => {
     };
 
     return (
-        <Main>
+        <>
             <Form title='Login into app' type='login' id='login-form' name='login-form' />
 
             {/* Alert */}
@@ -26,6 +25,6 @@ export const Login: React.FC = () => {
 
             {/* Loader */}
             {loading ? <Loader /> : null}
-        </Main>
+        </>
     );
 };
