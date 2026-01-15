@@ -6,9 +6,10 @@ import { AlertState } from '../../types/alert-state.type';
 import { ALERT_COPY_MSG } from '../../constants';
 import { Link } from 'react-router-dom';
 
-import styles from './UserProfile.module.scss';
 import { useAppSelector } from '../../hooks/redux-hooks';
 import { selectJwtToken, selectUserEmail } from '../../store/authSlice';
+
+import styles from './UserProfile.module.scss';
 
 export const UserProfile: React.FC = () => {
     const [alertState, setAlertState] = useState<AlertState>({ type: 'info', message: ALERT_COPY_MSG, isOpen: false });
@@ -44,16 +45,20 @@ export const UserProfile: React.FC = () => {
                             />
                         </div>
 
-                        <div className={styles.UserProfile__dataItem}>
-                            <Typography component='h1' variant='h5' sx={{ marginBottom: '20px' }}>
-                                JWT token
-                            </Typography>
-                            <CopyFiled
-                                value={token || ''}
-                                alertState={alertState}
-                                setAlertState={setAlertState}
-                            />
-                        </div>
+                        {
+                            token && (
+                                <div className={styles.UserProfile__dataItem}>
+                                    <Typography component='h1' variant='h5' sx={{ marginBottom: '20px' }}>
+                                        JWT token
+                                    </Typography>
+                                    <CopyFiled
+                                        value={token}
+                                        alertState={alertState}
+                                        setAlertState={setAlertState}
+                                    />
+                                </div>
+                            )
+                        }
 
                         <Link to='/logout' className={styles.UserProfile__logoutBtn}>Logout</Link>
                     </div>

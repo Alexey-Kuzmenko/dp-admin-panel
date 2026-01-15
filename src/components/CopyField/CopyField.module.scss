@@ -9,4 +9,14 @@
 
     border-radius: 8px;
     background-color: vars.$primary;
+
+    &__text {
+        overflow-x: auto;
+        scrollbar-width: none;
+        white-space: nowrap;
+
+        &:hover {
+            scrollbar-width: thin;
+        }
+    }
 }
