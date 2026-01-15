@@ -5,11 +5,10 @@ import { UserModel } from '../models/user.model';
 import { CreateUserDto, DeleteUserDto } from '../dto/user.dto';
 import { ResponseError } from '../types/response-error.type';
 import excludeObjectValues from '../utils/excludeObjectValues';
-import { ERROR_MSG_TEMPLATE } from '../constants/constants';
+import { ERROR_MSG_TEMPLATE, JWT_TOKEN_IS_MISSING_IN_STORE } from '../constants';
 import { RootState } from '.';
 
 const API_URL = import.meta.env.VITE_API_URL;
-const JWT_TOKEN = import.meta.env.VITE_JWT_TOKEN;
 
 const createUserSlice = buildCreateSlice({
     creators: { asyncThunk: asyncThunkCreator }
@@ -39,7 +38,14 @@ const userSlice = createUserSlice({
         selectError: (state) => state.error
     },
     reducers: (create) => ({
-        fetchUsers: create.asyncThunk(async () => {
+        fetchUsers: create.asyncThunk(async (_, thunkApi) => {
+            const state = thunkApi.getState() as RootState;
+            const JWT_TOKEN = state.authentication.token;
+
+            if (!JWT_TOKEN) {
+                throw new Error(JWT_TOKEN_IS_MISSING_IN_STORE);
+            }
+
             const response: AxiosResponse<UserModel[]> = await axios.get(`${API_URL}/user`, {
                 headers: {
                     'Authorization': `Bearer ${JWT_TOKEN}`
@@ -98,6 +104,7 @@ const userSlice = createUserSlice({
         deleteUser: create.asyncThunk(async (id: string, thunkApi) => {
             const state = thunkApi.getState() as RootState;
             const user = state.users.users.find((u) => u._id === id);
+            const JWT_TOKEN = state.authentication.token;
 
             if (user) {
                 const data: DeleteUserDto = {

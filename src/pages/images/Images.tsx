@@ -27,7 +27,7 @@ import { selectMenuSlice } from '../../store/menuSlice';
 import { dtoCodeBlocks } from '../../dto/dto-code-blocks';
 import { AlertState } from '../../types/alert-state.type';
 
-import { ALERT_SUCCESS_MGS } from '../../constants/constants';
+import { ALERT_SUCCESS_MGS } from '../../constants';
 import hideAlertAutomatically from '../../utils/hideAlertAutomatically';
 
 import styles from './Images.module.scss';

@@ -1,4 +1,4 @@
-export type MenuLinkModel = {
+export type MenuLink = {
     href: string
     label: string
 };

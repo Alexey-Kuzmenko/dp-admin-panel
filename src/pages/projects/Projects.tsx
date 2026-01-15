@@ -21,6 +21,7 @@ import {
 import { selectMenuSlice } from '../../store/menuSlice';
 
 import { dtoCodeBlocks } from '../../dto/dto-code-blocks';
+import { ProjectDto } from '../../dto/project.dto';
 import { AlertState } from '../../types/alert-state.type';
 import { ProjectModel, projectModelKeys } from '../../models/project.model';
 
@@ -34,20 +35,10 @@ import {
     ALERT_SUCCESS_MGS,
     JSON_EDITOR_WARN_MSG,
     VIEWPORT_MIN_WIDTH
-} from '../../constants/constants';
+} from '../../constants';
+import { projectTemplate } from './project.template';
 
 import styles from './Projects.module.scss';
-
-const projectTemplate: Omit<ProjectModel, '_id'> = {
-    name: '',
-    tags: [],
-    description: '',
-    link: '',
-    repoLink: '',
-    image: '',
-    body: '',
-    technologies: []
-};
 
 export const Projects: React.FC = () => {
     const dispatch = useAppDispatch();
@@ -80,7 +71,7 @@ export const Projects: React.FC = () => {
                 setAlertState({ type: 'error', isOpen: true, message: ALERT_ERROR_MGS });
                 hideAlertAutomatically('error', alertState, setAlertState);
             } else {
-                await dispatch(addProject(newProject as ProjectModel));
+                await dispatch(addProject(newProject as ProjectDto));
                 setNewProject(projectTemplate);
                 setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
                 hideAlertAutomatically('success', alertState, setAlertState);

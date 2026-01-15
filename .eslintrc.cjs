@@ -24,6 +24,7 @@ module.exports = {
       'ignoreComments': true,
       'ignoreRegExpLiterals': true,
     }],
+    "eol-last": "warn",
     '@typescript-eslint/semi': ['warn'],
     "@typescript-eslint/no-inferrable-types": 'warn',
     "@typescript-eslint/no-explicit-any": 'warn',

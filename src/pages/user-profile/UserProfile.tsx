@@ -3,20 +3,17 @@ import { useEffect, useState } from 'react';
 import { Typography } from '@mui/material';
 import { CopyFiled, Alert } from '../../components';
 import { AlertState } from '../../types/alert-state.type';
-import { ALERT_COPY_MSG } from '../../constants/constants';
+import { ALERT_COPY_MSG } from '../../constants';
 import { Link } from 'react-router-dom';
 
 import styles from './UserProfile.module.scss';
-
-// * temporary data
-const userData = {
-    userEmail: 'example@gmail.com',
-    passwordHash: '12ddfj23r0dasfcses213',
-    jwtToken: 'Token'
-};
+import { useAppSelector } from '../../hooks/redux-hooks';
+import { selectJwtToken, selectUserEmail } from '../../store/authSlice';
 
 export const UserProfile: React.FC = () => {
     const [alertState, setAlertState] = useState<AlertState>({ type: 'info', message: ALERT_COPY_MSG, isOpen: false });
+    const email = useAppSelector(selectUserEmail);
+    const token = useAppSelector(selectJwtToken);
 
     useEffect(() => {
         const timeout = setTimeout(() => {
@@ -41,18 +38,7 @@ export const UserProfile: React.FC = () => {
                                 User email
                             </Typography>
                             <CopyFiled
-                                value={userData.userEmail}
-                                alertState={alertState}
-                                setAlertState={setAlertState}
-                            />
-                        </div>
-
-                        <div className={styles.UserProfile__dataItem}>
-                            <Typography component='h1' variant='h5' sx={{ marginBottom: '20px' }}>
-                                User password hash
-                            </Typography>
-                            <CopyFiled
-                                value={userData.passwordHash}
+                                value={email}
                                 alertState={alertState}
                                 setAlertState={setAlertState}
                             />
@@ -63,7 +49,7 @@ export const UserProfile: React.FC = () => {
                                 JWT token
                             </Typography>
                             <CopyFiled
-                                value={userData.jwtToken}
+                                value={token || ''}
                                 alertState={alertState}
                                 setAlertState={setAlertState}
                             />

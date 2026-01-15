@@ -42,7 +42,7 @@ export const CopyFiled: React.FC<CopyFiledProps> = ({ value, alertState, setAler
 
     return (
         <div className={styles.CopyField} {...props}>
-            <Typography variant='body1' sx={{ overflow: 'auto' }}>
+            <Typography variant='body1' sx={{ overflow: 'auto', scrollbarWidth: 'none' }}>
                 {value}
             </Typography>
 

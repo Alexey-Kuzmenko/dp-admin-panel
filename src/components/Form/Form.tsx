@@ -8,7 +8,7 @@ import { Button } from '../Button/Button';
 import { EyeIconButton } from './EyeIconButton/EyeIconButton';
 
 import extractSecrets from '../../utils/extractSecrets';
-import { PASSWORD_INPUT_HELPER_TEXT, SECRET_INPUT_HELPER_TEXT } from '../../constants/constants';
+import { PASSWORD_INPUT_HELPER_TEXT, SECRET_INPUT_HELPER_TEXT } from '../../constants';
 
 import { useAppDispatch } from '../../hooks/redux-hooks';
 import { login, register } from '../../store/authSlice';

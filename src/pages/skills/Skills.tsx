@@ -24,6 +24,7 @@ import {
 import { selectMenuSlice } from '../../store/menuSlice';
 
 import { dtoCodeBlocks } from '../../dto/dto-code-blocks';
+import { SkillDto } from '../../dto/skill.dto';
 import { AlertState } from '../../types/alert-state.type';
 import { SkillModel, skillModelKeys } from '../../models/skill.model';
 
@@ -37,15 +38,10 @@ import {
     ALERT_ERROR_MGS,
     ALERT_RESET_MGS,
     JSON_EDITOR_WARN_MSG
-} from '../../constants/constants';
+} from '../../constants';
+import { skillTemplate } from './skill.template';
 
 import styles from './Skills.module.scss';
-
-const skillTemplate: Omit<SkillModel, '_id'> = {
-    slug: '',
-    label: '',
-    iconClass: ''
-};
 
 export const Skills: React.FC = () => {
     const dispatch = useAppDispatch();
@@ -78,7 +74,7 @@ export const Skills: React.FC = () => {
                 setAlertState({ type: 'error', isOpen: true, message: ALERT_ERROR_MGS });
                 hideAlertAutomatically('error', alertState, setAlertState);
             } else {
-                await dispatch(addSkill(newSkill as SkillModel));
+                await dispatch(addSkill(newSkill as SkillDto));
                 setNewSkill(skillTemplate);
                 setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
                 hideAlertAutomatically('success', alertState, setAlertState);

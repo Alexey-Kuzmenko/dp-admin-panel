@@ -21,6 +21,7 @@ import {
 import { selectMenuSlice } from '../../store/menuSlice';
 
 import { dtoCodeBlocks } from '../../dto/dto-code-blocks';
+import { CreateContentDto } from '../../dto/content.dto';
 import { ContentModel, Content as SubContent } from '../../models/content.model';
 import { contentModelKeys } from '../../models/content.model';
 import { AlertState } from '../../types/alert-state.type';
@@ -36,25 +37,10 @@ import {
     ALERT_SUCCESS_MGS,
     ALERT_ERROR_MGS, ALERT_RESET_MGS,
     JSON_EDITOR_WARN_MSG
-} from '../../constants/constants';
+} from '../../constants';
+import { contentTemplate } from './content.template';
 
 import styles from './Content.module.scss';
-
-const contentTemplate: Omit<ContentModel, '_id'> = {
-    type: 'about',
-    eng: {
-        title: '',
-        body: '',
-        image: '',
-        links: [],
-    },
-    ua: {
-        title: '',
-        body: '',
-        image: '',
-        links: [],
-    }
-};
 
 export const Content: React.FC = () => {
     const dispatch = useAppDispatch();
@@ -89,7 +75,7 @@ export const Content: React.FC = () => {
                 setAlertState({ type: 'error', isOpen: true, message: ALERT_ERROR_MGS });
                 hideAlertAutomatically('error', alertState, setAlertState);
             } else {
-                await dispatch(addPageContent(newContent as ContentModel));
+                await dispatch(addPageContent(newContent as CreateContentDto));
                 setNewContent(contentTemplate);
                 setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
                 hideAlertAutomatically('success', alertState, setAlertState);
