@@ -4,7 +4,7 @@ import axios, { AxiosResponse } from 'axios';
 import { ContactModel } from '../models/contact.model';
 import { ContactDto } from '../dto/contact.dto';
 import { ResponseError } from '../types/response-error.type';
-import { ERROR_MSG_TEMPLATE } from '../constants/constants';
+import { ERROR_MSG_TEMPLATE } from '../constants';
 import excludeObjectValues from '../utils/excludeObjectValues';
 
 const API_URL = import.meta.env.VITE_API_URL;

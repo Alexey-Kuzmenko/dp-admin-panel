@@ -24,6 +24,7 @@ import {
 import { selectMenuSlice } from '../../store/menuSlice';
 
 import { dtoCodeBlocks } from '../../dto/dto-code-blocks';
+import { ContactDto } from '../../dto/contact.dto';
 import { ContactModel, contactModelKeys } from '../../models/contact.model';
 import { AlertState } from '../../types/alert-state.type';
 
@@ -37,17 +38,10 @@ import {
     ALERT_ERROR_MGS,
     ALERT_RESET_MGS,
     JSON_EDITOR_WARN_MSG
-} from '../../constants/constants';
+} from '../../constants';
+import { contactTemplate } from './contact.template';
 
 import styles from './Contacts.module.scss';
-
-const contactTemplate: Omit<ContactModel, '_id'> = {
-    label: '',
-    body: '',
-    href: '',
-    iconType: 'email',
-    atl: ''
-};
 
 export const Contacts: React.FC = () => {
     const dispatch = useAppDispatch();
@@ -80,7 +74,7 @@ export const Contacts: React.FC = () => {
                 setAlertState({ type: 'error', isOpen: true, message: ALERT_ERROR_MGS });
                 hideAlertAutomatically('error', alertState, setAlertState);
             } else {
-                await dispatch(addContact(newContact as ContactModel));
+                await dispatch(addContact(newContact as ContactDto));
                 setNewContact(contactTemplate);
                 setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
                 hideAlertAutomatically('success', alertState, setAlertState);

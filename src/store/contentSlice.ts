@@ -5,7 +5,7 @@ import { Content, ContentModel } from '../models/content.model';
 import { CreateContentDto } from '../dto/content.dto';
 import { ResponseError } from '../types/response-error.type';
 import excludeObjectValues from '../utils/excludeObjectValues';
-import { ERROR_MSG_TEMPLATE } from '../constants/constants';
+import { ERROR_MSG_TEMPLATE } from '../constants';
 import { RootState } from '.';
 
 const API_URL = import.meta.env.VITE_API_URL;

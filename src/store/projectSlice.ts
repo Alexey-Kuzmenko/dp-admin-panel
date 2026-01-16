@@ -4,7 +4,7 @@ import axios, { AxiosResponse } from 'axios';
 import { ProjectModel } from '../models/project.model';
 import { ProjectDto } from '../dto/project.dto';
 import { ResponseError } from '../types/response-error.type';
-import { ERROR_MSG_TEMPLATE } from '../constants/constants';
+import { ERROR_MSG_TEMPLATE } from '../constants';
 import excludeObjectValues from '../utils/excludeObjectValues';
 
 const API_URL = import.meta.env.VITE_API_URL;

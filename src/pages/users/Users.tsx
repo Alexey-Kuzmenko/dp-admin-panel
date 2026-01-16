@@ -38,7 +38,7 @@ import {
     ALERT_SUCCESS_MGS,
     JSON_EDITOR_WARN_MSG,
     VIEWPORT_MIN_WIDTH
-} from '../../constants/constants';
+} from '../../constants';
 
 import styles from './Users.module.scss';
 

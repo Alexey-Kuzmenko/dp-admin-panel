@@ -2,7 +2,7 @@ import { asyncThunkCreator, buildCreateSlice, PayloadAction } from '@reduxjs/too
 import { CreateUserDto } from '../dto/user.dto';
 import axios, { AxiosResponse } from 'axios';
 import { ResponseError } from '../types/response-error.type';
-import { ENV_VAR_IS_NOT_DEFINED, ERROR_MSG_TEMPLATE } from '../constants/constants';
+import { ENV_VAR_IS_NOT_DEFINED, ERROR_MSG_TEMPLATE } from '../constants';
 import { UserModel } from '../models/user.model';
 import { LoginModel } from '../models/login.model';
 import { AppDispatch } from '.';
@@ -45,7 +45,7 @@ const authSlice = createAuthSlice({
     initialState,
     selectors: {
         selectJwtToken: (state) => state.token,
-        selectUserData: ({ userEmail }) => ({ email: userEmail }),
+        selectUserEmail: (state) => state.userEmail,
         selectLoading: (state) => state.loading,
         selectError: (state) => state.error
     },
@@ -156,8 +156,21 @@ const authSlice = createAuthSlice({
     }),
 });
 
-export const { selectJwtToken, selectUserData, selectLoading, selectError } = authSlice.selectors;
+export const {
+    selectJwtToken,
+    selectUserEmail,
+    selectLoading,
+    selectError
+} = authSlice.selectors;
 
-export const { login, register, autoLogout, logout, keepSession, saveSession, resetResponseError } = authSlice.actions;
+export const {
+    login,
+    register,
+    autoLogout,
+    logout,
+    keepSession,
+    saveSession,
+    resetResponseError
+} = authSlice.actions;
 
 export default authSlice.reducer;

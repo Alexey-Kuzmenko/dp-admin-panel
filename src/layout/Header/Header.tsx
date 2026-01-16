@@ -1,44 +1,12 @@
-import { Container } from '../Container/Container';
+import { Link, useLocation } from 'react-router-dom';
 import { Box, Typography } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
+import { Container } from '../Container/Container';
 import { Menu } from '../../components';
-import { MenuLinkModel } from '../../types/menu-link.type';
 import generatePageTitle from '../../utils/generatePageTitle';
-import { Link, useLocation } from 'react-router-dom';
+import { navigationLinks } from './navigation-links';
 
 import styles from './Header.module.scss';
-
-// * temporary data
-const menuLinks: Array<MenuLinkModel> = [
-    {
-        href: '/',
-        label: 'Dashboard'
-    },
-    {
-        href: 'contacts',
-        label: 'Contacts'
-    },
-    {
-        href: 'content',
-        label: 'Content'
-    },
-    {
-        href: 'images',
-        label: 'Images'
-    },
-    {
-        href: 'projects',
-        label: 'Projects'
-    },
-    {
-        href: 'skills',
-        label: 'Skills'
-    },
-    {
-        href: 'users',
-        label: 'Users'
-    },
-];
 
 export const Header = () => {
     const { pathname } = useLocation();
@@ -50,7 +18,7 @@ export const Header = () => {
                 <div className={styles.Header__innerFlexContainer}>
 
                     <Box component='div' sx={{ display: 'flex', alignItems: 'center' }}>
-                        <Menu menuLinks={menuLinks} />
+                        <Menu menuLinks={navigationLinks} />
                         <Typography
                             component='h1'
                             variant='h5'
@@ -68,4 +36,4 @@ export const Header = () => {
             </Container>
         </header>
     );
-}; 
+};
