@@ -1,4 +1,4 @@
-import { MenuLink } from '../../types/menu-link.type';
+import { MenuLink } from '@alexey-kuzmenko/ok-apps-sdk';
 
 export const navigationLinks: Array<MenuLink> = [
     {

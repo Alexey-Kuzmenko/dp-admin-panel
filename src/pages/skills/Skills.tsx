@@ -25,7 +25,7 @@ import { selectMenuSlice } from '../../store/menuSlice';
 
 import { dtoCodeBlocks } from '../../dto/dto-code-blocks';
 import { SkillDto } from '../../dto/skill.dto';
-import { AlertState } from '../../types/alert-state.type';
+import { AlertState } from '../../types';
 import { SkillModel, skillModelKeys } from '../../models/skill.model';
 
 import generateCodeBlock from '../../utils/generateCodeBlock';

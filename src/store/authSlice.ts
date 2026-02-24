@@ -1,7 +1,7 @@
 import { asyncThunkCreator, buildCreateSlice, PayloadAction } from '@reduxjs/toolkit';
 import { CreateUserDto } from '../dto/user.dto';
 import axios, { AxiosResponse } from 'axios';
-import { ResponseError } from '../types/response-error.type';
+import { ResponseError } from '../types';
 import { ENV_VAR_IS_NOT_DEFINED, ERROR_MSG_TEMPLATE } from '../constants';
 import { UserModel } from '../models/user.model';
 import { LoginModel } from '../models/login.model';

@@ -24,7 +24,7 @@ import { dtoCodeBlocks } from '../../dto/dto-code-blocks';
 import { CreateContentDto } from '../../dto/content.dto';
 import { ContentModel, Content as SubContent } from '../../models/content.model';
 import { contentModelKeys } from '../../models/content.model';
-import { AlertState } from '../../types/alert-state.type';
+import { AlertState } from '../../types';
 
 import validateValue from '../../utils/validateValue';
 import generateCodeBlock from '../../utils/generateCodeBlock';

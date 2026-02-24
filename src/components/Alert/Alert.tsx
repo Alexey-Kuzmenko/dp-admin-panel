@@ -1,6 +1,6 @@
 import { Alert as MuiAlert } from '@mui/material';
 import cn from 'classnames';
-import { AlertState } from '../../types/alert-state.type';
+import { AlertState } from '../../types';
 
 import styles from './Alert.module.scss';
 

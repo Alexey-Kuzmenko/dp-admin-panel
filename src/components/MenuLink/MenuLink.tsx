@@ -1,10 +1,10 @@
 import { NavLink } from 'react-router-dom';
 import styles from './MenuLink.module.scss';
-import { MenuLinkModel } from '../../types/menu-link.type';
+import { MenuLink as MenuLinkInterface } from '@alexey-kuzmenko/ok-apps-sdk';
 import { useAppDispatch } from '../../hooks/redux-hooks';
 import { closeMenu } from '../../store/menuSlice';
 
-interface MenuLinkProps extends MenuLinkModel { }
+interface MenuLinkProps extends MenuLinkInterface { }
 
 export const MenuLink: React.FC<MenuLinkProps> = ({ href, label }) => {
     const dispatch = useAppDispatch();

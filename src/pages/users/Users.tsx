@@ -24,7 +24,7 @@ import { addUser, deleteUser, fetchUsers, selectError, selectLoading, selectUser
 import { selectMenuSlice } from '../../store/menuSlice';
 
 import { dtoCodeBlocks } from '../../dto/dto-code-blocks';
-import { AlertState } from '../../types/alert-state.type';
+import { AlertState } from '../../types';
 import { UserModel } from '../../models/user.model';
 import { CreateUserDto, createUserDtoKeys } from '../../dto/user.dto';
 

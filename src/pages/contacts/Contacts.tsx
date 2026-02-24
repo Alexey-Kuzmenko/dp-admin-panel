@@ -26,7 +26,7 @@ import { selectMenuSlice } from '../../store/menuSlice';
 import { dtoCodeBlocks } from '../../dto/dto-code-blocks';
 import { ContactDto } from '../../dto/contact.dto';
 import { ContactModel, contactModelKeys } from '../../models/contact.model';
-import { AlertState } from '../../types/alert-state.type';
+import { AlertState } from '../../types';
 
 import generateCodeBlock from '../../utils/generateCodeBlock';
 import validateValue from '../../utils/validateValue';

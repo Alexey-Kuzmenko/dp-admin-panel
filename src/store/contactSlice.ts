@@ -3,7 +3,7 @@ import axios, { AxiosResponse } from 'axios';
 
 import { ContactModel } from '../models/contact.model';
 import { ContactDto } from '../dto/contact.dto';
-import { ResponseError } from '../types/response-error.type';
+import { ResponseError } from '../types';
 import { ERROR_MSG_TEMPLATE } from '../constants';
 import excludeObjectValues from '../utils/excludeObjectValues';
 

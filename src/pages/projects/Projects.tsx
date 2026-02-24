@@ -22,7 +22,7 @@ import { selectMenuSlice } from '../../store/menuSlice';
 
 import { dtoCodeBlocks } from '../../dto/dto-code-blocks';
 import { ProjectDto } from '../../dto/project.dto';
-import { AlertState } from '../../types/alert-state.type';
+import { AlertState } from '../../types';
 import { ProjectModel, projectModelKeys } from '../../models/project.model';
 
 import generateCodeBlock from '../../utils/generateCodeBlock';

@@ -3,7 +3,7 @@ import axios, { AxiosResponse } from 'axios';
 
 import { Content, ContentModel } from '../models/content.model';
 import { CreateContentDto } from '../dto/content.dto';
-import { ResponseError } from '../types/response-error.type';
+import { ResponseError } from '../types';
 import excludeObjectValues from '../utils/excludeObjectValues';
 import { ERROR_MSG_TEMPLATE } from '../constants';
 import { RootState } from '.';

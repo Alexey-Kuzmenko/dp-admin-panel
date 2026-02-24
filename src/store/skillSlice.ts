@@ -3,7 +3,7 @@ import axios, { AxiosResponse } from 'axios';
 
 import { SkillModel } from '../models/skill.model';
 import { SkillDto } from '../dto/skill.dto';
-import { ResponseError } from '../types/response-error.type';
+import { ResponseError } from '../types';
 import { ERROR_MSG_TEMPLATE } from '../constants';
 import excludeObjectValues from '../utils/excludeObjectValues';
 

@@ -1,4 +1,4 @@
-import { AlertState, AlertType } from '../types/alert-state.type';
+import { AlertState, AlertType } from '../types';
 
 type SetAlertState = (state: AlertState) => void;
 

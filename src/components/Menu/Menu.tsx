@@ -5,7 +5,7 @@ import cn from 'classnames';
 import { Backdrop, Box } from '@mui/material';
 import { MenuLink } from '../MenuLink/MenuLink';
 import { Link } from 'react-router-dom';
-import { MenuLinkModel } from '../../types/menu-link.type';
+import { MenuLink as MenuLinkInterface } from '@alexey-kuzmenko/ok-apps-sdk';
 import { useAppSelector, useAppDispatch } from '../../hooks/redux-hooks';
 import { closeMenu, selectMenuSlice } from '../../store/menuSlice';
 import { v4 as uuidv4 } from 'uuid';
@@ -14,7 +14,7 @@ import Logo from '../../assets/Logo.svg';
 import styles from './Menu.module.scss';
 
 interface MenuProps {
-    menuLinks: Array<MenuLinkModel>
+    menuLinks: Array<MenuLinkInterface>
 }
 
 const body = document.body;
@@ -29,7 +29,7 @@ export const Menu: React.FC<MenuProps> = ({ menuLinks }) => {
     };
 
     const renderLinks = (): JSX.Element[] => {
-        return menuLinks.map((link: MenuLinkModel) => {
+        return menuLinks.map((link: MenuLinkInterface) => {
             return (
                 <li key={uuidv4()}>
                     <MenuLink href={link.href} label={link.label} />

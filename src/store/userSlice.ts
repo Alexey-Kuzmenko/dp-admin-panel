@@ -3,7 +3,7 @@ import axios, { AxiosResponse } from 'axios';
 
 import { UserModel } from '../models/user.model';
 import { CreateUserDto, DeleteUserDto } from '../dto/user.dto';
-import { ResponseError } from '../types/response-error.type';
+import { ResponseError } from '../types';
 import excludeObjectValues from '../utils/excludeObjectValues';
 import { ERROR_MSG_TEMPLATE, JWT_TOKEN_IS_MISSING_IN_STORE } from '../constants';
 import { RootState } from '.';
