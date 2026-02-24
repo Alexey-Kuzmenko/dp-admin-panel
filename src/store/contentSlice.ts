@@ -1,7 +1,7 @@
 import { asyncThunkCreator, buildCreateSlice, PayloadAction } from '@reduxjs/toolkit';
 import axios, { AxiosResponse } from 'axios';
 
-import { Content, ContentModel } from '../models/content.model';
+import { Content, ContentModel } from '@alexey-kuzmenko/ok-apps-sdk';
 import { CreateContentDto } from '@alexey-kuzmenko/ok-apps-sdk';
 import { ResponseError } from '../types';
 import excludeObjectValues from '../utils/excludeObjectValues';

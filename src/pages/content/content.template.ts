@@ -1,4 +1,4 @@
-import { ContentModel } from '../../models/content.model';
+import { ContentModel } from '@alexey-kuzmenko/ok-apps-sdk';
 
 export const contentTemplate: Omit<ContentModel, '_id'> = {
     type: 'about',

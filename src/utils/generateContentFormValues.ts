@@ -1,4 +1,4 @@
-import { ContentModel } from '../models/content.model';
+import { ContentModel } from '@alexey-kuzmenko/ok-apps-sdk';
 
 export default function generateContentFormValues(content: Array<ContentModel>): Array<string> {
     const formValues: Array<string> = [];

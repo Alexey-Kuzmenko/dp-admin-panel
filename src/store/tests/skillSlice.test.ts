@@ -1,4 +1,4 @@
-import { SkillModel } from '../../models/skill.model';
+import { SkillModel } from '@alexey-kuzmenko/ok-apps-sdk';
 import { SkillDto } from '@alexey-kuzmenko/ok-apps-sdk';
 import skillReducer, {
     addSkill,

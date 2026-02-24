@@ -25,7 +25,7 @@ import { selectMenuSlice } from '../../store/menuSlice';
 
 import { codeBlockDtoTemplates } from '../../constants/code-block-dto';
 import { AlertState } from '../../types';
-import { UserModel } from '../../models/user.model';
+import { UserModel } from '@alexey-kuzmenko/ok-apps-sdk';
 import { CreateUserDto, createUserDtoKeys } from '@alexey-kuzmenko/ok-apps-sdk';
 
 import generateCodeBlock from '../../utils/generateCodeBlock';

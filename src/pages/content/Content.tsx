@@ -22,8 +22,8 @@ import { selectMenuSlice } from '../../store/menuSlice';
 
 import { codeBlockDtoTemplates } from '../../constants/code-block-dto';
 import { CreateContentDto } from '@alexey-kuzmenko/ok-apps-sdk';
-import { ContentModel, Content as SubContent } from '../../models/content.model';
-import { contentModelKeys } from '../../models/content.model';
+import { ContentModel, Content as SubContent } from '@alexey-kuzmenko/ok-apps-sdk';
+import { contentModelKeys } from '@alexey-kuzmenko/ok-apps-sdk';
 import { AlertState } from '../../types';
 
 import validateValue from '../../utils/validateValue';

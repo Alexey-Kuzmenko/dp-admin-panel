@@ -1,7 +1,7 @@
 import { asyncThunkCreator, buildCreateSlice, PayloadAction } from '@reduxjs/toolkit';
 import axios, { AxiosResponse } from 'axios';
 
-import { ProjectModel } from '../models/project.model';
+import { ProjectModel } from '@alexey-kuzmenko/ok-apps-sdk';
 import { ProjectDto } from '@alexey-kuzmenko/ok-apps-sdk';
 import { ResponseError } from '../types';
 import { ERROR_MSG_TEMPLATE } from '../constants';

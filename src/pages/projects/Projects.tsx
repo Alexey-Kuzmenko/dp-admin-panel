@@ -23,7 +23,7 @@ import { selectMenuSlice } from '../../store/menuSlice';
 import { codeBlockDtoTemplates } from '../../constants/code-block-dto';
 import { ProjectDto } from '@alexey-kuzmenko/ok-apps-sdk';
 import { AlertState } from '../../types';
-import { ProjectModel, projectModelKeys } from '../../models/project.model';
+import { ProjectModel, projectModelKeys } from '@alexey-kuzmenko/ok-apps-sdk';
 
 import generateCodeBlock from '../../utils/generateCodeBlock';
 import validateValue from '../../utils/validateValue';

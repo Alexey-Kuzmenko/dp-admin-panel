@@ -26,7 +26,7 @@ import { selectMenuSlice } from '../../store/menuSlice';
 import { codeBlockDtoTemplates } from '../../constants/code-block-dto';
 import { SkillDto } from '@alexey-kuzmenko/ok-apps-sdk';
 import { AlertState } from '../../types';
-import { SkillModel, skillModelKeys } from '../../models/skill.model';
+import { SkillModel, skillModelKeys } from '@alexey-kuzmenko/ok-apps-sdk';
 
 import generateCodeBlock from '../../utils/generateCodeBlock';
 import validateValue from '../../utils/validateValue';

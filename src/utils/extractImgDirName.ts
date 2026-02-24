@@ -1,4 +1,4 @@
-import { ImageModel } from '../models/image.model';
+import { ImageModel } from '@alexey-kuzmenko/ok-apps-sdk';
 
 export function extractImgDirName(imgList: Array<ImageModel>): Array<string> {
     const dirList: Array<string> = [];

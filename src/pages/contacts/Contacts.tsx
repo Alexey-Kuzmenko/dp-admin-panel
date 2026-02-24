@@ -25,7 +25,7 @@ import { selectMenuSlice } from '../../store/menuSlice';
 
 import { codeBlockDtoTemplates } from '../../constants/code-block-dto';
 import { ContactDto } from '@alexey-kuzmenko/ok-apps-sdk';
-import { ContactModel, contactModelKeys } from '../../models/contact.model';
+import { ContactModel, contactModelKeys } from '@alexey-kuzmenko/ok-apps-sdk';
 import { AlertState } from '../../types';
 
 import generateCodeBlock from '../../utils/generateCodeBlock';

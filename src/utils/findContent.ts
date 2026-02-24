@@ -1,4 +1,4 @@
-import { Content, ContentModel } from '../models/content.model';
+import { Content, ContentModel } from '@alexey-kuzmenko/ok-apps-sdk';
 
 export default function findContent(content: Array<ContentModel>, fromValue: string): Content | undefined {
     const [type, lang]: Array<string> = fromValue.replace(/\s+/g, '').split('|');

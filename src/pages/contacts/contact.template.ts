@@ -1,4 +1,4 @@
-import { ContactModel } from '../../models/contact.model';
+import { ContactModel } from '@alexey-kuzmenko/ok-apps-sdk';
 
 export const contactTemplate: Omit<ContactModel, '_id'> = {
     label: '',

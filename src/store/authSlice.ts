@@ -3,8 +3,8 @@ import { CreateUserDto } from '@alexey-kuzmenko/ok-apps-sdk';
 import axios, { AxiosResponse } from 'axios';
 import { ResponseError } from '../types';
 import { ENV_VAR_IS_NOT_DEFINED, ERROR_MSG_TEMPLATE } from '../constants';
-import { UserModel } from '../models/user.model';
-import { LoginModel } from '../models/login.model';
+import { UserModel } from '@alexey-kuzmenko/ok-apps-sdk';
+import { LoginModel } from '@alexey-kuzmenko/ok-apps-sdk';
 import { AppDispatch } from '.';
 
 const API_URL = import.meta.env.VITE_API_URL;

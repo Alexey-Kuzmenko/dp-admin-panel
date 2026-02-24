@@ -1,4 +1,4 @@
-import { UserModel } from '../../models/user.model';
+import { UserModel } from '@alexey-kuzmenko/ok-apps-sdk';
 import userReducer, {
     addUser,
     deleteUser,

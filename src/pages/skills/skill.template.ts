@@ -1,4 +1,4 @@
-import { SkillModel } from '../../models/skill.model';
+import { SkillModel } from '@alexey-kuzmenko/ok-apps-sdk';
 
 export const skillTemplate: Omit<SkillModel, '_id'> = {
     slug: '',

@@ -1,7 +1,7 @@
 import { asyncThunkCreator, buildCreateSlice } from '@reduxjs/toolkit';
 import axios, { AxiosResponse } from 'axios';
 
-import { UserModel } from '../models/user.model';
+import { UserModel } from '@alexey-kuzmenko/ok-apps-sdk';
 import { CreateUserDto, DeleteUserDto } from '@alexey-kuzmenko/ok-apps-sdk';
 import { ResponseError } from '../types';
 import excludeObjectValues from '../utils/excludeObjectValues';
