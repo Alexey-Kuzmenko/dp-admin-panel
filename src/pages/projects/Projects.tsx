@@ -20,8 +20,8 @@ import {
 } from '../../store/projectSlice';
 import { selectMenuSlice } from '../../store/menuSlice';
 
-import { dtoCodeBlocks } from '../../dto/dto-code-blocks';
-import { ProjectDto } from '../../dto/project.dto';
+import { codeBlockDtoTemplates } from '../../constants/code-block-dto';
+import { ProjectDto } from '@alexey-kuzmenko/ok-apps-sdk';
 import { AlertState } from '../../types';
 import { ProjectModel, projectModelKeys } from '../../models/project.model';
 
@@ -140,7 +140,7 @@ export const Projects: React.FC = () => {
                 </AccordionSummary>
                 <AccordionDetails>
                     <CodeBlock
-                        code={dtoCodeBlocks.projects}
+                        code={codeBlockDtoTemplates.projects}
                         lang='typescript'
                     />
                 </AccordionDetails>

@@ -23,8 +23,8 @@ import {
 } from '../../store/contactSlice';
 import { selectMenuSlice } from '../../store/menuSlice';
 
-import { dtoCodeBlocks } from '../../dto/dto-code-blocks';
-import { ContactDto } from '../../dto/contact.dto';
+import { codeBlockDtoTemplates } from '../../constants/code-block-dto';
+import { ContactDto } from '@alexey-kuzmenko/ok-apps-sdk';
 import { ContactModel, contactModelKeys } from '../../models/contact.model';
 import { AlertState } from '../../types';
 
@@ -143,7 +143,7 @@ export const Contacts: React.FC = () => {
                 </AccordionSummary>
                 <AccordionDetails>
                     <CodeBlock
-                        code={dtoCodeBlocks.contacts}
+                        code={codeBlockDtoTemplates.contacts}
                         lang='typescript'
                     />
                 </AccordionDetails>

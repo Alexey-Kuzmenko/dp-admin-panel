@@ -20,8 +20,8 @@ import {
 } from '../../store/contentSlice';
 import { selectMenuSlice } from '../../store/menuSlice';
 
-import { dtoCodeBlocks } from '../../dto/dto-code-blocks';
-import { CreateContentDto } from '../../dto/content.dto';
+import { codeBlockDtoTemplates } from '../../constants/code-block-dto';
+import { CreateContentDto } from '@alexey-kuzmenko/ok-apps-sdk';
 import { ContentModel, Content as SubContent } from '../../models/content.model';
 import { contentModelKeys } from '../../models/content.model';
 import { AlertState } from '../../types';
@@ -145,7 +145,7 @@ export const Content: React.FC = () => {
                 </AccordionSummary>
                 <AccordionDetails>
                     <CodeBlock
-                        code={dtoCodeBlocks.content}
+                        code={codeBlockDtoTemplates.content}
                         lang='typescript'
                     />
                 </AccordionDetails>

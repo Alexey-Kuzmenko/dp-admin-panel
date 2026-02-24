@@ -2,7 +2,7 @@ import { asyncThunkCreator, buildCreateSlice, PayloadAction } from '@reduxjs/too
 import axios, { AxiosResponse } from 'axios';
 
 import { ContactModel } from '../models/contact.model';
-import { ContactDto } from '../dto/contact.dto';
+import { ContactDto } from '@alexey-kuzmenko/ok-apps-sdk';
 import { ResponseError } from '../types';
 import { ERROR_MSG_TEMPLATE } from '../constants';
 import excludeObjectValues from '../utils/excludeObjectValues';

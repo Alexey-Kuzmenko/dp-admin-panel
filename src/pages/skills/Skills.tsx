@@ -23,8 +23,8 @@ import {
 } from '../../store/skillSlice';
 import { selectMenuSlice } from '../../store/menuSlice';
 
-import { dtoCodeBlocks } from '../../dto/dto-code-blocks';
-import { SkillDto } from '../../dto/skill.dto';
+import { codeBlockDtoTemplates } from '../../constants/code-block-dto';
+import { SkillDto } from '@alexey-kuzmenko/ok-apps-sdk';
 import { AlertState } from '../../types';
 import { SkillModel, skillModelKeys } from '../../models/skill.model';
 
@@ -143,7 +143,7 @@ export const Skills: React.FC = () => {
                 </AccordionSummary>
                 <AccordionDetails>
                     <CodeBlock
-                        code={dtoCodeBlocks.skills}
+                        code={codeBlockDtoTemplates.skills}
                         lang='typescript'
                     />
                 </AccordionDetails>

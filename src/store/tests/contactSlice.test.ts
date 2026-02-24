@@ -1,5 +1,5 @@
 import { ContactModel } from '../../models/contact.model';
-import { ContactDto } from '../../dto/contact.dto';
+import { ContactDto } from '@alexey-kuzmenko/ok-apps-sdk';
 
 import contactReducer, {
     addContact,

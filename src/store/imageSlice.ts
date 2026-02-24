@@ -2,7 +2,7 @@ import { asyncThunkCreator, buildCreateSlice, PayloadAction } from '@reduxjs/too
 import axios, { AxiosResponse } from 'axios';
 
 import { ImageModel } from '../models/image.model';
-import { DeleteImageDto } from '../dto/image.dto';
+import { DeleteImageDto } from '@alexey-kuzmenko/ok-apps-sdk';
 import { ResponseError } from '../types';
 import { ERROR_MSG_TEMPLATE } from '../constants';
 import { extractImgDirName } from '../utils/extractImgDirName';

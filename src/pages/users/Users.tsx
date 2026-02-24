@@ -23,10 +23,10 @@ import { useAppDispatch, useAppSelector } from '../../hooks/redux-hooks';
 import { addUser, deleteUser, fetchUsers, selectError, selectLoading, selectUsers } from '../../store/userSlice';
 import { selectMenuSlice } from '../../store/menuSlice';
 
-import { dtoCodeBlocks } from '../../dto/dto-code-blocks';
+import { codeBlockDtoTemplates } from '../../constants/code-block-dto';
 import { AlertState } from '../../types';
 import { UserModel } from '../../models/user.model';
-import { CreateUserDto, createUserDtoKeys } from '../../dto/user.dto';
+import { CreateUserDto, createUserDtoKeys } from '@alexey-kuzmenko/ok-apps-sdk';
 
 import generateCodeBlock from '../../utils/generateCodeBlock';
 import validateValue from '../../utils/validateValue';
@@ -128,7 +128,7 @@ export const Users: React.FC = () => {
                 </AccordionSummary>
                 <AccordionDetails>
                     <CodeBlock
-                        code={dtoCodeBlocks.user}
+                        code={codeBlockDtoTemplates.user}
                         lang='typescript'
                     />
                 </AccordionDetails>

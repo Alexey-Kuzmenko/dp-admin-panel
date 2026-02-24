@@ -1,4 +1,4 @@
-export const dtoCodeBlocks = {
+export const codeBlockDtoTemplates = {
     contacts: `
     type ContactIconType = 'telegram' | 'email' | 'linkedIn' | 'instagram';
 

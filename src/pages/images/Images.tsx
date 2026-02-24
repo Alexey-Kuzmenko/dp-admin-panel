@@ -24,7 +24,7 @@ import {
 } from '../../store/imageSlice';
 import { selectMenuSlice } from '../../store/menuSlice';
 
-import { dtoCodeBlocks } from '../../dto/dto-code-blocks';
+import { codeBlockDtoTemplates } from '../../constants/code-block-dto';
 import { AlertState } from '../../types';
 
 import { ALERT_SUCCESS_MGS } from '../../constants';
@@ -110,7 +110,7 @@ export const Images: React.FC = () => {
                 </AccordionSummary>
                 <AccordionDetails>
                     <CodeBlock
-                        code={dtoCodeBlocks.images}
+                        code={codeBlockDtoTemplates.images}
                         lang='typescript'
                     />
                 </AccordionDetails>
