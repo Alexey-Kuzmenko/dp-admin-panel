@@ -1,0 +1,19 @@
+@use '../../scss/utilities/variables' as vars;
+
+.ServiceStatusWidget {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+
+    width: 100%;
+    max-width: 360px;
+    min-height: 140px;
+    padding: 20px;
+
+    border-radius: 0.938rem;
+    background-color: vars.$primary-light;
+
+    &_reverse {
+        flex-direction: row-reverse;
+    }
+}
