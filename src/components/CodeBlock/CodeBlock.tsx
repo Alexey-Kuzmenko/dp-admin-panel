@@ -12,6 +12,7 @@ export const CodeBlock: React.FC<CodeBlockProps> = ({ code, lang }) => {
             language={lang}
             theme={vs2015}
             wrapLongLines={true}
+            codeBlock={false}
         />
     );
 };
