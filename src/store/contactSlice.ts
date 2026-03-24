@@ -3,12 +3,16 @@ import axios, { AxiosResponse } from 'axios';
 
 import { ContactModel } from '@alexey-kuzmenko/ok-apps-sdk';
 import { ContactDto } from '@alexey-kuzmenko/ok-apps-sdk';
+import type { RootState } from './types';
 import { ResponseError } from '../types';
-import { ERROR_MSG_TEMPLATE } from '../constants';
 import excludeObjectValues from '../utils/excludeObjectValues';
+import { ENV_VAR_IS_NOT_DEFINED, ERROR_MSG_TEMPLATE, JWT_TOKEN_IS_MISSING_IN_STORE } from '../constants';
 
 const API_URL = import.meta.env.VITE_API_URL;
-const JWT_TOKEN = import.meta.env.VITE_JWT_TOKEN;
+const API_KEY = import.meta.env.VITE_API_KEY;
+
+if (!API_URL) throw new Error(`API_URL ${ENV_VAR_IS_NOT_DEFINED} contactSlice`);
+if (!API_KEY) throw new Error(`API_KEY ${ENV_VAR_IS_NOT_DEFINED} contactSlice`);
 
 const createContactSlice = buildCreateSlice({
     creators: { asyncThunk: asyncThunkCreator }
@@ -44,7 +48,7 @@ const contactSlice = createContactSlice({
         fetchContacts: create.asyncThunk(async () => {
             const response: AxiosResponse<ContactModel[]> = await axios.get(`${API_URL}/contacts`, {
                 headers: {
-                    'Api-key': import.meta.env.VITE_API_KEY
+                    'Api-key': API_KEY
                 }
             });
 
@@ -56,7 +60,7 @@ const contactSlice = createContactSlice({
                 },
                 fulfilled: (state, { payload }) => {
                     const data = excludeObjectValues<ContactModel>(['createdAt', 'updatedAt', '__v'], payload);
-                    state.contacts.push(...data);
+                    state.contacts = data;
                 },
                 rejected: (state, { error }) => {
                     state.error.exists = true;
@@ -67,10 +71,15 @@ const contactSlice = createContactSlice({
                 }
             }
         ),
-        addContact: create.asyncThunk(async (dto: ContactDto) => {
+        addContact: create.asyncThunk(async (dto: ContactDto, thunkApi) => {
+            const state = thunkApi.getState() as RootState;
+            const token = state.authentication.token;
+
+            if (!token) throw new Error(JWT_TOKEN_IS_MISSING_IN_STORE);
+
             const response: AxiosResponse<ContactModel> = await axios.post(`${API_URL}/contacts`, dto, {
                 headers: {
-                    'Authorization': `Bearer ${JWT_TOKEN}`
+                    'Authorization': `Bearer ${token}`
                 }
             });
 
@@ -94,9 +103,14 @@ const contactSlice = createContactSlice({
             }
         ),
         deleteContact: create.asyncThunk(async (id: string, thunkApi) => {
+            const state = thunkApi.getState() as RootState;
+            const token = state.authentication.token;
+
+            if (!token) throw new Error(JWT_TOKEN_IS_MISSING_IN_STORE);
+
             await axios.delete(`${API_URL}/contacts/${id}`, {
                 headers: {
-                    'Authorization': `Bearer ${JWT_TOKEN}`
+                    'Authorization': `Bearer ${token}`
                 }
             });
 
@@ -115,10 +129,16 @@ const contactSlice = createContactSlice({
                 }
             }
         ),
-        editContact: create.asyncThunk(async (contact: ContactModel) => {
+        editContact: create.asyncThunk(async (contact: ContactModel, thunkApi) => {
+            const state = thunkApi.getState() as RootState;
+            // * this type cast added to fix circular definition error for contactReducer alias
+            const token = state.authentication.token as string | null;
+
+            if (!token) throw new Error(JWT_TOKEN_IS_MISSING_IN_STORE);
+
             const response = await axios.patch(`${API_URL}/contacts/${contact._id}`, contact, {
                 headers: {
-                    'Authorization': `Bearer ${JWT_TOKEN}`
+                    'Authorization': `Bearer ${token}`
                 }
             });
 

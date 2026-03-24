@@ -1,3 +1,4 @@
+// ! Refactor this code
 import { AlertState, AlertType } from '../types';
 
 type SetAlertState = (state: AlertState) => void;

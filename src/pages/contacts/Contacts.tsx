@@ -73,23 +73,41 @@ export const Contacts: React.FC = () => {
             if (validateValue(newContact) === false) {
                 setAlertState({ type: 'error', isOpen: true, message: ALERT_ERROR_MGS });
                 hideAlertAutomatically('error', alertState, setAlertState);
-            } else {
-                await dispatch(addContact(newContact as ContactDto));
-                setNewContact(contactTemplate);
-                setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
-                hideAlertAutomatically('success', alertState, setAlertState);
+
+                return;
             }
+
+            await dispatch(addContact(newContact as ContactDto));
+            setNewContact(contactTemplate);
+
+            if (exists) {
+                setAlertState({ type: 'error', isOpen: true, message: message ?? '' });
+
+                return;
+            }
+
+            setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
+            hideAlertAutomatically('success', alertState, setAlertState);
         }
 
         if (action === 'edit' && editedContact) {
             if (validateValue(editedContact) === false) {
                 setAlertState({ type: 'error', isOpen: true, message: ALERT_ERROR_MGS });
                 hideAlertAutomatically('error', alertState, setAlertState);
-            } else {
-                await dispatch(editContact(editedContact as ContactModel));
-                setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
-                hideAlertAutomatically('success', alertState, setAlertState);
+
+                return;
             }
+
+            await dispatch(editContact(editedContact as ContactModel));
+
+            if (exists) {
+                setAlertState({ type: 'error', isOpen: true, message: message ?? '' });
+
+                return;
+            }
+
+            setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
+            hideAlertAutomatically('success', alertState, setAlertState);
         }
     };
 
@@ -330,17 +348,14 @@ export const Contacts: React.FC = () => {
 
             {/* Alerts */}
             <Alert
-                type={exists ? 'error' : alertState.type}
-                message={message ? message : alertState.message}
-                isOpen={exists ? true : alertState.isOpen}
+                type={alertState.type}
+                message={alertState.message}
+                isOpen={alertState.isOpen}
                 onClose={handleAlertClose}
             />
 
             {/* Loader */}
-            {
-                loading ? <Loader /> : null
-            }
-
+            {loading && <Loader />}
         </div>
     );
 };

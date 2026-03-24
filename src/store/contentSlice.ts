@@ -3,10 +3,10 @@ import axios, { AxiosResponse } from 'axios';
 
 import { Content, ContentModel } from '@alexey-kuzmenko/ok-apps-sdk';
 import { CreateContentDto } from '@alexey-kuzmenko/ok-apps-sdk';
+import type { RootState } from './types';
 import { ResponseError } from '../types';
 import excludeObjectValues from '../utils/excludeObjectValues';
 import { ERROR_MSG_TEMPLATE } from '../constants';
-import { RootState } from '.';
 
 const API_URL = import.meta.env.VITE_API_URL;
 const API_KEY = import.meta.env.VITE_API_KEY;

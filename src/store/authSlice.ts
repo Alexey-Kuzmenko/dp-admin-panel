@@ -2,7 +2,7 @@ import { asyncThunkCreator, buildCreateSlice, PayloadAction } from '@reduxjs/too
 import axios, { AxiosResponse } from 'axios';
 import { UserModel, LoginModel, CreateUserDto } from '@alexey-kuzmenko/ok-apps-sdk';
 
-import { AppDispatch } from '.';
+import type { AppDispatch } from './types';
 import { ResponseError } from '../types';
 import { ENV_VAR_IS_NOT_DEFINED, ERROR_MSG_TEMPLATE } from '../constants';
 

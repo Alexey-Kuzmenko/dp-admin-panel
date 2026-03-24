@@ -3,10 +3,10 @@ import axios, { AxiosResponse } from 'axios';
 
 import { UserModel } from '@alexey-kuzmenko/ok-apps-sdk';
 import { CreateUserDto, DeleteUserDto } from '@alexey-kuzmenko/ok-apps-sdk';
+import type { RootState } from './types';
 import { ResponseError } from '../types';
 import excludeObjectValues from '../utils/excludeObjectValues';
 import { ERROR_MSG_TEMPLATE, JWT_TOKEN_IS_MISSING_IN_STORE } from '../constants';
-import { RootState } from '.';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
