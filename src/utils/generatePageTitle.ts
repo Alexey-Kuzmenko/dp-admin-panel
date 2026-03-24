@@ -18,5 +18,4 @@ export default function generatePageTitle(route: string): string {
 
         }).join('');
     }
-
 }
