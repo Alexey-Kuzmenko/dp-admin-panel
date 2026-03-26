@@ -111,7 +111,6 @@ export const Images: React.FC = () => {
                 <AccordionDetails>
                     <CodeBlock
                         code={codeBlockDtoTemplates.images}
-                        lang='typescript'
                     />
                 </AccordionDetails>
             </Accordion>

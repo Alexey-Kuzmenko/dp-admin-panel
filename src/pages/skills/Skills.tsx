@@ -144,7 +144,6 @@ export const Skills: React.FC = () => {
                 <AccordionDetails>
                     <CodeBlock
                         code={codeBlockDtoTemplates.skills}
-                        lang='typescript'
                     />
                 </AccordionDetails>
             </Accordion>
@@ -318,7 +317,8 @@ export const Skills: React.FC = () => {
                             <Box component='div' sx={{ marginTop: '20px' }}>
                                 <CodeBlock
                                     code={generateCodeBlock(deletedSkill)}
-                                    lang='typescript'
+                                    copyButton={false}
+                                    lang='json'
                                 />
                             </Box>
                     }

@@ -141,7 +141,6 @@ export const Projects: React.FC = () => {
                 <AccordionDetails>
                     <CodeBlock
                         code={codeBlockDtoTemplates.projects}
-                        lang='typescript'
                     />
                 </AccordionDetails>
             </Accordion>
@@ -317,7 +316,8 @@ export const Projects: React.FC = () => {
                             <Box component='div' sx={{ marginTop: '20px' }}>
                                 <CodeBlock
                                     code={generateCodeBlock(deletedProject)}
-                                    lang='typescript'
+                                    copyButton={false}
+                                    lang='json'
                                 />
                             </Box>
                     }

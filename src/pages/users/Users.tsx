@@ -129,7 +129,6 @@ export const Users: React.FC = () => {
                 <AccordionDetails>
                     <CodeBlock
                         code={codeBlockDtoTemplates.user}
-                        lang='typescript'
                     />
                 </AccordionDetails>
             </Accordion>
@@ -269,7 +268,8 @@ export const Users: React.FC = () => {
                             <Box component='div' sx={{ marginTop: '20px' }}>
                                 <CodeBlock
                                     code={generateCodeBlock(deletedUser)}
-                                    lang='typescript'
+                                    copyButton={false}
+                                    lang='json'
                                 />
                             </Box>
                     }

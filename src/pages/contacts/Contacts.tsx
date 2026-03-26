@@ -162,7 +162,6 @@ export const Contacts: React.FC = () => {
                 <AccordionDetails>
                     <CodeBlock
                         code={codeBlockDtoTemplates.contacts}
-                        lang='typescript'
                     />
                 </AccordionDetails>
             </Accordion>
@@ -338,7 +337,8 @@ export const Contacts: React.FC = () => {
                             <Box component='div' sx={{ marginTop: '20px' }}>
                                 <CodeBlock
                                     code={generateCodeBlock(deletedContact)}
-                                    lang='typescript'
+                                    copyButton={false}
+                                    lang='json'
                                 />
                             </Box>
                     }
