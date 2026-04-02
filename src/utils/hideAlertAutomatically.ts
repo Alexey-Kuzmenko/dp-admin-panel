@@ -1,10 +1,8 @@
-// ! Refactor this code
-import { AlertState, AlertType } from '../types';
+import { AlertState } from '../types';
 
 type SetAlertState = (state: AlertState) => void;
 
 export default function hideAlertAutomatically(
-    type: AlertType,
     state: AlertState,
     setState: SetAlertState,
     timeout = 3_000
@@ -12,7 +10,6 @@ export default function hideAlertAutomatically(
     setTimeout(() => {
         setState({
             ...state,
-            type,
             isOpen: false
         });
     }, timeout);

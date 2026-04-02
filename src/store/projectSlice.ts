@@ -4,12 +4,15 @@ import axios, { AxiosResponse } from 'axios';
 import { ProjectModel } from '@alexey-kuzmenko/ok-apps-sdk';
 import { ProjectDto } from '@alexey-kuzmenko/ok-apps-sdk';
 import { ResponseError } from '../types';
-import { ERROR_MSG_TEMPLATE } from '../constants';
+import { ENV_VAR_IS_NOT_DEFINED, ERROR_MSG_TEMPLATE } from '../constants';
 import excludeObjectValues from '../utils/excludeObjectValues';
+import { RootState } from './types';
 
 const API_URL = import.meta.env.VITE_API_URL;
 const API_KEY = import.meta.env.VITE_API_KEY;
-const JWT_TOKEN = import.meta.env.VITE_JWT_TOKEN;
+
+if (!API_URL) throw new Error(`API_URL ${ENV_VAR_IS_NOT_DEFINED} contactSlice`);
+if (!API_KEY) throw new Error(`API_KEY ${ENV_VAR_IS_NOT_DEFINED} contactSlice`);
 
 const createProjectSlice = buildCreateSlice({
     creators: { asyncThunk: asyncThunkCreator }
@@ -57,7 +60,7 @@ const projectSlice = createProjectSlice({
                 },
                 fulfilled: (state, { payload }) => {
                     const data = excludeObjectValues<ProjectModel>(['createdAt', 'updatedAt', '__v'], payload);
-                    state.projects.push(...data);
+                    state.projects = data;
                 },
                 rejected: (state, { error }) => {
                     state.error.exists = true;
@@ -68,10 +71,13 @@ const projectSlice = createProjectSlice({
                 }
             }
         ),
-        addProject: create.asyncThunk(async (dto: ProjectDto) => {
+        addProject: create.asyncThunk(async (dto: ProjectDto, thunkApi) => {
+            const state = thunkApi.getState() as RootState;
+            const token = state.authentication.token;
+
             const response: AxiosResponse<ProjectModel> = await axios.post(`${API_URL}/projects`, dto, {
                 headers: {
-                    'Authorization': `Bearer ${JWT_TOKEN}`
+                    'Authorization': `Bearer ${token}`
                 }
             });
 
@@ -95,9 +101,12 @@ const projectSlice = createProjectSlice({
             }
         ),
         deleteProject: create.asyncThunk(async (id: string, thunkApi) => {
+            const state = thunkApi.getState() as RootState;
+            const token = state.authentication.token;
+
             await axios.delete(`${API_URL}/projects/${id}`, {
                 headers: {
-                    'Authorization': `Bearer ${JWT_TOKEN}`
+                    'Authorization': `Bearer ${token}`
                 }
             });
 
@@ -116,13 +125,16 @@ const projectSlice = createProjectSlice({
                 }
             }
         ),
-        editProject: create.asyncThunk(async (project: ProjectModel) => {
+        editProject: create.asyncThunk(async (project: ProjectModel, thunkApi) => {
+            const state = thunkApi.getState() as RootState;
+            const token = state.authentication.token;
+
             const response: AxiosResponse<ProjectModel> = await axios.patch(
                 `${API_URL}/projects/${project._id}`,
                 project,
                 {
                     headers: {
-                        'Authorization': `Bearer ${JWT_TOKEN}`
+                        'Authorization': `Bearer ${token}`
                     }
                 }
             );

@@ -138,7 +138,7 @@ const contactSlice = createContactSlice({
 
             const response = await axios.patch(`${API_URL}/contacts/${contact._id}`, contact, {
                 headers: {
-                    'Authorization': `Bearer ${token}`
+                    // 'Authorization': `Bearer ${token}`
                 }
             });
 

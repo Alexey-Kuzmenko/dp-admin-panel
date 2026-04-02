@@ -18,7 +18,6 @@ import {
     editContact,
     fetchContacts,
     selectContacts,
-    selectError,
     selectLoading
 } from '../../store/contactSlice';
 import { selectMenuSlice } from '../../store/menuSlice';
@@ -53,7 +52,6 @@ export const Contacts: React.FC = () => {
 
     const contacts = useAppSelector(selectContacts);
     const loading = useAppSelector(selectLoading);
-    const { exists, message } = useAppSelector(selectError);
     const { isMenuOpen } = useAppSelector(selectMenuSlice);
     const contactsIds = contacts.map((c) => c._id);
 
@@ -72,42 +70,42 @@ export const Contacts: React.FC = () => {
         if (action === 'add') {
             if (validateValue(newContact) === false) {
                 setAlertState({ type: 'error', isOpen: true, message: ALERT_ERROR_MGS });
-                hideAlertAutomatically('error', alertState, setAlertState);
+                hideAlertAutomatically(alertState, setAlertState);
 
                 return;
             }
 
-            await dispatch(addContact(newContact as ContactDto));
+            const actionResult = await dispatch(addContact(newContact as ContactDto));
             setNewContact(contactTemplate);
 
-            if (exists) {
-                setAlertState({ type: 'error', isOpen: true, message: message ?? '' });
+            if (addContact.rejected.match(actionResult)) {
+                setAlertState({ type: 'error', isOpen: true, message: actionResult.error.message ?? '' });
 
                 return;
             }
 
             setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
-            hideAlertAutomatically('success', alertState, setAlertState);
+            hideAlertAutomatically(alertState, setAlertState);
         }
 
         if (action === 'edit' && editedContact) {
             if (validateValue(editedContact) === false) {
                 setAlertState({ type: 'error', isOpen: true, message: ALERT_ERROR_MGS });
-                hideAlertAutomatically('error', alertState, setAlertState);
+                hideAlertAutomatically(alertState, setAlertState);
 
                 return;
             }
 
-            await dispatch(editContact(editedContact as ContactModel));
+            const actionResult = await dispatch(editContact(editedContact as ContactModel));
 
-            if (exists) {
-                setAlertState({ type: 'error', isOpen: true, message: message ?? '' });
+            if (editContact.rejected.match(actionResult)) {
+                setAlertState({ type: 'error', isOpen: true, message: actionResult.error.message ?? '' });
 
                 return;
             }
 
             setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
-            hideAlertAutomatically('success', alertState, setAlertState);
+            hideAlertAutomatically(alertState, setAlertState);
         }
     };
 
@@ -121,7 +119,7 @@ export const Contacts: React.FC = () => {
         }
 
         setAlertState({ type: 'warning', isOpen: true, message: ALERT_RESET_MGS });
-        hideAlertAutomatically('warning', alertState, setAlertState);
+        hideAlertAutomatically(alertState, setAlertState);
     };
 
     const handleFind = (id: string): void => {
@@ -134,11 +132,17 @@ export const Contacts: React.FC = () => {
     };
 
     const handleDelete = async (): Promise<void> => {
-        await dispatch(deleteContact(deletedContactId));
+        const actionResult = await dispatch(deleteContact(deletedContactId));
         setDeletedContactId('');
 
+        if (deleteContact.rejected.match(actionResult)) {
+            setAlertState({ type: 'error', isOpen: true, message: actionResult.error.message ?? '' });
+
+            return;
+        }
+
         setAlertState({ type: 'success', isOpen: true, message: 'Contact successfully deleted' });
-        hideAlertAutomatically('success', alertState, setAlertState);
+        hideAlertAutomatically(alertState, setAlertState);
     };
 
     const handleAlertClose = () => {

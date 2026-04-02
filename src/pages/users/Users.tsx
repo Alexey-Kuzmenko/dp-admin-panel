@@ -20,7 +20,13 @@ import cn from 'classnames';
 import { JsonEditor } from 'json-edit-react';
 
 import { useAppDispatch, useAppSelector } from '../../hooks/redux-hooks';
-import { addUser, deleteUser, fetchUsers, selectError, selectLoading, selectUsers } from '../../store/userSlice';
+import {
+    addUser,
+    deleteUser,
+    fetchUsers,
+    selectLoading,
+    selectUsers
+} from '../../store/userSlice';
 import { selectMenuSlice } from '../../store/menuSlice';
 
 import { codeBlockDtoTemplates } from '../../constants/code-block-dto';
@@ -57,7 +63,6 @@ export const Users: React.FC = () => {
 
     const users = useAppSelector(selectUsers);
     const loading = useAppSelector(selectLoading);
-    const { exists, message } = useAppSelector(selectError);
     const { isMenuOpen } = useAppSelector(selectMenuSlice);
     const usersIds = users.map((u) => u._id);
 
@@ -85,27 +90,42 @@ export const Users: React.FC = () => {
     const handleSave = async (): Promise<void> => {
         if (validateValue(newUser) === false) {
             setAlertState({ type: 'error', isOpen: true, message: ALERT_ERROR_MGS });
-            hideAlertAutomatically('error', alertState, setAlertState);
-        } else {
-            await dispatch(addUser(newUser as CreateUserDto));
-            setNewUser(userTemplate);
-            setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
-            hideAlertAutomatically('success', alertState, setAlertState);
+            hideAlertAutomatically(alertState, setAlertState);
+
+            return;
         }
+
+        const actionResult = await dispatch(addUser(newUser as CreateUserDto));
+        setNewUser(userTemplate);
+
+        if (addUser.rejected.match(actionResult)) {
+            setAlertState({ type: 'error', isOpen: true, message: actionResult.error.message ?? '' });
+
+            return;
+        }
+
+        setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
+        hideAlertAutomatically(alertState, setAlertState);
     };
 
     const handleReset = (): void => {
         setNewUser(userTemplate);
         setAlertState({ type: 'warning', isOpen: true, message: ALERT_RESET_MGS });
-        hideAlertAutomatically('warning', alertState, setAlertState);
+        hideAlertAutomatically(alertState, setAlertState);
     };
 
     const handleDelete = async (): Promise<void> => {
-        await dispatch(deleteUser(deletedUserId));
+        const actionResult = await dispatch(deleteUser(deletedUserId));
         setDeletedUserId('');
 
+        if (deleteUser.rejected.match(actionResult)) {
+            setAlertState({ type: 'error', isOpen: true, message: actionResult.error.message ?? '' });
+
+            return;
+        }
+
         setAlertState({ type: 'success', isOpen: true, message: 'User successfully deleted' });
-        hideAlertAutomatically('success', alertState, setAlertState);
+        hideAlertAutomatically(alertState, setAlertState);
     };
 
     const handleAlertClose = () => {
@@ -279,14 +299,14 @@ export const Users: React.FC = () => {
 
             {/* Alerts */}
             <Alert
-                type={exists ? 'error' : alertState.type}
-                message={message ? message : alertState.message}
-                isOpen={exists ? true : alertState.isOpen}
+                type={alertState.type}
+                message={alertState.message}
+                isOpen={alertState.isOpen}
                 onClose={handleAlertClose}
             />
 
             {/* Loader */}
-            {loading ? <Loader /> : null}
+            {loading && <Loader />}
 
         </div>
     );

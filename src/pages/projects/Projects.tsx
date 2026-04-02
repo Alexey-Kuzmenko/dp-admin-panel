@@ -14,7 +14,6 @@ import {
     deleteProject,
     editProject,
     fetchProjects,
-    selectError,
     selectLoading,
     selectProjects
 } from '../../store/projectSlice';
@@ -50,7 +49,6 @@ export const Projects: React.FC = () => {
 
     const projects = useAppSelector(selectProjects);
     const loading = useAppSelector(selectLoading);
-    const { exists, message } = useAppSelector(selectError);
     const { isMenuOpen } = useAppSelector(selectMenuSlice);
     const projectsIds = projects.map((p) => p._id);
 
@@ -69,24 +67,43 @@ export const Projects: React.FC = () => {
         if (action === 'add') {
             if (validateValue(newProject) === false) {
                 setAlertState({ type: 'error', isOpen: true, message: ALERT_ERROR_MGS });
-                hideAlertAutomatically('error', alertState, setAlertState);
-            } else {
-                await dispatch(addProject(newProject as ProjectDto));
-                setNewProject(projectTemplate);
-                setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
-                hideAlertAutomatically('success', alertState, setAlertState);
+                hideAlertAutomatically(alertState, setAlertState);
+
+                return;
             }
+
+            const actionResult = await dispatch(addProject(newProject as ProjectDto));
+            setNewProject(projectTemplate);
+
+            if (addProject.rejected.match(actionResult)) {
+                setAlertState({ type: 'error', isOpen: true, message: actionResult.error.message ?? '' });
+
+                return;
+            }
+
+            setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
+            hideAlertAutomatically(alertState, setAlertState);
+
         }
 
         if (action === 'edit' && editedProject) {
             if (validateValue(editedProject) === false) {
                 setAlertState({ type: 'error', isOpen: true, message: ALERT_ERROR_MGS });
-                hideAlertAutomatically('error', alertState, setAlertState);
-            } else {
-                await dispatch(editProject(editedProject as ProjectModel));
-                setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
-                hideAlertAutomatically('success', alertState, setAlertState);
+                hideAlertAutomatically(alertState, setAlertState);
+
+                return;
             }
+
+            const actionResult = await dispatch(editProject(editedProject as ProjectModel));
+
+            if (editProject.rejected.match(actionResult)) {
+                setAlertState({ type: 'error', isOpen: true, message: actionResult.error.message ?? '' });
+
+                return;
+            }
+
+            setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
+            hideAlertAutomatically(alertState, setAlertState);
         }
     };
 
@@ -100,7 +117,7 @@ export const Projects: React.FC = () => {
         }
 
         setAlertState({ type: 'warning', isOpen: true, message: ALERT_RESET_MGS });
-        hideAlertAutomatically('warning', alertState, setAlertState);
+        hideAlertAutomatically(alertState, setAlertState);
     };
 
     const handleFind = (id: string): void => {
@@ -113,11 +130,17 @@ export const Projects: React.FC = () => {
     };
 
     const handleDelete = async (): Promise<void> => {
-        await dispatch(deleteProject(deletedProjectId));
+        const actionResult = await dispatch(deleteProject(deletedProjectId));
         setDeletedProjectId('');
 
+        if (deleteProject.rejected.match(actionResult)) {
+            setAlertState({ type: 'error', isOpen: true, message: actionResult.error.message ?? '' });
+
+            return;
+        }
+
         setAlertState({ type: 'success', isOpen: true, message: 'Project successfully deleted' });
-        hideAlertAutomatically('success', alertState, setAlertState);
+        hideAlertAutomatically(alertState, setAlertState);
     };
 
     const handleAlertClose = () => {
@@ -327,14 +350,14 @@ export const Projects: React.FC = () => {
 
             {/* Alerts */}
             <Alert
-                type={exists ? 'error' : alertState.type}
-                message={message ? message : alertState.message}
-                isOpen={exists ? true : alertState.isOpen}
+                type={alertState.type}
+                message={alertState.message}
+                isOpen={alertState.isOpen}
                 onClose={handleAlertClose}
             />
 
             {/* Loader */}
-            {loading ? <Loader /> : null}
+            {loading && <Loader />}
 
         </div>
     );

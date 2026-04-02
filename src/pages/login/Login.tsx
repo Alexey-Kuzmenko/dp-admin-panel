@@ -16,15 +16,15 @@ export const Login: React.FC = () => {
             <Form title='Login into app' type='login' id='login-form' name='login-form' />
 
             {/* Alert */}
-            <Alert
+            {exists && <Alert
                 type='error'
                 message={message ? message : ''}
-                isOpen={exists ? true : false}
+                isOpen={true}
                 onClose={handleAlertClose}
-            />
+            />}
 
             {/* Loader */}
-            {loading ? <Loader /> : null}
+            {loading && <Loader />}
         </>
     );
 };

@@ -3,13 +3,16 @@ import axios, { AxiosResponse } from 'axios';
 
 import { ImageModel } from '@alexey-kuzmenko/ok-apps-sdk';
 import { DeleteImageDto } from '@alexey-kuzmenko/ok-apps-sdk';
+import { RootState } from './types';
 import { ResponseError } from '../types';
-import { ERROR_MSG_TEMPLATE } from '../constants';
+import { ENV_VAR_IS_NOT_DEFINED, ERROR_MSG_TEMPLATE } from '../constants';
 import { extractImgDirName } from '../utils/extractImgDirName';
 
 const API_URL = import.meta.env.VITE_API_URL;
 const API_KEY = import.meta.env.VITE_API_KEY;
-const JWT_TOKEN = import.meta.env.VITE_JWT_TOKEN;
+
+if (!API_URL) throw new Error(`API_URL ${ENV_VAR_IS_NOT_DEFINED} contactSlice`);
+if (!API_KEY) throw new Error(`API_KEY ${ENV_VAR_IS_NOT_DEFINED} contactSlice`);
 
 const createImageSlice = buildCreateSlice({
     creators: { asyncThunk: asyncThunkCreator }
@@ -59,10 +62,10 @@ const imageSlice = createImageSlice({
                     state.loading = true;
                 },
                 fulfilled: (state, { payload }) => {
-                    state.imagesList.push(...payload);
+                    state.imagesList = payload;
 
                     const directories = extractImgDirName(payload);
-                    state.dirList.push(...directories);
+                    state.dirList = directories;
                 },
                 rejected: (state, { error }) => {
                     state.error.exists = true;
@@ -73,10 +76,13 @@ const imageSlice = createImageSlice({
                 }
             }
         ),
-        addImage: create.asyncThunk(async (img: FormData) => {
+        addImage: create.asyncThunk(async (img: FormData, thunkApi) => {
+            const state = thunkApi.getState() as RootState;
+            const token = state.authentication.token;
+
             const response: AxiosResponse<ImageModel[]> = await axios.post(`${API_URL}/images/upload`, img, {
                 headers: {
-                    'Authorization': `Bearer ${JWT_TOKEN}`,
+                    'Authorization': `Bearer ${token}`,
                     'Content-Type': 'multipart/form-data',
                 }
             });
@@ -103,6 +109,9 @@ const imageSlice = createImageSlice({
             }
         ),
         deleteImage: create.asyncThunk(async (imgUrl: string, thunkApi) => {
+            const state = thunkApi.getState() as RootState;
+            const token = state.authentication.token;
+
             const dto: DeleteImageDto = {
                 imgPath: imgUrl
             };
@@ -110,7 +119,7 @@ const imageSlice = createImageSlice({
             await axios.delete(`${API_URL}/images/delete`, {
                 data: dto,
                 headers: {
-                    'Authorization': `Bearer ${JWT_TOKEN}`
+                    'Authorization': `Bearer ${token}`
                 }
             });
 
@@ -129,10 +138,13 @@ const imageSlice = createImageSlice({
                 }
             }
         ),
-        deleteDir: create.asyncThunk(async (dirName: string) => {
+        deleteDir: create.asyncThunk(async (dirName: string, thunkApi) => {
+            const state = thunkApi.getState() as RootState;
+            const token = state.authentication.token;
+
             await axios.delete(`${API_URL}/images/delete/${dirName}`, {
                 headers: {
-                    'Authorization': `Bearer ${JWT_TOKEN}`
+                    'Authorization': `Bearer ${token}`
                 }
             });
 

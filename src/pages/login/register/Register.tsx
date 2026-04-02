@@ -16,14 +16,15 @@ export const Register: React.FC = () => {
             <Form title='Create new account' type='register' id='register-form' name='register-form' />
 
             {/* Alert */}
-            <Alert
+            {exists && <Alert
                 type='error'
                 message={message ? message : ''}
-                isOpen={exists ? true : false}
+                isOpen={true}
                 onClose={handleAlertClose}
-            />
+            />}
+
             {/* Loading */}
-            {loading ? <Loader /> : null}
+            {loading && <Loader />}
         </>
     );
 };

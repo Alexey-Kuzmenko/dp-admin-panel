@@ -15,7 +15,6 @@ import {
     editContent,
     fetchPagesContent,
     selectContent,
-    selectError,
     selectLoading
 } from '../../store/contentSlice';
 import { selectMenuSlice } from '../../store/menuSlice';
@@ -52,7 +51,6 @@ export const Content: React.FC = () => {
 
     const content = useAppSelector(selectContent);
     const loading = useAppSelector(selectLoading);
-    const { exists, message } = useAppSelector(selectError);
     const { isMenuOpen } = useAppSelector(selectMenuSlice);
     const contentTypes = generateContentFormValues(content);
     const contentIds = content.map((c) => c._id);
@@ -71,26 +69,47 @@ export const Content: React.FC = () => {
 
     const handleSave = async (action: 'edit' | 'add'): Promise<void> => {
         if (action === 'add') {
-            if (validateValue((newContent as ContentModel).eng) === false && ((newContent as ContentModel).ua)) {
+            if (!validateValue((newContent as ContentModel).eng) || !validateValue((newContent as ContentModel).ua)) {
                 setAlertState({ type: 'error', isOpen: true, message: ALERT_ERROR_MGS });
-                hideAlertAutomatically('error', alertState, setAlertState);
-            } else {
-                await dispatch(addPageContent(newContent as CreateContentDto));
-                setNewContent(contentTemplate);
-                setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
-                hideAlertAutomatically('success', alertState, setAlertState);
+                hideAlertAutomatically(alertState, setAlertState);
+
+                return;
             }
+
+            const actionResult = await dispatch(addPageContent(newContent as CreateContentDto));
+            setNewContent(contentTemplate);
+
+            if (addPageContent.rejected.match(actionResult)) {
+                setAlertState({ type: 'error', isOpen: true, message: actionResult.error.message ?? '' });
+
+                return;
+            }
+
+            setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
+            hideAlertAutomatically(alertState, setAlertState);
         }
 
         if (action === 'edit' && editedContent && selectionFormValue.length) {
             if (validateValue(editedContent) === false) {
                 setAlertState({ type: 'error', isOpen: true, message: ALERT_ERROR_MGS });
-                hideAlertAutomatically('error', alertState, setAlertState);
-            } else {
-                dispatch(editContent({ content: editedContent as SubContent, formValue: selectionFormValue }));
-                setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
-                hideAlertAutomatically('success', alertState, setAlertState);
+                hideAlertAutomatically(alertState, setAlertState);
+
+                return;
             }
+
+            const actionResult = await dispatch(editContent({
+                content: editedContent as SubContent,
+                formValue: selectionFormValue
+            }));
+
+            if (editContent.rejected.match(actionResult)) {
+                setAlertState({ type: 'error', isOpen: true, message: actionResult.error.message ?? '' });
+
+                return;
+            }
+
+            setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
+            hideAlertAutomatically(alertState, setAlertState);
         }
     };
 
@@ -104,7 +123,7 @@ export const Content: React.FC = () => {
         }
 
         setAlertState({ type: 'warning', isOpen: true, message: ALERT_RESET_MGS });
-        hideAlertAutomatically('warning', alertState, setAlertState);
+        hideAlertAutomatically(alertState, setAlertState);
     };
 
     const handleFind = (value: string): void => {
@@ -118,11 +137,17 @@ export const Content: React.FC = () => {
     };
 
     const handleDelete = async (): Promise<void> => {
-        await dispatch(deletePageContent(deletedContentId));
+        const actionResult = await dispatch(deletePageContent(deletedContentId));
         setDeletedContentId('');
 
+        if (deletePageContent.rejected.match(actionResult)) {
+            setAlertState({ type: 'error', isOpen: true, message: actionResult.error.message ?? '' });
+
+            return;
+        }
+
         setAlertState({ type: 'success', isOpen: true, message: 'Content successfully deleted' });
-        hideAlertAutomatically('success', alertState, setAlertState);
+        hideAlertAutomatically(alertState, setAlertState);
     };
 
     const handleAlertClose = () => {
@@ -332,14 +357,14 @@ export const Content: React.FC = () => {
 
             {/* Alerts */}
             <Alert
-                type={exists ? 'error' : alertState.type}
-                message={message ? message : alertState.message}
-                isOpen={exists ? true : alertState.isOpen}
+                type={alertState.type}
+                message={alertState.message}
+                isOpen={alertState.isOpen}
                 onClose={handleAlertClose}
             />
 
             {/* Loader */}
-            {loading ? <Loader /> : null}
+            {loading && <Loader />}
 
         </div>
     );

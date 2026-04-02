@@ -10,13 +10,8 @@ const API_URL = import.meta.env.VITE_API_URL;
 const SESSION_EXPIRATION_TIME = import.meta.env.VITE_SESSION_EXPIRATION;
 const SESSION_EXPIRATION_DATE = new Date(new Date().getTime() + Number(SESSION_EXPIRATION_TIME) * 1_000);
 
-if (!API_URL) {
-    throw new Error(`API_URL ${ENV_VAR_IS_NOT_DEFINED} authSlice`);
-}
-
-if (!SESSION_EXPIRATION_TIME) {
-    throw new Error(`SESSION_EXPIRATION_TIME ${ENV_VAR_IS_NOT_DEFINED} authSlice`);
-}
+if (!API_URL) throw new Error(`API_URL ${ENV_VAR_IS_NOT_DEFINED} authSlice`);
+if (!SESSION_EXPIRATION_TIME) throw new Error(`SESSION_EXPIRATION_TIME ${ENV_VAR_IS_NOT_DEFINED} authSlice`);
 
 const createAuthSlice = buildCreateSlice({
     creators: { asyncThunk: asyncThunkCreator }
