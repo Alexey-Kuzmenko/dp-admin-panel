@@ -1,5 +1,5 @@
-import { ProjectModel } from '../../models/project.model';
-import { ProjectDto } from '../../dto/project.dto';
+import { ProjectModel } from '@alexey-kuzmenko/ok-apps-sdk';
+import { ProjectDto } from '@alexey-kuzmenko/ok-apps-sdk';
 
 import projectReducer, {
     addProject,

@@ -1,15 +1,15 @@
 import { asyncThunkCreator, buildCreateSlice, PayloadAction } from '@reduxjs/toolkit';
 import axios, { AxiosResponse } from 'axios';
 
-import { SkillModel } from '../models/skill.model';
-import { SkillDto } from '../dto/skill.dto';
-import { ResponseError } from '../types/response-error.type';
+import { SkillModel } from '@alexey-kuzmenko/ok-apps-sdk';
+import { SkillDto } from '@alexey-kuzmenko/ok-apps-sdk';
+import { ResponseError } from '../types';
 import { ERROR_MSG_TEMPLATE } from '../constants';
 import excludeObjectValues from '../utils/excludeObjectValues';
+import { RootState } from './types';
 
 const API_URL = import.meta.env.VITE_API_URL;
 const API_KEY = import.meta.env.VITE_API_KEY;
-const JWT_TOKEN = import.meta.env.VITE_JWT_TOKEN;
 
 const createSkillSlice = buildCreateSlice({
     creators: { asyncThunk: asyncThunkCreator }
@@ -57,7 +57,7 @@ export const skillSlice = createSkillSlice({
                 },
                 fulfilled: (state, { payload }) => {
                     const data = excludeObjectValues<SkillModel>(['createdAt', 'updatedAt', '__v'], payload);
-                    state.skills.push(...data);
+                    state.skills = data;
                 },
                 rejected: (state, { error }) => {
                     state.error.exists = true;
@@ -68,10 +68,13 @@ export const skillSlice = createSkillSlice({
                 }
             }
         ),
-        addSkill: create.asyncThunk(async (dto: SkillDto) => {
+        addSkill: create.asyncThunk(async (dto: SkillDto, thunkApi) => {
+            const state = thunkApi.getState() as RootState;
+            const token = state.authentication.token;
+
             const response: AxiosResponse<SkillModel> = await axios.post(`${API_URL}/skills`, dto, {
                 headers: {
-                    'Authorization': `Bearer ${JWT_TOKEN}`
+                    'Authorization': `Bearer ${token}`
                 }
             });
 
@@ -95,9 +98,12 @@ export const skillSlice = createSkillSlice({
             }
         ),
         deleteSkill: create.asyncThunk(async (id: string, thunkApi) => {
+            const state = thunkApi.getState() as RootState;
+            const token = state.authentication.token;
+
             await axios.delete(`${API_URL}/skills/${id}`, {
                 headers: {
-                    'Authorization': `Bearer ${JWT_TOKEN}`
+                    'Authorization': `Bearer ${token}`
                 }
             });
 
@@ -116,10 +122,13 @@ export const skillSlice = createSkillSlice({
                 }
             }
         ),
-        editSkill: create.asyncThunk(async (skill: SkillModel) => {
+        editSkill: create.asyncThunk(async (skill: SkillModel, thunkApi) => {
+            const state = thunkApi.getState() as RootState;
+            const token = state.authentication.token;
+
             const response: AxiosResponse<SkillModel> = await axios.patch(`${API_URL}/skills/${skill._id}`, skill, {
                 headers: {
-                    'Authorization': `Bearer ${JWT_TOKEN}`
+                    'Authorization': `Bearer ${token}`
                 }
             });
 

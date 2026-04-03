@@ -4,7 +4,7 @@ import { IconButton, Typography } from '@mui/material';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DoneIcon from '@mui/icons-material/Done';
 import { theme } from '../../theme/ThemeRegistry';
-import { AlertState } from '../../types/alert-state.type';
+import { AlertState } from '../../types';
 
 import styles from './CopyField.module.scss';
 

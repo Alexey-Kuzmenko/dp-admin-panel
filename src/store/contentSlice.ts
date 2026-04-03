@@ -1,16 +1,18 @@
 import { asyncThunkCreator, buildCreateSlice, PayloadAction } from '@reduxjs/toolkit';
 import axios, { AxiosResponse } from 'axios';
 
-import { Content, ContentModel } from '../models/content.model';
-import { CreateContentDto } from '../dto/content.dto';
-import { ResponseError } from '../types/response-error.type';
+import { Content, ContentModel } from '@alexey-kuzmenko/ok-apps-sdk';
+import { CreateContentDto } from '@alexey-kuzmenko/ok-apps-sdk';
+import type { RootState } from './types';
+import { ResponseError } from '../types';
 import excludeObjectValues from '../utils/excludeObjectValues';
-import { ERROR_MSG_TEMPLATE } from '../constants';
-import { RootState } from '.';
+import { ENV_VAR_IS_NOT_DEFINED, ERROR_MSG_TEMPLATE } from '../constants';
 
 const API_URL = import.meta.env.VITE_API_URL;
 const API_KEY = import.meta.env.VITE_API_KEY;
-const JWT_TOKEN = import.meta.env.VITE_JWT_TOKEN;
+
+if (!API_URL) throw new Error(`API_URL ${ENV_VAR_IS_NOT_DEFINED} contactSlice`);
+if (!API_KEY) throw new Error(`API_KEY ${ENV_VAR_IS_NOT_DEFINED} contactSlice`);
 
 const createContentSlice = buildCreateSlice({
     creators: { asyncThunk: asyncThunkCreator }
@@ -58,7 +60,7 @@ const contentSlice = createContentSlice({
                 },
                 fulfilled: (state, { payload }) => {
                     const data = excludeObjectValues<ContentModel>(['createdAt', 'updatedAt', '__v'], payload);
-                    state.content.push(...data);
+                    state.content = data;
                 },
                 rejected: (state, { error }) => {
                     state.error.exists = true;
@@ -69,10 +71,13 @@ const contentSlice = createContentSlice({
                 }
             }
         ),
-        addPageContent: create.asyncThunk(async (dto: CreateContentDto) => {
+        addPageContent: create.asyncThunk(async (dto: CreateContentDto, thunkApi) => {
+            const state = thunkApi.getState() as RootState;
+            const token = state.authentication.token;
+
             const response: AxiosResponse<ContentModel> = await axios.post(`${API_URL}/content/create`, dto, {
                 headers: {
-                    'Authorization': `Bearer ${JWT_TOKEN}`
+                    'Authorization': `Bearer ${token}`
                 }
             });
 
@@ -96,9 +101,12 @@ const contentSlice = createContentSlice({
             }
         ),
         deletePageContent: create.asyncThunk(async (id: string, thunkApi) => {
+            const state = thunkApi.getState() as RootState;
+            const token = state.authentication.token;
+
             await axios.delete(`${API_URL}/content/${id}`, {
                 headers: {
-                    'Authorization': `Bearer ${JWT_TOKEN}`
+                    'Authorization': `Bearer ${token}`
                 }
             });
 
@@ -121,6 +129,7 @@ const contentSlice = createContentSlice({
             const [type, lang]: Array<string> = payload.formValue.replace(/\s+/g, '').split('|');
             const state = thunkApi.getState() as RootState;
             const pageContent = state.content.content.find((c) => c.type === type);
+            const token = state.authentication.token;
 
             if (pageContent) {
                 const { _id } = pageContent;
@@ -128,7 +137,7 @@ const contentSlice = createContentSlice({
                     payload.content,
                     {
                         headers: {
-                            'Authorization': `Bearer ${JWT_TOKEN}`
+                            'Authorization': `Bearer ${token}`
                         }
                     }
                 );

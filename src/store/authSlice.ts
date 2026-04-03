@@ -1,23 +1,17 @@
 import { asyncThunkCreator, buildCreateSlice, PayloadAction } from '@reduxjs/toolkit';
-import { CreateUserDto } from '../dto/user.dto';
 import axios, { AxiosResponse } from 'axios';
-import { ResponseError } from '../types/response-error.type';
+import { UserModel, LoginModel, CreateUserDto } from '@alexey-kuzmenko/ok-apps-sdk';
+
+import type { AppDispatch } from './types';
+import { ResponseError } from '../types';
 import { ENV_VAR_IS_NOT_DEFINED, ERROR_MSG_TEMPLATE } from '../constants';
-import { UserModel } from '../models/user.model';
-import { LoginModel } from '../models/login.model';
-import { AppDispatch } from '.';
 
 const API_URL = import.meta.env.VITE_API_URL;
 const SESSION_EXPIRATION_TIME = import.meta.env.VITE_SESSION_EXPIRATION;
 const SESSION_EXPIRATION_DATE = new Date(new Date().getTime() + Number(SESSION_EXPIRATION_TIME) * 1_000);
 
-if (!API_URL) {
-    throw new Error(`API_URL ${ENV_VAR_IS_NOT_DEFINED} authSlice`);
-}
-
-if (!SESSION_EXPIRATION_TIME) {
-    throw new Error(`SESSION_EXPIRATION_TIME ${ENV_VAR_IS_NOT_DEFINED} authSlice`);
-}
+if (!API_URL) throw new Error(`API_URL ${ENV_VAR_IS_NOT_DEFINED} authSlice`);
+if (!SESSION_EXPIRATION_TIME) throw new Error(`SESSION_EXPIRATION_TIME ${ENV_VAR_IS_NOT_DEFINED} authSlice`);
 
 const createAuthSlice = buildCreateSlice({
     creators: { asyncThunk: asyncThunkCreator }
@@ -28,6 +22,11 @@ interface AuthState {
     userEmail: string
     loading: boolean | null
     error: ResponseError
+}
+
+interface SessionData {
+    token: string
+    email: string
 }
 
 const initialState: AuthState = {
@@ -103,12 +102,14 @@ const authSlice = createAuthSlice({
                 }
             }
         ),
-        saveSession: create.reducer((state, { payload }: PayloadAction<
-            { token: string, email: string }
-        >) => {
+        saveSession: create.reducer((state, { payload }: PayloadAction<SessionData>) => {
             localStorage.setItem('token', payload.token);
             localStorage.setItem('email', payload.email);
 
+            state.token = payload.token;
+            state.userEmail = payload.email;
+        }),
+        updateSession: create.reducer((state, { payload }: PayloadAction<SessionData>) => {
             state.token = payload.token;
             state.userEmail = payload.email;
         }),
@@ -132,7 +133,7 @@ const authSlice = createAuthSlice({
             const token = localStorage.getItem('token');
             const userEmail = localStorage.getItem('email');
 
-            if (!token && !userEmail) {
+            if (!token || !userEmail) {
                 dispatch(logout());
 
                 return;
@@ -145,7 +146,7 @@ const authSlice = createAuthSlice({
             }
 
             if (token && userEmail) {
-                dispatch(saveSession({ token, email: userEmail }));
+                dispatch(updateSession({ token, email: userEmail }));
                 dispatch(autoLogout());
             }
         }),
@@ -170,6 +171,7 @@ export const {
     logout,
     keepSession,
     saveSession,
+    updateSession,
     resetResponseError
 } = authSlice.actions;
 

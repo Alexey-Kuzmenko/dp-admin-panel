@@ -1,5 +1,5 @@
-import { Content } from '../../models/content.model';
-import { CreateContentDto } from '../../dto/content.dto';
+import { Content } from '@alexey-kuzmenko/ok-apps-sdk';
+import { CreateContentDto } from '@alexey-kuzmenko/ok-apps-sdk';
 
 import contentReducer,
 {

@@ -18,14 +18,13 @@ import {
     deleteImage,
     fetchImages,
     selectDirectories,
-    selectError,
     selectImages,
     selectLoading
 } from '../../store/imageSlice';
 import { selectMenuSlice } from '../../store/menuSlice';
 
-import { dtoCodeBlocks } from '../../dto/dto-code-blocks';
-import { AlertState } from '../../types/alert-state.type';
+import { codeBlockDtoTemplates } from '../../constants/code-block-dto';
+import { AlertState } from '../../types';
 
 import { ALERT_SUCCESS_MGS } from '../../constants';
 import hideAlertAutomatically from '../../utils/hideAlertAutomatically';
@@ -45,7 +44,6 @@ export const Images: React.FC = () => {
     const imagesList = useAppSelector(selectImages);
     const dirList = useAppSelector(selectDirectories);
     const loading = useAppSelector(selectLoading);
-    const { exists, message } = useAppSelector(selectError);
     const { isMenuOpen } = useAppSelector(selectMenuSlice);
 
     const uploadForm = useRef<HTMLFormElement>(null);
@@ -55,39 +53,58 @@ export const Images: React.FC = () => {
     const [alertState, setAlertState] = useState<AlertState>({ type: 'success', isOpen: false, message: '' });
 
     const handleImageDelete = async (imgUrl: string): Promise<void> => {
-        await dispatch(deleteImage(imgUrl));
+        const actionResult = await dispatch(deleteImage(imgUrl));
+
+        if (deleteImage.rejected.match(actionResult)) {
+            setAlertState({ type: 'error', isOpen: true, message: actionResult.error.message ?? '' });
+
+            return;
+        }
+
         setAlertState({ type: 'success', isOpen: true, message: 'Image successfully deleted' });
-        hideAlertAutomatically('success', alertState, setAlertState);
+        hideAlertAutomatically(setAlertState);
     };
 
-    const handelSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
-        event.preventDefault();
+    const handelSubmit = async (): Promise<void> => {
         const formData = new FormData();
 
         if (selectedImg) {
             formData.append('image', selectedImg);
-            await dispatch(addImage(formData));
+            const actionResult = await dispatch(addImage(formData));
 
             uploadForm.current?.reset();
             setIsFormValid(false);
 
+            if (addImage.rejected.match(actionResult)) {
+                setAlertState({ type: 'error', isOpen: true, message: actionResult.error.message ?? '' });
+
+                return;
+            }
+
             setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
-            hideAlertAutomatically('success', alertState, setAlertState);
+            hideAlertAutomatically(setAlertState);
         }
     };
 
     const handelReset = (): void => {
+        uploadForm.current?.reset();
         setIsFormValid(false);
         setAlertState({ type: 'warning', isOpen: true, message: 'Input value was reset' });
-        hideAlertAutomatically('warning', alertState, setAlertState);
+        hideAlertAutomatically(setAlertState);
     };
 
     const handleDirDelete = async (): Promise<void> => {
-        await dispatch(deleteDir(deletedDirName));
+        const actionResult = await dispatch(deleteDir(deletedDirName));
         setDeletedDirName('');
 
+        if (deleteDir.rejected.match(actionResult)) {
+            setAlertState({ type: 'error', isOpen: true, message: actionResult.error.message ?? '' });
+
+            return;
+        }
+
         setAlertState({ type: 'success', isOpen: true, message: 'Directory successfully deleted' });
-        hideAlertAutomatically('success', alertState, setAlertState);
+        hideAlertAutomatically(setAlertState);
     };
 
     const handleAlertClose = (): void => {
@@ -110,8 +127,7 @@ export const Images: React.FC = () => {
                 </AccordionSummary>
                 <AccordionDetails>
                     <CodeBlock
-                        code={dtoCodeBlocks.images}
-                        lang='typescript'
+                        code={codeBlockDtoTemplates.images}
                     />
                 </AccordionDetails>
             </Accordion>
@@ -182,8 +198,8 @@ export const Images: React.FC = () => {
                         setValue={setSelectedImg}
                         isValid={isFormValid}
                         setIsValid={setIsFormValid}
-                        onSubmit={handelSubmit}
-                        onReset={handelReset}
+                        onFromSubmit={handelSubmit}
+                        onFormReset={handelReset}
                     />
                 </AccordionDetails>
             </Accordion>
@@ -228,13 +244,13 @@ export const Images: React.FC = () => {
 
             {/* Alerts */}
             <Alert
-                type={exists ? 'error' : alertState.type}
-                message={message ? message : alertState.message}
-                isOpen={exists ? true : alertState.isOpen}
+                type={alertState.type}
+                message={alertState.message}
+                isOpen={alertState.isOpen}
                 onClose={handleAlertClose}
             />
 
-            {loading ? <Loader /> : null}
+            {loading && <Loader />}
 
         </div>
     );

@@ -17,16 +17,15 @@ import {
     deleteSkill,
     editSkill,
     fetchSkills,
-    selectError,
     selectLoading,
     selectSkills
 } from '../../store/skillSlice';
 import { selectMenuSlice } from '../../store/menuSlice';
 
-import { dtoCodeBlocks } from '../../dto/dto-code-blocks';
-import { SkillDto } from '../../dto/skill.dto';
-import { AlertState } from '../../types/alert-state.type';
-import { SkillModel, skillModelKeys } from '../../models/skill.model';
+import { codeBlockDtoTemplates } from '../../constants/code-block-dto';
+import { SkillDto } from '@alexey-kuzmenko/ok-apps-sdk';
+import { AlertState } from '../../types';
+import { SkillModel, skillModelKeys } from '@alexey-kuzmenko/ok-apps-sdk';
 
 import generateCodeBlock from '../../utils/generateCodeBlock';
 import validateValue from '../../utils/validateValue';
@@ -53,7 +52,6 @@ export const Skills: React.FC = () => {
 
     const skills = useAppSelector(selectSkills);
     const loading = useAppSelector(selectLoading);
-    const { exists, message } = useAppSelector(selectError);
     const { isMenuOpen } = useAppSelector(selectMenuSlice);
     const skillsIds = skills.map((s) => s._id);
 
@@ -72,24 +70,42 @@ export const Skills: React.FC = () => {
         if (action === 'add') {
             if (validateValue(newSkill) === false) {
                 setAlertState({ type: 'error', isOpen: true, message: ALERT_ERROR_MGS });
-                hideAlertAutomatically('error', alertState, setAlertState);
-            } else {
-                await dispatch(addSkill(newSkill as SkillDto));
-                setNewSkill(skillTemplate);
-                setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
-                hideAlertAutomatically('success', alertState, setAlertState);
+                hideAlertAutomatically(setAlertState);
+
+                return;
             }
+
+            const actionResult = await dispatch(addSkill(newSkill as SkillDto));
+            setNewSkill(skillTemplate);
+
+            if (addSkill.rejected.match(actionResult)) {
+                setAlertState({ type: 'error', isOpen: true, message: actionResult.error.message ?? '' });
+
+                return;
+            }
+
+            setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
+            hideAlertAutomatically(setAlertState);
         }
 
         if (action === 'edit' && editedSkill) {
             if (validateValue(editedSkill) === false) {
                 setAlertState({ type: 'error', isOpen: true, message: ALERT_ERROR_MGS });
-                hideAlertAutomatically('error', alertState, setAlertState);
-            } else {
-                await dispatch(editSkill(editedSkill as SkillModel));
-                setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
-                hideAlertAutomatically('success', alertState, setAlertState);
+                hideAlertAutomatically(setAlertState);
+
+                return;
             }
+
+            const actionResult = await dispatch(editSkill(editedSkill as SkillModel));
+
+            if (editSkill.rejected.match(actionResult)) {
+                setAlertState({ type: 'error', isOpen: true, message: actionResult.error.message ?? '' });
+
+                return;
+            }
+
+            setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
+            hideAlertAutomatically(setAlertState);
         }
     };
 
@@ -103,7 +119,7 @@ export const Skills: React.FC = () => {
         }
 
         setAlertState({ type: 'warning', isOpen: true, message: ALERT_RESET_MGS });
-        hideAlertAutomatically('warning', alertState, setAlertState);
+        hideAlertAutomatically(setAlertState);
     };
 
     const handleFind = (id: string): void => {
@@ -116,11 +132,17 @@ export const Skills: React.FC = () => {
     };
 
     const handleDelete = async (): Promise<void> => {
-        await dispatch(deleteSkill(deletedSkillId));
+        const actionResult = await dispatch(deleteSkill(deletedSkillId));
         setDeletedSkillId('');
 
+        if (deleteSkill.rejected.match(actionResult)) {
+            setAlertState({ type: 'error', isOpen: true, message: actionResult.error.message ?? '' });
+
+            return;
+        }
+
         setAlertState({ type: 'success', isOpen: true, message: 'Skill successfully deleted' });
-        hideAlertAutomatically('success', alertState, setAlertState);
+        hideAlertAutomatically(setAlertState);
     };
 
     const handleAlertClose = () => {
@@ -143,8 +165,7 @@ export const Skills: React.FC = () => {
                 </AccordionSummary>
                 <AccordionDetails>
                     <CodeBlock
-                        code={dtoCodeBlocks.skills}
-                        lang='typescript'
+                        code={codeBlockDtoTemplates.skills}
                     />
                 </AccordionDetails>
             </Accordion>
@@ -318,7 +339,8 @@ export const Skills: React.FC = () => {
                             <Box component='div' sx={{ marginTop: '20px' }}>
                                 <CodeBlock
                                     code={generateCodeBlock(deletedSkill)}
-                                    lang='typescript'
+                                    copyButton={false}
+                                    lang='json'
                                 />
                             </Box>
                     }
@@ -328,13 +350,13 @@ export const Skills: React.FC = () => {
 
             {/* Alerts */}
             <Alert
-                type={exists ? 'error' : alertState.type}
-                message={message ? message : alertState.message}
-                isOpen={exists ? true : alertState.isOpen}
+                type={alertState.type}
+                message={alertState.message}
+                isOpen={alertState.isOpen}
                 onClose={handleAlertClose}
             />
 
-            {loading ? <Loader /> : null}
+            {loading && <Loader />}
 
         </div>
     );

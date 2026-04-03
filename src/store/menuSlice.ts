@@ -11,7 +11,6 @@ export const initialState: MenuState = {
 export const menuSlice = createSlice({
     name: 'menu',
     initialState,
-
     selectors: {
         selectMenuSlice: (state) => state
     },

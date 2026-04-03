@@ -7,9 +7,24 @@ interface UploadFormProps extends DetailedHTMLProps<FormHTMLAttributes<HTMLFormE
     formRef: React.RefObject<HTMLFormElement>
     isValid: boolean
     setIsValid: (state: boolean) => void
+    onFormReset: () => void
+    onFromSubmit: () => Promise<void>
 }
 
-export const UploadForm: React.FC<UploadFormProps> = ({ setValue, formRef, isValid, setIsValid, ...props }) => {
+export const UploadForm: React.FC<UploadFormProps> = ({
+    setValue,
+    formRef,
+    isValid,
+    setIsValid,
+    onFromSubmit,
+    onFormReset,
+    ...props
+}) => {
+
+    const handelSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+    };
+
     const handleChange: ChangeEventHandler<HTMLInputElement> = async (event) => {
         const file = event.target.files as FileList;
 
@@ -25,7 +40,7 @@ export const UploadForm: React.FC<UploadFormProps> = ({ setValue, formRef, isVal
     };
 
     return (
-        <form {...props} ref={formRef} className={styles.UploadForm}>
+        <form {...props} ref={formRef} className={styles.UploadForm} onSubmit={handelSubmit}>
             <input
                 className={styles.UploadForm__input}
                 type='file'
@@ -34,8 +49,8 @@ export const UploadForm: React.FC<UploadFormProps> = ({ setValue, formRef, isVal
             />
 
             <div className={styles.UploadForm__controls}>
-                <Button variant='outlined' type='submit' disabled={!isValid}>Submit</Button>
-                <Button variant='contained' type='reset'>Reset</Button>
+                <Button variant='outlined' onClick={onFromSubmit} disabled={!isValid}>Submit</Button>
+                <Button variant='contained' onClick={onFormReset} disabled={!isValid}>Reset</Button>
             </div>
         </form>
     );

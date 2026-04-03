@@ -1,14 +1,16 @@
 import { asyncThunkCreator, buildCreateSlice } from '@reduxjs/toolkit';
 import axios, { AxiosResponse } from 'axios';
 
-import { UserModel } from '../models/user.model';
-import { CreateUserDto, DeleteUserDto } from '../dto/user.dto';
-import { ResponseError } from '../types/response-error.type';
+import { UserModel } from '@alexey-kuzmenko/ok-apps-sdk';
+import { CreateUserDto, DeleteUserDto } from '@alexey-kuzmenko/ok-apps-sdk';
+import type { RootState } from './types';
+import { ResponseError } from '../types';
 import excludeObjectValues from '../utils/excludeObjectValues';
-import { ERROR_MSG_TEMPLATE, JWT_TOKEN_IS_MISSING_IN_STORE } from '../constants';
-import { RootState } from '.';
+import { ENV_VAR_IS_NOT_DEFINED, ERROR_MSG_TEMPLATE, JWT_TOKEN_IS_MISSING_IN_STORE } from '../constants';
 
 const API_URL = import.meta.env.VITE_API_URL;
+
+if (!API_URL) throw new Error(`API_URL ${ENV_VAR_IS_NOT_DEFINED} contactSlice`);
 
 const createUserSlice = buildCreateSlice({
     creators: { asyncThunk: asyncThunkCreator }
@@ -64,7 +66,7 @@ const userSlice = createUserSlice({
                         payload
                     );
 
-                    state.users.push(...data);
+                    state.users = data;
                 },
                 rejected: (state, { error }) => {
                     state.error.exists = true;

@@ -1,22 +1,19 @@
 export default function generatePageTitle(route: string): string {
 
-    if (!route.length) {
-        throw new Error('Route argument can\'t be empty');
-    } else {
-        return route.split('').map((symbol: string) => {
-            let newStr = '';
+    if (!route.length) throw new Error('Route argument can\'t be empty');
 
-            if (symbol !== '/') {
-                newStr += symbol;
-            }
+    let newStr = '';
 
-            if (symbol === '-') {
-                newStr = newStr.replace('-', ' ');
-            }
+    route.split('').forEach((symbol: string) => {
 
-            return newStr.toUpperCase();
+        if (symbol !== '/') {
+            newStr += symbol;
+        }
 
-        }).join('');
-    }
+        if (symbol === '-') {
+            newStr = newStr.replace('-', ' ');
+        }
+    });
 
+    return newStr.toUpperCase();
 }

@@ -1,18 +1,13 @@
-import { AlertState, AlertType } from '../types/alert-state.type';
-
-type SetAlertState = (state: AlertState) => void;
+import { AlertState } from '../types';
 
 export default function hideAlertAutomatically(
-    type: AlertType,
-    state: AlertState,
-    setState: SetAlertState,
+    setState: React.Dispatch<React.SetStateAction<AlertState>>,
     timeout = 3_000
 ): void {
     setTimeout(() => {
-        setState({
-            ...state,
-            type,
+        setState((currentSate) => ({
+            ...currentSate,
             isOpen: false
-        });
+        }));
     }, timeout);
 }

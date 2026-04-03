@@ -1,0 +1,43 @@
+@use '../../../scss/utilities/variables' as vars;
+
+.Status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 100px;
+    height: 100px;
+
+    border-radius: 100%;
+
+    &_success {
+        border: 3px solid vars.$success;
+    }
+
+    &_error {
+        border: 3px solid vars.$error;
+    }
+
+    &__text {
+        cursor: default;
+        text-align: center;
+
+        font-size: 1.5rem;
+        font-weight: 600;
+
+        &_success {
+            color: vars.$success;
+        }
+
+        &_error {
+            color: vars.$error;
+        }
+    }
+}
+
+.StatusContent {
+    display: flex;
+    align-items: center;
+    flex-flow: column nowrap;
+    justify-content: center;
+}
