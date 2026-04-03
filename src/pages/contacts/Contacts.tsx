@@ -70,7 +70,7 @@ export const Contacts: React.FC = () => {
         if (action === 'add') {
             if (validateValue(newContact) === false) {
                 setAlertState({ type: 'error', isOpen: true, message: ALERT_ERROR_MGS });
-                hideAlertAutomatically(alertState, setAlertState);
+                hideAlertAutomatically(setAlertState);
 
                 return;
             }
@@ -85,13 +85,13 @@ export const Contacts: React.FC = () => {
             }
 
             setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
-            hideAlertAutomatically(alertState, setAlertState);
+            hideAlertAutomatically(setAlertState);
         }
 
         if (action === 'edit' && editedContact) {
             if (validateValue(editedContact) === false) {
                 setAlertState({ type: 'error', isOpen: true, message: ALERT_ERROR_MGS });
-                hideAlertAutomatically(alertState, setAlertState);
+                hideAlertAutomatically(setAlertState);
 
                 return;
             }
@@ -105,7 +105,7 @@ export const Contacts: React.FC = () => {
             }
 
             setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
-            hideAlertAutomatically(alertState, setAlertState);
+            hideAlertAutomatically(setAlertState);
         }
     };
 
@@ -119,7 +119,7 @@ export const Contacts: React.FC = () => {
         }
 
         setAlertState({ type: 'warning', isOpen: true, message: ALERT_RESET_MGS });
-        hideAlertAutomatically(alertState, setAlertState);
+        hideAlertAutomatically(setAlertState);
     };
 
     const handleFind = (id: string): void => {
@@ -142,7 +142,7 @@ export const Contacts: React.FC = () => {
         }
 
         setAlertState({ type: 'success', isOpen: true, message: 'Contact successfully deleted' });
-        hideAlertAutomatically(alertState, setAlertState);
+        hideAlertAutomatically(setAlertState);
     };
 
     const handleAlertClose = () => {

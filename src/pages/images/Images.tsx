@@ -62,7 +62,7 @@ export const Images: React.FC = () => {
         }
 
         setAlertState({ type: 'success', isOpen: true, message: 'Image successfully deleted' });
-        hideAlertAutomatically(alertState, setAlertState);
+        hideAlertAutomatically(setAlertState);
     };
 
     const handelSubmit = async (): Promise<void> => {
@@ -82,7 +82,7 @@ export const Images: React.FC = () => {
             }
 
             setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
-            hideAlertAutomatically(alertState, setAlertState);
+            hideAlertAutomatically(setAlertState);
         }
     };
 
@@ -90,7 +90,7 @@ export const Images: React.FC = () => {
         uploadForm.current?.reset();
         setIsFormValid(false);
         setAlertState({ type: 'warning', isOpen: true, message: 'Input value was reset' });
-        hideAlertAutomatically(alertState, setAlertState);
+        hideAlertAutomatically(setAlertState);
     };
 
     const handleDirDelete = async (): Promise<void> => {
@@ -104,7 +104,7 @@ export const Images: React.FC = () => {
         }
 
         setAlertState({ type: 'success', isOpen: true, message: 'Directory successfully deleted' });
-        hideAlertAutomatically(alertState, setAlertState);
+        hideAlertAutomatically(setAlertState);
     };
 
     const handleAlertClose = (): void => {

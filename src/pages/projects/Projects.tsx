@@ -67,7 +67,7 @@ export const Projects: React.FC = () => {
         if (action === 'add') {
             if (validateValue(newProject) === false) {
                 setAlertState({ type: 'error', isOpen: true, message: ALERT_ERROR_MGS });
-                hideAlertAutomatically(alertState, setAlertState);
+                hideAlertAutomatically(setAlertState);
 
                 return;
             }
@@ -82,14 +82,14 @@ export const Projects: React.FC = () => {
             }
 
             setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
-            hideAlertAutomatically(alertState, setAlertState);
+            hideAlertAutomatically(setAlertState);
 
         }
 
         if (action === 'edit' && editedProject) {
             if (validateValue(editedProject) === false) {
                 setAlertState({ type: 'error', isOpen: true, message: ALERT_ERROR_MGS });
-                hideAlertAutomatically(alertState, setAlertState);
+                hideAlertAutomatically(setAlertState);
 
                 return;
             }
@@ -103,7 +103,7 @@ export const Projects: React.FC = () => {
             }
 
             setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
-            hideAlertAutomatically(alertState, setAlertState);
+            hideAlertAutomatically(setAlertState);
         }
     };
 
@@ -117,7 +117,7 @@ export const Projects: React.FC = () => {
         }
 
         setAlertState({ type: 'warning', isOpen: true, message: ALERT_RESET_MGS });
-        hideAlertAutomatically(alertState, setAlertState);
+        hideAlertAutomatically(setAlertState);
     };
 
     const handleFind = (id: string): void => {
@@ -140,7 +140,7 @@ export const Projects: React.FC = () => {
         }
 
         setAlertState({ type: 'success', isOpen: true, message: 'Project successfully deleted' });
-        hideAlertAutomatically(alertState, setAlertState);
+        hideAlertAutomatically(setAlertState);
     };
 
     const handleAlertClose = () => {

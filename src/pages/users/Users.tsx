@@ -90,7 +90,7 @@ export const Users: React.FC = () => {
     const handleSave = async (): Promise<void> => {
         if (validateValue(newUser) === false) {
             setAlertState({ type: 'error', isOpen: true, message: ALERT_ERROR_MGS });
-            hideAlertAutomatically(alertState, setAlertState);
+            hideAlertAutomatically(setAlertState);
 
             return;
         }
@@ -105,13 +105,13 @@ export const Users: React.FC = () => {
         }
 
         setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
-        hideAlertAutomatically(alertState, setAlertState);
+        hideAlertAutomatically(setAlertState);
     };
 
     const handleReset = (): void => {
         setNewUser(userTemplate);
         setAlertState({ type: 'warning', isOpen: true, message: ALERT_RESET_MGS });
-        hideAlertAutomatically(alertState, setAlertState);
+        hideAlertAutomatically(setAlertState);
     };
 
     const handleDelete = async (): Promise<void> => {
@@ -125,7 +125,7 @@ export const Users: React.FC = () => {
         }
 
         setAlertState({ type: 'success', isOpen: true, message: 'User successfully deleted' });
-        hideAlertAutomatically(alertState, setAlertState);
+        hideAlertAutomatically(setAlertState);
     };
 
     const handleAlertClose = () => {

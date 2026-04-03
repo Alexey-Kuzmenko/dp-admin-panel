@@ -71,7 +71,7 @@ export const Content: React.FC = () => {
         if (action === 'add') {
             if (!validateValue((newContent as ContentModel).eng) || !validateValue((newContent as ContentModel).ua)) {
                 setAlertState({ type: 'error', isOpen: true, message: ALERT_ERROR_MGS });
-                hideAlertAutomatically(alertState, setAlertState);
+                hideAlertAutomatically(setAlertState);
 
                 return;
             }
@@ -86,13 +86,13 @@ export const Content: React.FC = () => {
             }
 
             setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
-            hideAlertAutomatically(alertState, setAlertState);
+            hideAlertAutomatically(setAlertState);
         }
 
         if (action === 'edit' && editedContent && selectionFormValue.length) {
             if (validateValue(editedContent) === false) {
                 setAlertState({ type: 'error', isOpen: true, message: ALERT_ERROR_MGS });
-                hideAlertAutomatically(alertState, setAlertState);
+                hideAlertAutomatically(setAlertState);
 
                 return;
             }
@@ -109,7 +109,7 @@ export const Content: React.FC = () => {
             }
 
             setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
-            hideAlertAutomatically(alertState, setAlertState);
+            hideAlertAutomatically(setAlertState);
         }
     };
 
@@ -123,7 +123,7 @@ export const Content: React.FC = () => {
         }
 
         setAlertState({ type: 'warning', isOpen: true, message: ALERT_RESET_MGS });
-        hideAlertAutomatically(alertState, setAlertState);
+        hideAlertAutomatically(setAlertState);
     };
 
     const handleFind = (value: string): void => {
@@ -147,7 +147,7 @@ export const Content: React.FC = () => {
         }
 
         setAlertState({ type: 'success', isOpen: true, message: 'Content successfully deleted' });
-        hideAlertAutomatically(alertState, setAlertState);
+        hideAlertAutomatically(setAlertState);
     };
 
     const handleAlertClose = () => {
