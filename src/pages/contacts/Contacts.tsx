@@ -47,8 +47,7 @@ export const Contacts: React.FC = () => {
 
     useEffect(() => {
         dispatch(fetchContacts());
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [dispatch]);
 
     const contacts = useAppSelector(selectContacts);
     const loading = useAppSelector(selectLoading);
@@ -62,7 +61,7 @@ export const Contacts: React.FC = () => {
     const deletedContact = contacts.find((c) => c._id === deletedContactId);
 
     const [editedContact, setEditedContact] = useState<object>();
-    const editedContactCopy = useRef<ContactModel>();
+    const editedContactCopyRef = useRef<ContactModel>();
 
     const viewportWidth = window.innerWidth;
 
@@ -115,7 +114,7 @@ export const Contacts: React.FC = () => {
         }
 
         if (action === 'edit') {
-            setEditedContact(editedContactCopy.current);
+            setEditedContact(editedContactCopyRef.current);
         }
 
         setAlertState({ type: 'warning', isOpen: true, message: ALERT_RESET_MGS });
@@ -127,7 +126,7 @@ export const Contacts: React.FC = () => {
 
         if (jsonEditorData) {
             setEditedContact(jsonEditorData);
-            editedContactCopy.current = jsonEditorData;
+            editedContactCopyRef.current = jsonEditorData;
         }
     };
 

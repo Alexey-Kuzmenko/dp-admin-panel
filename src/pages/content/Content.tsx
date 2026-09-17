@@ -46,8 +46,7 @@ export const Content: React.FC = () => {
 
     useEffect(() => {
         dispatch(fetchPagesContent());
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [dispatch]);
 
     const content = useAppSelector(selectContent);
     const loading = useAppSelector(selectLoading);
@@ -63,7 +62,7 @@ export const Content: React.FC = () => {
     const deletedContent = content.find((c) => c._id === deletedContentId);
 
     const [editedContent, setEditedContent] = useState<object>();
-    const editedContentCopy = useRef<SubContent>();
+    const editedContentCopyRef = useRef<SubContent>();
 
     const viewportWidth = window.innerWidth;
 
@@ -119,7 +118,7 @@ export const Content: React.FC = () => {
         }
 
         if (action === 'edit') {
-            setEditedContent(editedContentCopy.current);
+            setEditedContent(editedContentCopyRef.current);
         }
 
         setAlertState({ type: 'warning', isOpen: true, message: ALERT_RESET_MGS });
@@ -132,7 +131,7 @@ export const Content: React.FC = () => {
 
         if (jsonEditorData) {
             setEditedContent(jsonEditorData);
-            editedContentCopy.current = jsonEditorData;
+            editedContentCopyRef.current = jsonEditorData;
         }
     };
 

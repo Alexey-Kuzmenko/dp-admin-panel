@@ -1,6 +1,6 @@
 @use '../../scss/utilities/variables' as vars;
 @use '../../scss/utilities/placeholders';
-@use '../Button/Button.module.scss';
+@use '../Button/Button.module';
 
 .UploadForm {
     display: flex;

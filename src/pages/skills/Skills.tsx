@@ -47,8 +47,7 @@ export const Skills: React.FC = () => {
 
     useEffect(() => {
         dispatch(fetchSkills());
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [dispatch]);
 
     const skills = useAppSelector(selectSkills);
     const loading = useAppSelector(selectLoading);
@@ -62,7 +61,7 @@ export const Skills: React.FC = () => {
     const deletedSkill = skills.find((s) => s._id === deletedSkillId);
 
     const [editedSkill, setEditedSkill] = useState<object>();
-    const editedSkillCopy = useRef<SkillModel>();
+    const editedSkillCopyRef = useRef<SkillModel>();
 
     const viewportWidth = window.innerWidth;
 
@@ -115,7 +114,7 @@ export const Skills: React.FC = () => {
         }
 
         if (action === 'edit') {
-            setEditedSkill(editedSkillCopy.current);
+            setEditedSkill(editedSkillCopyRef.current);
         }
 
         setAlertState({ type: 'warning', isOpen: true, message: ALERT_RESET_MGS });
@@ -127,7 +126,7 @@ export const Skills: React.FC = () => {
 
         if (jsonEditorData) {
             setEditedSkill(jsonEditorData);
-            editedSkillCopy.current = jsonEditorData;
+            editedSkillCopyRef.current = jsonEditorData;
         }
     };
 

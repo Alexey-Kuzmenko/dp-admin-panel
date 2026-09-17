@@ -1,6 +1,7 @@
 import React, { ChangeEventHandler, DetailedHTMLProps, FormHTMLAttributes } from 'react';
-import styles from './UploadForm.module.scss';
 import { Button } from '../Button/Button';
+
+import styles from './UploadForm.module.scss';
 
 interface UploadFormProps extends DetailedHTMLProps<FormHTMLAttributes<HTMLFormElement>, HTMLFormElement> {
     setValue: (state: File) => void
@@ -26,16 +27,11 @@ export const UploadForm: React.FC<UploadFormProps> = ({
     };
 
     const handleChange: ChangeEventHandler<HTMLInputElement> = async (event) => {
-        const file = event.target.files as FileList;
+        const file = event.target.files?.[0];
 
-        if (file.length) {
+        if (file) {
             setIsValid(true);
-
-            try {
-                setValue(file?.[0]);
-            } catch (error) {
-                throw new Error(error as string);
-            }
+            setValue(file);
         }
     };
 

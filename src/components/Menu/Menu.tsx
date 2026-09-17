@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import { BurgerMenuIcon } from '../BurgerMenuIcon/BurgerMenuIcon';
 import cn from 'classnames';
@@ -16,12 +16,17 @@ interface MenuProps {
     menuLinks: Array<MenuLinkInterface>
 }
 
-const body = document.body;
-
 export const Menu: React.FC<MenuProps> = ({ menuLinks }) => {
     const dispatch = useAppDispatch();
     const { isMenuOpen } = useAppSelector(selectMenuSlice);
-    body.dataset.bodyScroll = String(!isMenuOpen);
+
+    useEffect(() => {
+        document.body.dataset.bodyScroll = String(!isMenuOpen);
+
+        return () => {
+            document.body.dataset.bodyScroll = 'true';
+        };
+    }, [isMenuOpen]);
 
     const handleBackdropClick = (): void => {
         dispatch(closeMenu());

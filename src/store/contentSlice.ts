@@ -155,8 +155,12 @@ const contentSlice = createContentSlice({
                         if (pageContent) {
                             const pageContentIndex = state.content.indexOf(pageContent);
                             const contentCopy = [...state.content];
-                            payload.lang === 'eng' ?
-                                pageContent.eng = payload.data.eng : pageContent.ua = payload.data.ua;
+
+                            if (payload.lang === 'eng') {
+                                pageContent.eng = payload.data.eng;
+                            } else {
+                                pageContent.ua = payload.data.ua;
+                            }
 
                             contentCopy[pageContentIndex] = pageContent;
                             state.content = contentCopy;

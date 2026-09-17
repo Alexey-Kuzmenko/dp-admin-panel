@@ -30,8 +30,7 @@ function App() {
 
   useEffect(() => {
     dispatch(keepSession());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [dispatch]);
 
   const routes: JSX.Element = (
     <Routes>

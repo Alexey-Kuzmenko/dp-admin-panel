@@ -58,8 +58,7 @@ export const Users: React.FC = () => {
 
     useEffect(() => {
         dispatch(fetchUsers());
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [dispatch]);
 
     const users = useAppSelector(selectUsers);
     const loading = useAppSelector(selectLoading);

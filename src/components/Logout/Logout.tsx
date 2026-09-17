@@ -11,8 +11,7 @@ export const Logout: React.FC = () => {
     useEffect(() => {
         dispatch(logout());
         dispatch(closeMenu());
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [dispatch]);
 
     return (
         <Navigate to='/' replace />

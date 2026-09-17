@@ -44,8 +44,7 @@ export const Projects: React.FC = () => {
 
     useEffect(() => {
         dispatch(fetchProjects());
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [dispatch]);
 
     const projects = useAppSelector(selectProjects);
     const loading = useAppSelector(selectLoading);
@@ -59,7 +58,7 @@ export const Projects: React.FC = () => {
     const deletedProject = projects.find((p) => p._id === deletedProjectId);
 
     const [editedProject, setEditedProject] = useState<object>();
-    const editedProjectCopy = useRef<ProjectModel>();
+    const editedProjectCopyRef = useRef<ProjectModel>();
 
     const viewportWidth = window.innerWidth;
 
@@ -113,7 +112,7 @@ export const Projects: React.FC = () => {
         }
 
         if (action === 'edit') {
-            setEditedProject(editedProjectCopy.current);
+            setEditedProject(editedProjectCopyRef.current);
         }
 
         setAlertState({ type: 'warning', isOpen: true, message: ALERT_RESET_MGS });
@@ -125,7 +124,7 @@ export const Projects: React.FC = () => {
 
         if (jsonEditorData) {
             setEditedProject(jsonEditorData);
-            editedProjectCopy.current = jsonEditorData;
+            editedProjectCopyRef.current = jsonEditorData;
         }
     };
 
