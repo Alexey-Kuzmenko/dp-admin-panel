@@ -2,7 +2,6 @@ import React, { DetailedHTMLProps, FormHTMLAttributes, useState } from 'react';
 import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { Button } from '../Button/Button';
-import { v4 as uuidv4 } from 'uuid';
 
 import styles from './SelectionForm.module.scss';
 
@@ -53,9 +52,9 @@ export const SelectionForm: React.FC<SelectionFormProps> =
         };
 
         const renderMenuItem = (): JSX.Element[] => {
-            return values.map((v: string) => {
+            return values.map((value: string) => {
                 return (
-                    <MenuItem key={uuidv4()} value={v}>{v}</MenuItem>
+                    <MenuItem key={value} value={value}>{value}</MenuItem>
                 );
             });
         };

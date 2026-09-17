@@ -9,7 +9,7 @@ import { theme } from '../../theme/ThemeRegistry';
 import { CodeBlock, SelectionForm, Button, Alert, Loader } from '../../components';
 
 import cn from 'classnames';
-import { JsonEditor } from 'json-edit-react';
+import { JsonEditor, githubDarkTheme } from 'json-edit-react';
 
 import { useAppDispatch, useAppSelector } from '../../hooks/redux-hooks';
 import {
@@ -191,7 +191,7 @@ export const Contacts: React.FC = () => {
                             <JsonEditor
                                 data={contacts}
                                 className={styles.Contacts__jsonEditor}
-                                theme='githubDark'
+                                theme={githubDarkTheme}
                                 restrictEdit={({ fullData }) => fullData !== null}
                                 restrictAdd={({ fullData }) => fullData !== null}
                                 restrictDelete={({ fullData }) => fullData !== null}
@@ -222,9 +222,10 @@ export const Contacts: React.FC = () => {
                                 <JsonEditor
                                     data={newContact}
                                     className={styles.Contacts__jsonEditor}
-                                    theme='githubDark'
+                                    theme={githubDarkTheme}
                                     onUpdate={({ newData }) => {
-                                        setNewContact(newData);
+                                        // ! Temporary fix
+                                        setNewContact(newData as object);
                                     }}
                                     restrictAdd={({ fullData }) => fullData !== null}
                                     restrictDelete={({ key }) => contactModelKeys.includes(key as string)}
@@ -281,9 +282,10 @@ export const Contacts: React.FC = () => {
                                         <JsonEditor
                                             data={editedContact}
                                             className={styles.Contacts__jsonEditor}
-                                            theme='githubDark'
+                                            theme={githubDarkTheme}
                                             onUpdate={({ newData }) => {
-                                                setEditedContact(newData);
+                                                // ! Temporary fix
+                                                setEditedContact(newData as object);
                                             }}
                                             restrictAdd={({ key }) => key in editContact}
                                             restrictDelete={({ key }) => contactModelKeys.includes(key as string)}

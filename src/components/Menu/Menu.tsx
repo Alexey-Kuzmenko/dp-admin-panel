@@ -8,7 +8,6 @@ import { Link } from 'react-router-dom';
 import { MenuLink as MenuLinkInterface } from '@alexey-kuzmenko/ok-apps-sdk';
 import { useAppSelector, useAppDispatch } from '../../hooks/redux-hooks';
 import { closeMenu, selectMenuSlice } from '../../store/menuSlice';
-import { v4 as uuidv4 } from 'uuid';
 
 import Logo from '../../assets/Logo.svg';
 import styles from './Menu.module.scss';
@@ -29,10 +28,10 @@ export const Menu: React.FC<MenuProps> = ({ menuLinks }) => {
     };
 
     const renderLinks = (): JSX.Element[] => {
-        return menuLinks.map((link: MenuLinkInterface) => {
+        return menuLinks.map(({ label, href }: MenuLinkInterface) => {
             return (
-                <li key={uuidv4()}>
-                    <MenuLink href={link.href} label={link.label} />
+                <li key={label}>
+                    <MenuLink href={href} label={label} />
                 </li>
             );
         });

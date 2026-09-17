@@ -9,7 +9,7 @@ import { theme } from '../../theme/ThemeRegistry';
 import { Alert, Button, CodeBlock, Loader, SelectionForm } from '../../components';
 
 import cn from 'classnames';
-import { JsonEditor } from 'json-edit-react';
+import { JsonEditor, githubDarkTheme } from 'json-edit-react';
 
 import { useAppDispatch, useAppSelector } from '../../hooks/redux-hooks';
 import {
@@ -191,7 +191,7 @@ export const Skills: React.FC = () => {
                             <JsonEditor
                                 data={skills}
                                 className={styles.Skills__jsonEditor}
-                                theme='githubDark'
+                                theme={githubDarkTheme}
                                 restrictEdit={({ fullData }) => fullData !== null}
                                 restrictAdd={({ fullData }) => fullData !== null}
                                 restrictDelete={({ fullData }) => fullData !== null}
@@ -222,9 +222,10 @@ export const Skills: React.FC = () => {
                                 <JsonEditor
                                     data={newSkill}
                                     className={styles.Skills__jsonEditor}
-                                    theme='githubDark'
+                                    theme={githubDarkTheme}
                                     onUpdate={({ newData }) => {
-                                        setNewSkill(newData);
+                                        // ! temporary fix
+                                        setNewSkill(newData as object);
                                     }}
                                     restrictAdd={({ fullData }) => fullData !== null}
                                     restrictDelete={({ key }) => skillModelKeys.includes(key as string)}
@@ -282,9 +283,10 @@ export const Skills: React.FC = () => {
                                         <JsonEditor
                                             data={editedSkill}
                                             className={styles.Skills__jsonEditor}
-                                            theme='githubDark'
+                                            theme={githubDarkTheme}
                                             onUpdate={({ newData }) => {
-                                                setEditedSkill(newData);
+                                                // ! Temporary fix
+                                                setEditedSkill(newData as object);
                                             }}
                                             restrictAdd={({ fullData }) => fullData !== null}
                                             restrictDelete={({ key }) => skillModelKeys.includes(key as string)}

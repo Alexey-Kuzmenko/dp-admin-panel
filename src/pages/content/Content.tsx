@@ -5,7 +5,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { theme } from '../../theme/ThemeRegistry';
 import { Alert, Button, CodeBlock, Loader, SelectionForm } from '../../components';
 
-import { JsonEditor } from 'json-edit-react';
+import { JsonEditor, githubDarkTheme } from 'json-edit-react';
 import cn from 'classnames';
 
 import { useAppDispatch, useAppSelector } from '../../hooks/redux-hooks';
@@ -196,7 +196,7 @@ export const Content: React.FC = () => {
                             <JsonEditor
                                 data={content}
                                 className={styles.Content__jsonEditor}
-                                theme='githubDark'
+                                theme={githubDarkTheme}
                                 restrictEdit={({ fullData }) => fullData !== null}
                                 restrictAdd={({ fullData }) => fullData !== null}
                                 restrictDelete={({ fullData }) => fullData !== null}
@@ -227,9 +227,10 @@ export const Content: React.FC = () => {
                                 <JsonEditor
                                     data={newContent}
                                     className={styles.Content__jsonEditor}
-                                    theme='githubDark'
+                                    theme={githubDarkTheme}
                                     onUpdate={({ newData }) => {
-                                        setNewContent(newData);
+                                        // ! Temporary fix
+                                        setNewContent(newData as object);
                                     }}
                                     restrictAdd={({ fullData }) => fullData !== null}
                                     restrictDelete={({ key }) => contentModelKeys.includes(key as string)}
@@ -288,9 +289,9 @@ export const Content: React.FC = () => {
                                         <JsonEditor
                                             data={editedContent}
                                             className={styles.Content__jsonEditor}
-                                            theme='githubDark'
+                                            theme={githubDarkTheme}
                                             onUpdate={({ newData }) => {
-                                                setEditedContent(newData);
+                                                setEditedContent(newData as object);
                                             }}
                                             restrictDelete={({ key }) => contentModelKeys.includes(key as string)}
                                             restrictEdit={({ key }) => key === '_id'}

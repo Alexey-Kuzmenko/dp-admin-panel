@@ -6,7 +6,7 @@ import { theme } from '../../theme/ThemeRegistry';
 import { Alert, Button, CodeBlock, Loader, SelectionForm } from '../../components';
 
 import cn from 'classnames';
-import { JsonEditor } from 'json-edit-react';
+import { JsonEditor, githubDarkTheme } from 'json-edit-react';
 
 import { useAppSelector, useAppDispatch } from '../../hooks/redux-hooks';
 import {
@@ -189,7 +189,7 @@ export const Projects: React.FC = () => {
                             <JsonEditor
                                 data={projects}
                                 className={styles.Projects__jsonEditor}
-                                theme='githubDark'
+                                theme={githubDarkTheme}
                                 restrictEdit={({ fullData }) => fullData !== null}
                                 restrictAdd={({ fullData }) => fullData !== null}
                                 restrictDelete={({ fullData }) => fullData !== null}
@@ -220,9 +220,10 @@ export const Projects: React.FC = () => {
                                 <JsonEditor
                                     data={newProject}
                                     className={styles.Projects__jsonEditor}
-                                    theme='githubDark'
+                                    theme={githubDarkTheme}
                                     onUpdate={({ newData }) => {
-                                        setNewProject(newData);
+                                        // ! Temporary fix
+                                        setNewProject(newData as object);
                                     }}
                                     restrictAdd={({ fullData }) => fullData !== null}
                                     restrictDelete={({ key }) => projectModelKeys.includes(key as string)}
@@ -280,9 +281,10 @@ export const Projects: React.FC = () => {
                                         <JsonEditor
                                             data={editedProject}
                                             className={styles.Projects__jsonEditor}
-                                            theme='githubDark'
+                                            theme={githubDarkTheme}
                                             onUpdate={({ newData }) => {
-                                                setEditedProject(newData);
+                                                // ! Temporary fix
+                                                setEditedProject(newData as object);
                                             }}
                                             restrictAdd={({ key }) => key !== 'technologies' && key !== 'tags'}
                                             restrictDelete={({ key }) => projectModelKeys.includes(key as string)}
