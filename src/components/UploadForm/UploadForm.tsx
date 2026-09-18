@@ -5,7 +5,7 @@ import styles from './UploadForm.module.scss';
 
 interface UploadFormProps extends DetailedHTMLProps<FormHTMLAttributes<HTMLFormElement>, HTMLFormElement> {
     setValue: (state: File) => void
-    formRef: React.RefObject<HTMLFormElement>
+    formRef: React.RefObject<HTMLFormElement | null>
     isValid: boolean
     setIsValid: (state: boolean) => void
     onFormReset: () => void

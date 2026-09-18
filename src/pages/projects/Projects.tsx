@@ -58,7 +58,7 @@ export const Projects: React.FC = () => {
     const deletedProject = projects.find((p) => p._id === deletedProjectId);
 
     const [editedProject, setEditedProject] = useState<object>();
-    const editedProjectCopyRef = useRef<ProjectModel>();
+    const editedProjectCopyRef = useRef<ProjectModel | null>(null);
 
     const viewportWidth = window.innerWidth;
 
@@ -111,7 +111,7 @@ export const Projects: React.FC = () => {
             setNewProject(projectTemplate);
         }
 
-        if (action === 'edit') {
+        if (action === 'edit' && editedProjectCopyRef.current) {
             setEditedProject(editedProjectCopyRef.current);
         }
 

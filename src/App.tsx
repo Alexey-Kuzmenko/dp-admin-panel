@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, type JSX } from 'react';
 import { Route, Routes } from 'react-router';
 
 import { useAppDispatch } from './hooks/redux-hooks';

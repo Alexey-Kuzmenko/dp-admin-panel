@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect, type JSX } from 'react';
 
 import { BurgerMenuIcon } from '../BurgerMenuIcon/BurgerMenuIcon';
 import cn from 'classnames';

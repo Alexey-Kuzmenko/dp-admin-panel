@@ -62,7 +62,7 @@ export const Content: React.FC = () => {
     const deletedContent = content.find((c) => c._id === deletedContentId);
 
     const [editedContent, setEditedContent] = useState<object>();
-    const editedContentCopyRef = useRef<SubContent>();
+    const editedContentCopyRef = useRef<SubContent | null>(null);
 
     const viewportWidth = window.innerWidth;
 
@@ -117,7 +117,7 @@ export const Content: React.FC = () => {
             setNewContent(contentTemplate);
         }
 
-        if (action === 'edit') {
+        if (action === 'edit' && editedContentCopyRef.current) {
             setEditedContent(editedContentCopyRef.current);
         }
 

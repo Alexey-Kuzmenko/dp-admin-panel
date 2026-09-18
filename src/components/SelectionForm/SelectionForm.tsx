@@ -1,4 +1,4 @@
-import React, { DetailedHTMLProps, FormHTMLAttributes, useState } from 'react';
+import { DetailedHTMLProps, FormHTMLAttributes, useState, type JSX } from 'react';
 import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { Button } from '../Button/Button';

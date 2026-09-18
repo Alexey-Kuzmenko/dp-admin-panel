@@ -61,7 +61,7 @@ export const Skills: React.FC = () => {
     const deletedSkill = skills.find((s) => s._id === deletedSkillId);
 
     const [editedSkill, setEditedSkill] = useState<object>();
-    const editedSkillCopyRef = useRef<SkillModel>();
+    const editedSkillCopyRef = useRef<SkillModel | null>(null);
 
     const viewportWidth = window.innerWidth;
 
@@ -113,7 +113,7 @@ export const Skills: React.FC = () => {
             setNewSkill(skillTemplate);
         }
 
-        if (action === 'edit') {
+        if (action === 'edit' && editedSkillCopyRef.current) {
             setEditedSkill(editedSkillCopyRef.current);
         }
 

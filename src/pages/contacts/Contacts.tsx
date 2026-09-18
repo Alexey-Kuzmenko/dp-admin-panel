@@ -61,7 +61,7 @@ export const Contacts: React.FC = () => {
     const deletedContact = contacts.find((c) => c._id === deletedContactId);
 
     const [editedContact, setEditedContact] = useState<object>();
-    const editedContactCopyRef = useRef<ContactModel>();
+    const editedContactCopyRef = useRef<ContactModel | null>(null);
 
     const viewportWidth = window.innerWidth;
 
@@ -113,7 +113,7 @@ export const Contacts: React.FC = () => {
             setNewContact(contactTemplate);
         }
 
-        if (action === 'edit') {
+        if (action === 'edit' && editedContactCopyRef.current) {
             setEditedContact(editedContactCopyRef.current);
         }
 
