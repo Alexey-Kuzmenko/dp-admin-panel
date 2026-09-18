@@ -80,7 +80,7 @@ export const Form: React.FC<FormProps> = ({ title, type, ...props }) => {
             <img src={Logo} alt='logo' className={styles.Form__logo} />
 
             {/* Title */}
-            <Typography variant='h5' component='h1' textAlign='center'>{title}</Typography>
+            <Typography variant='h5' component='h1' sx={{ textAlign: 'center' }}>{title}</Typography>
 
             <div className={styles.Form__textFields}>
                 {/* Email input */}
@@ -94,7 +94,9 @@ export const Form: React.FC<FormProps> = ({ title, type, ...props }) => {
                     render={({ field }) =>
                         <TextField
                             sx={{ width: '100%' }}
-                            InputProps={{ disableUnderline: true }}
+                            slotProps={{
+                                input: { disableUnderline: true }
+                            }}
                             id='user-email'
                             label='Email'
                             variant='filled'
@@ -119,22 +121,26 @@ export const Form: React.FC<FormProps> = ({ title, type, ...props }) => {
                     }}
                     render={({ field }) =>
                         <TextField
-                            FormHelperTextProps={{ className: styles.HelperText }}
-                            sx={{ width: '100%' }}
-                            InputProps={{
-                                disableUnderline: true,
-                                endAdornment: (
-                                    <InputAdornment position='end'>
-                                        <EyeIconButton
-                                            isValueShown={showPassword}
-                                            ariaLabelValues={{
-                                                shown: 'hide the password',
-                                                hidden: 'display the password'
-                                            }}
-                                            onClick={handleShowPasswordClick} />
-                                    </InputAdornment>
-                                )
+                            slotProps={{
+                                formHelperText: {
+                                    className: styles.HelperText
+                                },
+                                input: {
+                                    disableUnderline: true,
+                                    endAdornment: (
+                                        <InputAdornment position='end'>
+                                            <EyeIconButton
+                                                isValueShown={showPassword}
+                                                ariaLabelValues={{
+                                                    shown: 'hide the password',
+                                                    hidden: 'display the password'
+                                                }}
+                                                onClick={handleShowPasswordClick} />
+                                        </InputAdornment>
+                                    )
+                                }
                             }}
+                            sx={{ width: '100%' }}
                             id='user-password'
                             label='Password'
                             variant='filled'
@@ -161,22 +167,26 @@ export const Form: React.FC<FormProps> = ({ title, type, ...props }) => {
                             }}
                             render={({ field }) =>
                                 <TextField
-                                    FormHelperTextProps={{ className: styles.HelperText }}
-                                    sx={{ width: '100%' }}
-                                    InputProps={{
-                                        disableUnderline: true,
-                                        endAdornment: (
-                                            <InputAdornment position='end'>
-                                                <EyeIconButton
-                                                    isValueShown={showSecret}
-                                                    ariaLabelValues={{
-                                                        shown: 'hide the secret',
-                                                        hidden: 'display the secret'
-                                                    }}
-                                                    onClick={handleShowSecretClick} />
-                                            </InputAdornment>
-                                        )
+                                    slotProps={{
+                                        formHelperText: {
+                                            className: styles.HelperText
+                                        },
+                                        input: {
+                                            disableUnderline: true,
+                                            endAdornment: (
+                                                <InputAdornment position='end'>
+                                                    <EyeIconButton
+                                                        isValueShown={showSecret}
+                                                        ariaLabelValues={{
+                                                            shown: 'hide the secret',
+                                                            hidden: 'display the secret'
+                                                        }}
+                                                        onClick={handleShowSecretClick} />
+                                                </InputAdornment>
+                                            )
+                                        }
                                     }}
+                                    sx={{ width: '100%' }}
                                     id='secret-word'
                                     label='Secret word'
                                     variant='filled'

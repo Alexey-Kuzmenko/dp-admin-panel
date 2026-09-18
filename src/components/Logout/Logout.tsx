@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 
-import { Navigate } from 'react-router-dom';
+import { Navigate } from 'react-router';
 import { useAppDispatch } from '../../hooks/redux-hooks';
 import { logout } from '../../store/authSlice';
 import { closeMenu } from '../../store/menuSlice';

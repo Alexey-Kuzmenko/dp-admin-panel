@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router';
 
 import { useAppDispatch } from './hooks/redux-hooks';
 import { keepSession } from './store/authSlice';

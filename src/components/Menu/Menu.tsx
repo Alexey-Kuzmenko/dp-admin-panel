@@ -4,7 +4,7 @@ import { BurgerMenuIcon } from '../BurgerMenuIcon/BurgerMenuIcon';
 import cn from 'classnames';
 import { Backdrop, Box } from '@mui/material';
 import { MenuLink } from '../MenuLink/MenuLink';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import { MenuLink as MenuLinkInterface } from '@alexey-kuzmenko/ok-apps-sdk';
 import { useAppSelector, useAppDispatch } from '../../hooks/redux-hooks';
 import { closeMenu, selectMenuSlice } from '../../store/menuSlice';

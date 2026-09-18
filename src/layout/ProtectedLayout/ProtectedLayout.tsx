@@ -1,4 +1,4 @@
-import { Navigate, Outlet } from 'react-router-dom';
+import { Navigate, Outlet } from 'react-router';
 import { Header } from '../Header/Header';
 import { Main } from '../Main/Main';
 import { useAppSelector } from '../../hooks/redux-hooks';

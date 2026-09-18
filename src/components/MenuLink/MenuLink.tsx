@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink } from 'react-router';
 import styles from './MenuLink.module.scss';
 import { MenuLink as MenuLinkProps } from '@alexey-kuzmenko/ok-apps-sdk';
 import { useAppDispatch } from '../../hooks/redux-hooks';

@@ -2,7 +2,7 @@ import styles from './Button.module.scss';
 
 import { ButtonHTMLAttributes, DetailedHTMLProps } from 'react';
 import cn from 'classnames';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 
 interface ButtonProps extends DetailedHTMLProps<ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement> {
     children: React.ReactNode

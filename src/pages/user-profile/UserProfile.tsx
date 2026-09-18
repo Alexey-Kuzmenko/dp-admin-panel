@@ -4,7 +4,7 @@ import { Typography } from '@mui/material';
 import { CopyFiled, Alert } from '../../components';
 import { AlertState } from '../../types';
 import { ALERT_COPY_MSG } from '../../constants';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 
 import { useAppSelector } from '../../hooks/redux-hooks';
 import { selectJwtToken, selectUserEmail } from '../../store/authSlice';
