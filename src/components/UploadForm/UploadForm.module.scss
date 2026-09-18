@@ -19,9 +19,11 @@
 
         &::file-selector-button {
             font-family: "Nunito Sans", sans-serif;
+
+            // ! Temporary fix
             /* stylelint-disable scss/at-extend-no-missing-placeholder */
-            @extend .Button;
-            @extend .Button_contained;
+            // @extend .Button;
+            // @extend .Button_contained;
         }
 
         @media (min-width: vars.$sm) {
