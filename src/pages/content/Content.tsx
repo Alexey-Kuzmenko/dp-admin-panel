@@ -228,7 +228,6 @@ export const Content: React.FC = () => {
                                     className={styles.Content__jsonEditor}
                                     theme={githubDarkTheme}
                                     onUpdate={({ newData }) => {
-                                        // ! Temporary fix
                                         setNewContent(newData as object);
                                     }}
                                     restrictAdd={({ fullData }) => fullData !== null}

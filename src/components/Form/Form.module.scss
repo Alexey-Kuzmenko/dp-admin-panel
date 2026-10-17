@@ -42,23 +42,12 @@
         @extend %controls;
     }
 
-    // TODO: REMOVE THIS
-    // &__captchaWrapper {
-    //     &_hidden {
-    //         display: none;
-    //     }
-    // }
-
     @media (min-width: vars.$sm) {
-        & {
-            padding: 30px;
-        }
+        padding: 30px;
     }
 
     @media (min-width: vars.$md) {
-        & {
-            padding: 70px;
-        }
+        padding: 70px;
     }
 }
 

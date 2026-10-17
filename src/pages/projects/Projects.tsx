@@ -221,7 +221,6 @@ export const Projects: React.FC = () => {
                                     className={styles.Projects__jsonEditor}
                                     theme={githubDarkTheme}
                                     onUpdate={({ newData }) => {
-                                        // ! Temporary fix
                                         setNewProject(newData as object);
                                     }}
                                     restrictAdd={({ fullData }) => fullData !== null}

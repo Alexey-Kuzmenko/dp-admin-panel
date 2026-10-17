@@ -234,7 +234,6 @@ export const Users: React.FC = () => {
                                     className={styles.Users__jsonEditor}
                                     theme={githubDarkTheme}
                                     onUpdate={({ newData }) => {
-                                        // ! Temporary fix
                                         setNewUser(newData as object);
                                     }}
                                     restrictAdd={({ fullData }) => fullData !== null}
@@ -307,7 +306,6 @@ export const Users: React.FC = () => {
 
             {/* Loader */}
             {loading && <Loader />}
-
         </div>
     );
 };

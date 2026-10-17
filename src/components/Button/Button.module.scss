@@ -45,9 +45,7 @@
     }
 
     @media (min-width: vars.$md) {
-        & {
-            transition: all ease .4s;
-        }
+        transition: all ease .4s;
 
         &_contained {
             &:hover {

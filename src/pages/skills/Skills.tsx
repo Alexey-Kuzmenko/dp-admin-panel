@@ -284,7 +284,6 @@ export const Skills: React.FC = () => {
                                             className={styles.Skills__jsonEditor}
                                             theme={githubDarkTheme}
                                             onUpdate={({ newData }) => {
-                                                // ! Temporary fix
                                                 setEditedSkill(newData as object);
                                             }}
                                             restrictAdd={({ fullData }) => fullData !== null}

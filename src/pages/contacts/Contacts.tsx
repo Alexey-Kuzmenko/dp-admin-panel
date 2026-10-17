@@ -223,7 +223,6 @@ export const Contacts: React.FC = () => {
                                     className={styles.Contacts__jsonEditor}
                                     theme={githubDarkTheme}
                                     onUpdate={({ newData }) => {
-                                        // ! Temporary fix
                                         setNewContact(newData as object);
                                     }}
                                     restrictAdd={({ fullData }) => fullData !== null}
