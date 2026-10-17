@@ -1,3 +1,5 @@
+import type { JSX } from 'react';
+
 import MenuIcon from '@mui/icons-material/Menu';
 import MenuOpenIcon from '@mui/icons-material/MenuOpen';
 import { Box } from '@mui/material';

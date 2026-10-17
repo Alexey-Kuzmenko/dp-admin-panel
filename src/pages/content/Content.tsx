@@ -5,7 +5,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { theme } from '../../theme/ThemeRegistry';
 import { Alert, Button, CodeBlock, Loader, SelectionForm } from '../../components';
 
-import { JsonEditor } from 'json-edit-react';
+import { JsonEditor, githubDarkTheme } from 'json-edit-react';
 import cn from 'classnames';
 
 import { useAppDispatch, useAppSelector } from '../../hooks/redux-hooks';
@@ -46,8 +46,7 @@ export const Content: React.FC = () => {
 
     useEffect(() => {
         dispatch(fetchPagesContent());
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [dispatch]);
 
     const content = useAppSelector(selectContent);
     const loading = useAppSelector(selectLoading);
@@ -63,7 +62,7 @@ export const Content: React.FC = () => {
     const deletedContent = content.find((c) => c._id === deletedContentId);
 
     const [editedContent, setEditedContent] = useState<object>();
-    const editedContentCopy = useRef<SubContent>();
+    const editedContentCopyRef = useRef<SubContent | null>(null);
 
     const viewportWidth = window.innerWidth;
 
@@ -118,8 +117,8 @@ export const Content: React.FC = () => {
             setNewContent(contentTemplate);
         }
 
-        if (action === 'edit') {
-            setEditedContent(editedContentCopy.current);
+        if (action === 'edit' && editedContentCopyRef.current) {
+            setEditedContent(editedContentCopyRef.current);
         }
 
         setAlertState({ type: 'warning', isOpen: true, message: ALERT_RESET_MGS });
@@ -132,7 +131,7 @@ export const Content: React.FC = () => {
 
         if (jsonEditorData) {
             setEditedContent(jsonEditorData);
-            editedContentCopy.current = jsonEditorData;
+            editedContentCopyRef.current = jsonEditorData;
         }
     };
 
@@ -196,7 +195,7 @@ export const Content: React.FC = () => {
                             <JsonEditor
                                 data={content}
                                 className={styles.Content__jsonEditor}
-                                theme='githubDark'
+                                theme={githubDarkTheme}
                                 restrictEdit={({ fullData }) => fullData !== null}
                                 restrictAdd={({ fullData }) => fullData !== null}
                                 restrictDelete={({ fullData }) => fullData !== null}
@@ -227,9 +226,9 @@ export const Content: React.FC = () => {
                                 <JsonEditor
                                     data={newContent}
                                     className={styles.Content__jsonEditor}
-                                    theme='githubDark'
+                                    theme={githubDarkTheme}
                                     onUpdate={({ newData }) => {
-                                        setNewContent(newData);
+                                        setNewContent(newData as object);
                                     }}
                                     restrictAdd={({ fullData }) => fullData !== null}
                                     restrictDelete={({ key }) => contentModelKeys.includes(key as string)}
@@ -288,9 +287,9 @@ export const Content: React.FC = () => {
                                         <JsonEditor
                                             data={editedContent}
                                             className={styles.Content__jsonEditor}
-                                            theme='githubDark'
+                                            theme={githubDarkTheme}
                                             onUpdate={({ newData }) => {
-                                                setEditedContent(newData);
+                                                setEditedContent(newData as object);
                                             }}
                                             restrictDelete={({ key }) => contentModelKeys.includes(key as string)}
                                             restrictEdit={({ key }) => key === '_id'}

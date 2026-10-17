@@ -6,7 +6,7 @@ import { theme } from '../../theme/ThemeRegistry';
 import { Alert, Button, CodeBlock, Loader, SelectionForm } from '../../components';
 
 import cn from 'classnames';
-import { JsonEditor } from 'json-edit-react';
+import { JsonEditor, githubDarkTheme } from 'json-edit-react';
 
 import { useAppSelector, useAppDispatch } from '../../hooks/redux-hooks';
 import {
@@ -44,8 +44,7 @@ export const Projects: React.FC = () => {
 
     useEffect(() => {
         dispatch(fetchProjects());
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [dispatch]);
 
     const projects = useAppSelector(selectProjects);
     const loading = useAppSelector(selectLoading);
@@ -59,7 +58,7 @@ export const Projects: React.FC = () => {
     const deletedProject = projects.find((p) => p._id === deletedProjectId);
 
     const [editedProject, setEditedProject] = useState<object>();
-    const editedProjectCopy = useRef<ProjectModel>();
+    const editedProjectCopyRef = useRef<ProjectModel | null>(null);
 
     const viewportWidth = window.innerWidth;
 
@@ -112,8 +111,8 @@ export const Projects: React.FC = () => {
             setNewProject(projectTemplate);
         }
 
-        if (action === 'edit') {
-            setEditedProject(editedProjectCopy.current);
+        if (action === 'edit' && editedProjectCopyRef.current) {
+            setEditedProject(editedProjectCopyRef.current);
         }
 
         setAlertState({ type: 'warning', isOpen: true, message: ALERT_RESET_MGS });
@@ -125,7 +124,7 @@ export const Projects: React.FC = () => {
 
         if (jsonEditorData) {
             setEditedProject(jsonEditorData);
-            editedProjectCopy.current = jsonEditorData;
+            editedProjectCopyRef.current = jsonEditorData;
         }
     };
 
@@ -189,7 +188,7 @@ export const Projects: React.FC = () => {
                             <JsonEditor
                                 data={projects}
                                 className={styles.Projects__jsonEditor}
-                                theme='githubDark'
+                                theme={githubDarkTheme}
                                 restrictEdit={({ fullData }) => fullData !== null}
                                 restrictAdd={({ fullData }) => fullData !== null}
                                 restrictDelete={({ fullData }) => fullData !== null}
@@ -220,9 +219,9 @@ export const Projects: React.FC = () => {
                                 <JsonEditor
                                     data={newProject}
                                     className={styles.Projects__jsonEditor}
-                                    theme='githubDark'
+                                    theme={githubDarkTheme}
                                     onUpdate={({ newData }) => {
-                                        setNewProject(newData);
+                                        setNewProject(newData as object);
                                     }}
                                     restrictAdd={({ fullData }) => fullData !== null}
                                     restrictDelete={({ key }) => projectModelKeys.includes(key as string)}
@@ -280,9 +279,10 @@ export const Projects: React.FC = () => {
                                         <JsonEditor
                                             data={editedProject}
                                             className={styles.Projects__jsonEditor}
-                                            theme='githubDark'
+                                            theme={githubDarkTheme}
                                             onUpdate={({ newData }) => {
-                                                setEditedProject(newData);
+                                                // ! Temporary fix
+                                                setEditedProject(newData as object);
                                             }}
                                             restrictAdd={({ key }) => key !== 'technologies' && key !== 'tags'}
                                             restrictDelete={({ key }) => projectModelKeys.includes(key as string)}

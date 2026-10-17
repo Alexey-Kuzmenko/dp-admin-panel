@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type JSX } from 'react';
 
 import {
     Accordion,
@@ -17,7 +17,7 @@ import { theme } from '../../theme/ThemeRegistry';
 import { Alert, Button, CodeBlock, Loader, SelectionForm, StyledTableCell, StyledTableRow } from '../../components';
 
 import cn from 'classnames';
-import { JsonEditor } from 'json-edit-react';
+import { JsonEditor, githubDarkTheme } from 'json-edit-react';
 
 import { useAppDispatch, useAppSelector } from '../../hooks/redux-hooks';
 import {
@@ -58,8 +58,7 @@ export const Users: React.FC = () => {
 
     useEffect(() => {
         dispatch(fetchUsers());
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [dispatch]);
 
     const users = useAppSelector(selectUsers);
     const loading = useAppSelector(selectLoading);
@@ -202,7 +201,7 @@ export const Users: React.FC = () => {
                             <JsonEditor
                                 data={users}
                                 className={styles.Users__jsonEditor}
-                                theme='githubDark'
+                                theme={githubDarkTheme}
                                 restrictEdit={({ fullData }) => fullData !== null}
                                 restrictAdd={({ fullData }) => fullData !== null}
                                 restrictDelete={({ fullData }) => fullData !== null}
@@ -233,9 +232,9 @@ export const Users: React.FC = () => {
                                 <JsonEditor
                                     data={newUser}
                                     className={styles.Users__jsonEditor}
-                                    theme='githubDark'
+                                    theme={githubDarkTheme}
                                     onUpdate={({ newData }) => {
-                                        setNewUser(newData);
+                                        setNewUser(newData as object);
                                     }}
                                     restrictAdd={({ fullData }) => fullData !== null}
                                     restrictDelete={({ key }) => createUserDtoKeys.includes(key as string)}
@@ -307,7 +306,6 @@ export const Users: React.FC = () => {
 
             {/* Loader */}
             {loading && <Loader />}
-
         </div>
     );
 };

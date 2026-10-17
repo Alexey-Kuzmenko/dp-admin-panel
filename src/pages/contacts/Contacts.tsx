@@ -9,7 +9,7 @@ import { theme } from '../../theme/ThemeRegistry';
 import { CodeBlock, SelectionForm, Button, Alert, Loader } from '../../components';
 
 import cn from 'classnames';
-import { JsonEditor } from 'json-edit-react';
+import { JsonEditor, githubDarkTheme } from 'json-edit-react';
 
 import { useAppDispatch, useAppSelector } from '../../hooks/redux-hooks';
 import {
@@ -47,8 +47,7 @@ export const Contacts: React.FC = () => {
 
     useEffect(() => {
         dispatch(fetchContacts());
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [dispatch]);
 
     const contacts = useAppSelector(selectContacts);
     const loading = useAppSelector(selectLoading);
@@ -62,7 +61,7 @@ export const Contacts: React.FC = () => {
     const deletedContact = contacts.find((c) => c._id === deletedContactId);
 
     const [editedContact, setEditedContact] = useState<object>();
-    const editedContactCopy = useRef<ContactModel>();
+    const editedContactCopyRef = useRef<ContactModel | null>(null);
 
     const viewportWidth = window.innerWidth;
 
@@ -114,8 +113,8 @@ export const Contacts: React.FC = () => {
             setNewContact(contactTemplate);
         }
 
-        if (action === 'edit') {
-            setEditedContact(editedContactCopy.current);
+        if (action === 'edit' && editedContactCopyRef.current) {
+            setEditedContact(editedContactCopyRef.current);
         }
 
         setAlertState({ type: 'warning', isOpen: true, message: ALERT_RESET_MGS });
@@ -127,7 +126,7 @@ export const Contacts: React.FC = () => {
 
         if (jsonEditorData) {
             setEditedContact(jsonEditorData);
-            editedContactCopy.current = jsonEditorData;
+            editedContactCopyRef.current = jsonEditorData;
         }
     };
 
@@ -191,7 +190,7 @@ export const Contacts: React.FC = () => {
                             <JsonEditor
                                 data={contacts}
                                 className={styles.Contacts__jsonEditor}
-                                theme='githubDark'
+                                theme={githubDarkTheme}
                                 restrictEdit={({ fullData }) => fullData !== null}
                                 restrictAdd={({ fullData }) => fullData !== null}
                                 restrictDelete={({ fullData }) => fullData !== null}
@@ -222,9 +221,9 @@ export const Contacts: React.FC = () => {
                                 <JsonEditor
                                     data={newContact}
                                     className={styles.Contacts__jsonEditor}
-                                    theme='githubDark'
+                                    theme={githubDarkTheme}
                                     onUpdate={({ newData }) => {
-                                        setNewContact(newData);
+                                        setNewContact(newData as object);
                                     }}
                                     restrictAdd={({ fullData }) => fullData !== null}
                                     restrictDelete={({ key }) => contactModelKeys.includes(key as string)}
@@ -281,9 +280,10 @@ export const Contacts: React.FC = () => {
                                         <JsonEditor
                                             data={editedContact}
                                             className={styles.Contacts__jsonEditor}
-                                            theme='githubDark'
+                                            theme={githubDarkTheme}
                                             onUpdate={({ newData }) => {
-                                                setEditedContact(newData);
+                                                // ! Temporary fix
+                                                setEditedContact(newData as object);
                                             }}
                                             restrictAdd={({ key }) => key in editContact}
                                             restrictDelete={({ key }) => contactModelKeys.includes(key as string)}

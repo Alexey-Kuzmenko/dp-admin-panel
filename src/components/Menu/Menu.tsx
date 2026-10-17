@@ -1,14 +1,13 @@
-import React from 'react';
+import { useEffect, type JSX } from 'react';
 
 import { BurgerMenuIcon } from '../BurgerMenuIcon/BurgerMenuIcon';
 import cn from 'classnames';
 import { Backdrop, Box } from '@mui/material';
 import { MenuLink } from '../MenuLink/MenuLink';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import { MenuLink as MenuLinkInterface } from '@alexey-kuzmenko/ok-apps-sdk';
 import { useAppSelector, useAppDispatch } from '../../hooks/redux-hooks';
 import { closeMenu, selectMenuSlice } from '../../store/menuSlice';
-import { v4 as uuidv4 } from 'uuid';
 
 import Logo from '../../assets/Logo.svg';
 import styles from './Menu.module.scss';
@@ -17,22 +16,27 @@ interface MenuProps {
     menuLinks: Array<MenuLinkInterface>
 }
 
-const body = document.body;
-
 export const Menu: React.FC<MenuProps> = ({ menuLinks }) => {
     const dispatch = useAppDispatch();
     const { isMenuOpen } = useAppSelector(selectMenuSlice);
-    body.dataset.bodyScroll = String(!isMenuOpen);
+
+    useEffect(() => {
+        document.body.dataset.bodyScroll = String(!isMenuOpen);
+
+        return () => {
+            document.body.dataset.bodyScroll = 'true';
+        };
+    }, [isMenuOpen]);
 
     const handleBackdropClick = (): void => {
         dispatch(closeMenu());
     };
 
     const renderLinks = (): JSX.Element[] => {
-        return menuLinks.map((link: MenuLinkInterface) => {
+        return menuLinks.map(({ label, href }: MenuLinkInterface) => {
             return (
-                <li key={uuidv4()}>
-                    <MenuLink href={link.href} label={link.label} />
+                <li key={label}>
+                    <MenuLink href={href} label={label} />
                 </li>
             );
         });

@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 
-import { Navigate } from 'react-router-dom';
+import { Navigate } from 'react-router';
 import { useAppDispatch } from '../../hooks/redux-hooks';
 import { logout } from '../../store/authSlice';
 import { closeMenu } from '../../store/menuSlice';
@@ -11,8 +11,7 @@ export const Logout: React.FC = () => {
     useEffect(() => {
         dispatch(logout());
         dispatch(closeMenu());
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [dispatch]);
 
     return (
         <Navigate to='/' replace />

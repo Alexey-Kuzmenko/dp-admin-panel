@@ -9,7 +9,7 @@ import { theme } from '../../theme/ThemeRegistry';
 import { Alert, Button, CodeBlock, Loader, SelectionForm } from '../../components';
 
 import cn from 'classnames';
-import { JsonEditor } from 'json-edit-react';
+import { JsonEditor, githubDarkTheme } from 'json-edit-react';
 
 import { useAppDispatch, useAppSelector } from '../../hooks/redux-hooks';
 import {
@@ -47,8 +47,7 @@ export const Skills: React.FC = () => {
 
     useEffect(() => {
         dispatch(fetchSkills());
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [dispatch]);
 
     const skills = useAppSelector(selectSkills);
     const loading = useAppSelector(selectLoading);
@@ -62,7 +61,7 @@ export const Skills: React.FC = () => {
     const deletedSkill = skills.find((s) => s._id === deletedSkillId);
 
     const [editedSkill, setEditedSkill] = useState<object>();
-    const editedSkillCopy = useRef<SkillModel>();
+    const editedSkillCopyRef = useRef<SkillModel | null>(null);
 
     const viewportWidth = window.innerWidth;
 
@@ -114,8 +113,8 @@ export const Skills: React.FC = () => {
             setNewSkill(skillTemplate);
         }
 
-        if (action === 'edit') {
-            setEditedSkill(editedSkillCopy.current);
+        if (action === 'edit' && editedSkillCopyRef.current) {
+            setEditedSkill(editedSkillCopyRef.current);
         }
 
         setAlertState({ type: 'warning', isOpen: true, message: ALERT_RESET_MGS });
@@ -127,7 +126,7 @@ export const Skills: React.FC = () => {
 
         if (jsonEditorData) {
             setEditedSkill(jsonEditorData);
-            editedSkillCopy.current = jsonEditorData;
+            editedSkillCopyRef.current = jsonEditorData;
         }
     };
 
@@ -191,7 +190,7 @@ export const Skills: React.FC = () => {
                             <JsonEditor
                                 data={skills}
                                 className={styles.Skills__jsonEditor}
-                                theme='githubDark'
+                                theme={githubDarkTheme}
                                 restrictEdit={({ fullData }) => fullData !== null}
                                 restrictAdd={({ fullData }) => fullData !== null}
                                 restrictDelete={({ fullData }) => fullData !== null}
@@ -222,9 +221,10 @@ export const Skills: React.FC = () => {
                                 <JsonEditor
                                     data={newSkill}
                                     className={styles.Skills__jsonEditor}
-                                    theme='githubDark'
+                                    theme={githubDarkTheme}
                                     onUpdate={({ newData }) => {
-                                        setNewSkill(newData);
+                                        // ! temporary fix
+                                        setNewSkill(newData as object);
                                     }}
                                     restrictAdd={({ fullData }) => fullData !== null}
                                     restrictDelete={({ key }) => skillModelKeys.includes(key as string)}
@@ -282,9 +282,9 @@ export const Skills: React.FC = () => {
                                         <JsonEditor
                                             data={editedSkill}
                                             className={styles.Skills__jsonEditor}
-                                            theme='githubDark'
+                                            theme={githubDarkTheme}
                                             onUpdate={({ newData }) => {
-                                                setEditedSkill(newData);
+                                                setEditedSkill(newData as object);
                                             }}
                                             restrictAdd={({ fullData }) => fullData !== null}
                                             restrictDelete={({ key }) => skillModelKeys.includes(key as string)}

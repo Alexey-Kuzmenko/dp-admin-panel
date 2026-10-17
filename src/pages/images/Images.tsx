@@ -38,15 +38,14 @@ export const Images: React.FC = () => {
 
     useEffect(() => {
         dispatch(fetchImages());
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [dispatch]);
 
     const imagesList = useAppSelector(selectImages);
     const dirList = useAppSelector(selectDirectories);
     const loading = useAppSelector(selectLoading);
     const { isMenuOpen } = useAppSelector(selectMenuSlice);
 
-    const uploadForm = useRef<HTMLFormElement>(null);
+    const uploadFormRef = useRef<HTMLFormElement>(null);
     const [isFormValid, setIsFormValid] = useState<boolean>(false);
     const [selectedImg, setSelectedImg] = useState<File>();
     const [deletedDirName, setDeletedDirName] = useState<string>('');
@@ -72,7 +71,7 @@ export const Images: React.FC = () => {
             formData.append('image', selectedImg);
             const actionResult = await dispatch(addImage(formData));
 
-            uploadForm.current?.reset();
+            uploadFormRef.current?.reset();
             setIsFormValid(false);
 
             if (addImage.rejected.match(actionResult)) {
@@ -87,7 +86,7 @@ export const Images: React.FC = () => {
     };
 
     const handelReset = (): void => {
-        uploadForm.current?.reset();
+        uploadFormRef.current?.reset();
         setIsFormValid(false);
         setAlertState({ type: 'warning', isOpen: true, message: 'Input value was reset' });
         hideAlertAutomatically(setAlertState);
@@ -194,7 +193,7 @@ export const Images: React.FC = () => {
                 <AccordionDetails>
                     <UploadForm
                         id='upload-image-form'
-                        formRef={uploadForm}
+                        formRef={uploadFormRef}
                         setValue={setSelectedImg}
                         isValid={isFormValid}
                         setIsValid={setIsFormValid}

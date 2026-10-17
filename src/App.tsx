@@ -1,5 +1,5 @@
-import { useEffect } from 'react';
-import { Route, Routes } from 'react-router-dom';
+import { useEffect, type JSX } from 'react';
+import { Route, Routes } from 'react-router';
 
 import { useAppDispatch } from './hooks/redux-hooks';
 import { keepSession } from './store/authSlice';
@@ -30,8 +30,7 @@ function App() {
 
   useEffect(() => {
     dispatch(keepSession());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [dispatch]);
 
   const routes: JSX.Element = (
     <Routes>

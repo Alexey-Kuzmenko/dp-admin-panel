@@ -1,4 +1,4 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router';
 import { Box, Typography } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
 import { Container } from '../Container/Container';
@@ -22,8 +22,7 @@ export const Header = () => {
                         <Typography
                             component='h1'
                             variant='h5'
-                            textTransform='uppercase'
-                            sx={{ marginLeft: '10px' }}
+                            sx={{ marginLeft: '10px', textTransform: 'uppercase' }}
                             className={styles.Header__title}>
                             {pageTitle}
                         </Typography>

@@ -38,8 +38,7 @@ export const useCheckServiceStatus = (url: string, requestConfig?: RequestInit):
         };
 
         checkStatus();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [url]);
+    }, [requestConfig, url]);
 
     return {
         statusCode,

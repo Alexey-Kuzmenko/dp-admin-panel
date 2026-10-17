@@ -26,7 +26,7 @@ export const ServiceStatusWidgetContent: React.FC<Props> = ({
 
     if (error) {
         return (
-            <Typography variant='h5' textAlign='center'>
+            <Typography variant='h5' sx={{ textAlign: 'center' }}>
                 {`${SERVICE_STATUS_WIDGET_ERROR_TEMPLATE} ${error}`}
             </Typography>
         );
@@ -65,10 +65,9 @@ export const ServiceStatusWidgetContent: React.FC<Props> = ({
                     serviceStatus === 'available'
                     &&
                     <Typography
-                        textTransform='uppercase'
                         variant='h5'
                         color={theme.palette.success.main}
-                        sx={{ fontWeight: 400, cursor: 'default' }}
+                        sx={{ fontWeight: 400, cursor: 'default', textTransform: 'uppercase' }}
                     >
                         {serviceStatus}
                     </Typography>
@@ -77,10 +76,9 @@ export const ServiceStatusWidgetContent: React.FC<Props> = ({
                     serviceStatus === 'unavailable'
                     &&
                     <Typography
-                        textTransform='uppercase'
                         variant='h5'
                         color={theme.palette.error.main}
-                        sx={{ fontWeight: 400, cursor: 'default' }}
+                        sx={{ fontWeight: 400, cursor: 'default', textTransform: 'uppercase' }}
                     >
                         {serviceStatus}
                     </Typography>
