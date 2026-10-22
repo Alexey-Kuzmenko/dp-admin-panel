@@ -1,35 +1,67 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect, type JSX } from 'react';
+import { Route, Routes } from 'react-router';
+
+import { useAppDispatch } from './hooks/redux-hooks';
+import { keepSession } from './store/authSlice';
+
+import { ThemeProvider } from '@mui/material';
+import { theme } from './theme/ThemeRegistry';
+
+import { AuthLayout, ProtectedLayout } from './layout';
+import { Logout } from './components';
+import {
+  Contacts,
+  Content,
+  Dashboard,
+  Images,
+  Login,
+  Projects,
+  Skills,
+  UserProfile,
+  Users
+} from './pages';
+
+import { Register } from './pages/login/register/Register';
+
+import styles from './App.module.scss';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    dispatch(keepSession());
+  }, [dispatch]);
+
+  const routes: JSX.Element = (
+    <Routes>
+      {/* Public routes */}
+      <Route path='/auth' element={<AuthLayout />}>
+        <Route path='login' element={<Login />} />
+        <Route path='register' element={<Register />} />
+      </Route>
+
+      {/* Protected routes */}
+      <Route path='/' element={<ProtectedLayout />}>
+        <Route index element={<Dashboard />} />
+        <Route path='contacts' element={<Contacts />} />
+        <Route path='content' element={<Content />} />
+        <Route path='images' element={<Images />} />
+        <Route path='projects' element={<Projects />} />
+        <Route path='skills' element={<Skills />} />
+        <Route path='users' element={<Users />} />
+        <Route path='user-profile' element={<UserProfile />} />
+        <Route path='logout' element={<Logout />} />
+      </Route>
+    </Routes>
+  );
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <ThemeProvider theme={theme}>
+      <div className={styles.App}>
+        {routes}
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    </ThemeProvider>
+  );
 }
 
-export default App
+export default App;

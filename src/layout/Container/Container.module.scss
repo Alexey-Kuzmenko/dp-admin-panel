@@ -1,0 +1,5 @@
+.Container {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: calc(20px + (25 - 20) * ((100vw - 320px) / (1440 - 320)));
+}

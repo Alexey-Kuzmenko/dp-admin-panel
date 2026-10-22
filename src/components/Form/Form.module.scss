@@ -1,0 +1,56 @@
+@use '../../scss/utilities/variables' as vars;
+@use '../../scss/utilities/placeholders';
+
+.Form {
+    display: flex;
+    align-items: center;
+    flex-flow: column nowrap;
+    justify-content: center;
+
+    width: 100%;
+    max-width: 530px;
+    height: auto;
+    margin: 0 auto;
+    padding: calc(25px + (70 - 110) * ((100vw - 320px) / (1440 - 320)));
+
+    border-radius: vars.$border-radius;
+
+    background-color: vars.$primary-light;
+    box-shadow: vars.$header-box-shadow;
+    row-gap: 45px;
+
+    &__logo {
+        width: 110px;
+    }
+
+    &__textFields {
+        display: flex;
+        align-items: center;
+        flex-flow: column nowrap;
+        justify-content: center;
+
+        width: 100%;
+        height: max-content;
+        row-gap: 20px;
+    }
+
+    &__controls {
+        justify-content: space-between;
+
+        width: 100%;
+
+        @extend %controls;
+    }
+
+    @media (min-width: vars.$sm) {
+        padding: 30px;
+    }
+
+    @media (min-width: vars.$md) {
+        padding: 70px;
+    }
+}
+
+.HelperText {
+    color: vars.$white;
+}

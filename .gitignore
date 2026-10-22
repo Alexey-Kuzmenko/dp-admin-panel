@@ -11,6 +11,11 @@ node_modules
 dist
 dist-ssr
 *.local
+.npmrc
+
+# Jest
+coverage
+__snapshots__
 
 # Editor directories and files
 .vscode/*

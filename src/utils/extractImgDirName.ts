@@ -1,0 +1,18 @@
+import { ImageModel } from '@alexey-kuzmenko/ok-apps-sdk';
+
+export function extractImgDirName(imgList: Array<ImageModel>): Array<string> {
+    const dirList: Array<string> = [];
+
+    for (let i = 0; i < imgList.length; i++) {
+        const imgData = imgList[i];
+        const dirName: string = imgData.url.split('/')[0];
+
+        if (dirList.includes(dirName)) {
+            continue;
+        } else {
+            dirList.push(dirName);
+        }
+    }
+
+    return dirList;
+}

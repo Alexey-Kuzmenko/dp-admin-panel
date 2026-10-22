@@ -1,0 +1,311 @@
+import { useEffect, useState, type JSX } from 'react';
+
+import {
+    Accordion,
+    AccordionSummary,
+    Typography,
+    AccordionDetails,
+    TableContainer,
+    Paper,
+    Table,
+    TableHead,
+    TableBody,
+    Box
+} from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { theme } from '../../theme/ThemeRegistry';
+import { Alert, Button, CodeBlock, Loader, SelectionForm, StyledTableCell, StyledTableRow } from '../../components';
+
+import cn from 'classnames';
+import { JsonEditor, githubDarkTheme } from 'json-edit-react';
+
+import { useAppDispatch, useAppSelector } from '../../hooks/redux-hooks';
+import {
+    addUser,
+    deleteUser,
+    fetchUsers,
+    selectLoading,
+    selectUsers
+} from '../../store/userSlice';
+import { selectMenuSlice } from '../../store/menuSlice';
+
+import { codeBlockDtoTemplates } from '../../constants/code-block-dto';
+import { AlertState } from '../../types';
+import { UserModel } from '@alexey-kuzmenko/ok-apps-sdk';
+import { CreateUserDto, createUserDtoKeys } from '@alexey-kuzmenko/ok-apps-sdk';
+
+import generateCodeBlock from '../../utils/generateCodeBlock';
+import validateValue from '../../utils/validateValue';
+import hideAlertAutomatically from '../../utils/hideAlertAutomatically';
+
+import {
+    ALERT_ERROR_MGS,
+    ALERT_RESET_MGS,
+    ALERT_SUCCESS_MGS,
+    JSON_EDITOR_WARN_MSG,
+    VIEWPORT_MIN_WIDTH
+} from '../../constants';
+
+import styles from './Users.module.scss';
+
+const userTemplate: CreateUserDto = {
+    email: '',
+    password: ''
+};
+
+export const Users: React.FC = () => {
+    const dispatch = useAppDispatch();
+
+    useEffect(() => {
+        dispatch(fetchUsers());
+    }, [dispatch]);
+
+    const users = useAppSelector(selectUsers);
+    const loading = useAppSelector(selectLoading);
+    const { isMenuOpen } = useAppSelector(selectMenuSlice);
+    const usersIds = users.map((u) => u._id);
+
+    const [alertState, setAlertState] = useState<AlertState>({ type: 'success', isOpen: false, message: '' });
+    const [newUser, setNewUser] = useState<object>(userTemplate);
+
+    const [deletedUserId, setDeletedUserId] = useState<string>('');
+    const deletedUser = users.find((u) => u._id === deletedUserId);
+
+    const viewportWidth = window.innerWidth;
+
+    const renderTableRows = (users: Array<UserModel>): JSX.Element[] => {
+        return users.map(({ _id, email }) => {
+            return (
+                <StyledTableRow
+                    key={_id}
+                >
+                    <StyledTableCell>{_id}</StyledTableCell>
+                    <StyledTableCell content='th' scope='row' align='right'>{email}</StyledTableCell>
+                </StyledTableRow>
+            );
+        });
+    };
+
+    const handleSave = async (): Promise<void> => {
+        if (validateValue(newUser) === false) {
+            setAlertState({ type: 'error', isOpen: true, message: ALERT_ERROR_MGS });
+            hideAlertAutomatically(setAlertState);
+
+            return;
+        }
+
+        const actionResult = await dispatch(addUser(newUser as CreateUserDto));
+        setNewUser(userTemplate);
+
+        if (addUser.rejected.match(actionResult)) {
+            setAlertState({ type: 'error', isOpen: true, message: actionResult.error.message ?? '' });
+
+            return;
+        }
+
+        setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
+        hideAlertAutomatically(setAlertState);
+    };
+
+    const handleReset = (): void => {
+        setNewUser(userTemplate);
+        setAlertState({ type: 'warning', isOpen: true, message: ALERT_RESET_MGS });
+        hideAlertAutomatically(setAlertState);
+    };
+
+    const handleDelete = async (): Promise<void> => {
+        const actionResult = await dispatch(deleteUser(deletedUserId));
+        setDeletedUserId('');
+
+        if (deleteUser.rejected.match(actionResult)) {
+            setAlertState({ type: 'error', isOpen: true, message: actionResult.error.message ?? '' });
+
+            return;
+        }
+
+        setAlertState({ type: 'success', isOpen: true, message: 'User successfully deleted' });
+        hideAlertAutomatically(setAlertState);
+    };
+
+    const handleAlertClose = () => {
+        setAlertState({ ...alertState, isOpen: false });
+    };
+
+    return (
+        <div className={styles.Users}>
+
+            {/* DTO accordion */}
+            <Accordion className={cn(styles.Users__accordion, {
+                [styles.Users__accordion_hidden]: isMenuOpen === true
+            })}>
+                <AccordionSummary
+                    expandIcon={<ExpandMoreIcon sx={{ color: theme.palette.primary.contrastText }} />}
+                    aria-controls='users-dto-preview-accordion-content'
+                    id='users-dto-preview-accordion-header'
+                >
+                    <Typography component='h1' variant='h5'>Dto</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                    <CodeBlock
+                        code={codeBlockDtoTemplates.user}
+                    />
+                </AccordionDetails>
+            </Accordion>
+
+            {/* All users accordion (table view) */}
+            <Accordion className={cn(styles.Users__accordion, {
+                [styles.Users__accordion_hidden]: isMenuOpen === true
+            })}>
+                <AccordionSummary
+                    expandIcon={<ExpandMoreIcon sx={{ color: theme.palette.primary.contrastText }} />}
+                    aria-controls='users-table-preview-accordion-content'
+                    id='users-table-preview-accordion-header'
+                >
+                    <Typography component='h1' variant='h5'>All users (Table view)</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                    <TableContainer component={Paper}>
+                        <Table aria-label='users-data-table'>
+                            <TableHead>
+                                <StyledTableRow>
+                                    <StyledTableCell>User ID</StyledTableCell>
+                                    <StyledTableCell align='right'>User email</StyledTableCell>
+                                </StyledTableRow>
+                            </TableHead>
+                            <TableBody>
+                                {renderTableRows(users)}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                </AccordionDetails>
+            </Accordion>
+
+            {/* All users accordion (JSON view) */}
+            <Accordion className={cn(styles.Users__accordion, {
+                [styles.Users__accordion_hidden]: isMenuOpen === true
+            })}>
+                <AccordionSummary
+                    expandIcon={<ExpandMoreIcon sx={{ color: theme.palette.primary.contrastText }} />}
+                    aria-controls='users-json-preview-accordion-content'
+                    id='users-json-preview-accordion-header'
+                >
+                    <Typography component='h1' variant='h5'>All users (JSON view)</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                    {
+                        viewportWidth < VIEWPORT_MIN_WIDTH ?
+                            <Typography component='h2' variant='body1'>
+                                {JSON_EDITOR_WARN_MSG}
+                            </Typography>
+                            :
+                            <JsonEditor
+                                data={users}
+                                className={styles.Users__jsonEditor}
+                                theme={githubDarkTheme}
+                                restrictEdit={({ fullData }) => fullData !== null}
+                                restrictAdd={({ fullData }) => fullData !== null}
+                                restrictDelete={({ fullData }) => fullData !== null}
+                            />
+                    }
+                </AccordionDetails>
+            </Accordion>
+
+            {/* Add user accordion */}
+            <Accordion className={cn(styles.Users__accordion, {
+                [styles.Users__accordion_hidden]: isMenuOpen === true
+            })}>
+                <AccordionSummary
+                    expandIcon={<ExpandMoreIcon sx={{ color: theme.palette.primary.contrastText }} />}
+                    aria-controls='add-user-json-editor-content'
+                    id='add-user-json-editor-header'
+                >
+                    <Typography component='h1' variant='h5'>Add user</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                    {
+                        viewportWidth < VIEWPORT_MIN_WIDTH ?
+                            <Typography component='h2' variant='body1'>
+                                {JSON_EDITOR_WARN_MSG}
+                            </Typography>
+                            :
+                            <>
+                                <JsonEditor
+                                    data={newUser}
+                                    className={styles.Users__jsonEditor}
+                                    theme={githubDarkTheme}
+                                    onUpdate={({ newData }) => {
+                                        setNewUser(newData as object);
+                                    }}
+                                    restrictAdd={({ fullData }) => fullData !== null}
+                                    restrictDelete={({ key }) => createUserDtoKeys.includes(key as string)}
+                                    restrictTypeSelection={({ value }) => {
+                                        if (typeof value === 'boolean') return false;
+                                        if (typeof value === 'string') return ['string'];
+                                        return ['string'];
+                                    }}
+                                />
+
+                                <div className={styles.Users__jsonEditorControls}>
+                                    <Button onClick={() => handleSave()}>Save changes</Button>
+                                    <Button variant='outlined' onClick={() => handleReset()}>Reset state</Button>
+                                </div>
+                            </>
+                    }
+                </AccordionDetails>
+            </Accordion>
+
+            {/* Delete user accordion */}
+            <Accordion className={cn(styles.Users__accordion, {
+                [styles.Users__accordion_hidden]: isMenuOpen === true
+            })}>
+                <AccordionSummary
+                    expandIcon={<ExpandMoreIcon sx={{ color: theme.palette.primary.contrastText }} />}
+                    aria-controls='delete-user-accordion-content'
+                    id='delete-user-accordion-header'
+                >
+                    <Typography component='h1' variant='h5'>Delete user</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+
+                    <SelectionForm
+                        values={usersIds}
+                        label='Choose user id'
+                        selectId='user-select'
+                        labelId='user-select-label'
+                        id='user-select-form'
+                        onFind={setDeletedUserId}
+                        onDelete={handleDelete}
+                    />
+
+                    {
+                        !deletedUser
+                            ?
+                            <Typography component='h2' variant='h5' sx={{ textAlign: 'center', marginTop: '30px' }}>
+                                User ID is not selected
+                            </Typography>
+                            :
+                            <Box component='div' sx={{ marginTop: '20px' }}>
+                                <CodeBlock
+                                    code={generateCodeBlock(deletedUser)}
+                                    copyButton={false}
+                                    lang='json'
+                                />
+                            </Box>
+                    }
+
+                </AccordionDetails>
+            </Accordion>
+
+            {/* Alerts */}
+            <Alert
+                type={alertState.type}
+                message={alertState.message}
+                isOpen={alertState.isOpen}
+                onClose={handleAlertClose}
+            />
+
+            {/* Loader */}
+            {loading && <Loader />}
+        </div>
+    );
+};

@@ -1,0 +1,7 @@
+@use '../../scss/utilities/variables' as vars;
+
+.BurgerMenuIcon {
+    cursor: pointer;
+
+    color: vars.$white;
+}

@@ -1,0 +1,25 @@
+@use '../../scss/utilities/placeholders';
+@use '../../scss/utilities/variables' as vars;
+
+.SelectionForm {
+    display: flex;
+    align-items: center;
+    flex-flow: column wrap;
+    justify-content: center;
+
+    width: 100%;
+    row-gap: 30px;
+
+    &__selectLabel {
+        color: vars.$white !important;
+    }
+
+    &__controls {
+        @extend %controls
+    }
+
+    @media (min-width: vars.$lg) {
+        flex-direction: row;
+        justify-content: space-between;
+    }
+}

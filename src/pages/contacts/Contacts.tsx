@@ -1,0 +1,365 @@
+import { useEffect, useRef, useState } from 'react';
+
+import Accordion from '@mui/material/Accordion';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { Box, Typography } from '@mui/material';
+import { theme } from '../../theme/ThemeRegistry';
+import { CodeBlock, SelectionForm, Button, Alert, Loader } from '../../components';
+
+import cn from 'classnames';
+import { JsonEditor, githubDarkTheme } from 'json-edit-react';
+
+import { useAppDispatch, useAppSelector } from '../../hooks/redux-hooks';
+import {
+    addContact,
+    deleteContact,
+    editContact,
+    fetchContacts,
+    selectContacts,
+    selectLoading
+} from '../../store/contactSlice';
+import { selectMenuSlice } from '../../store/menuSlice';
+
+import { codeBlockDtoTemplates } from '../../constants/code-block-dto';
+import { ContactDto } from '@alexey-kuzmenko/ok-apps-sdk';
+import { ContactModel, contactModelKeys } from '@alexey-kuzmenko/ok-apps-sdk';
+import { AlertState } from '../../types';
+
+import generateCodeBlock from '../../utils/generateCodeBlock';
+import validateValue from '../../utils/validateValue';
+import hideAlertAutomatically from '../../utils/hideAlertAutomatically';
+
+import {
+    VIEWPORT_MIN_WIDTH,
+    ALERT_SUCCESS_MGS,
+    ALERT_ERROR_MGS,
+    ALERT_RESET_MGS,
+    JSON_EDITOR_WARN_MSG
+} from '../../constants';
+import { contactTemplate } from './contact.template';
+
+import styles from './Contacts.module.scss';
+
+export const Contacts: React.FC = () => {
+    const dispatch = useAppDispatch();
+
+    useEffect(() => {
+        dispatch(fetchContacts());
+    }, [dispatch]);
+
+    const contacts = useAppSelector(selectContacts);
+    const loading = useAppSelector(selectLoading);
+    const { isMenuOpen } = useAppSelector(selectMenuSlice);
+    const contactsIds = contacts.map((c) => c._id);
+
+    const [alertState, setAlertState] = useState<AlertState>({ type: 'success', isOpen: false, message: '' });
+    const [newContact, setNewContact] = useState<object>(contactTemplate);
+
+    const [deletedContactId, setDeletedContactId] = useState<string>('');
+    const deletedContact = contacts.find((c) => c._id === deletedContactId);
+
+    const [editedContact, setEditedContact] = useState<object>();
+    const editedContactCopyRef = useRef<ContactModel | null>(null);
+
+    const viewportWidth = window.innerWidth;
+
+    const handleSave = async (action: 'edit' | 'add'): Promise<void> => {
+        if (action === 'add') {
+            if (validateValue(newContact) === false) {
+                setAlertState({ type: 'error', isOpen: true, message: ALERT_ERROR_MGS });
+                hideAlertAutomatically(setAlertState);
+
+                return;
+            }
+
+            const actionResult = await dispatch(addContact(newContact as ContactDto));
+            setNewContact(contactTemplate);
+
+            if (addContact.rejected.match(actionResult)) {
+                setAlertState({ type: 'error', isOpen: true, message: actionResult.error.message ?? '' });
+
+                return;
+            }
+
+            setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
+            hideAlertAutomatically(setAlertState);
+        }
+
+        if (action === 'edit' && editedContact) {
+            if (validateValue(editedContact) === false) {
+                setAlertState({ type: 'error', isOpen: true, message: ALERT_ERROR_MGS });
+                hideAlertAutomatically(setAlertState);
+
+                return;
+            }
+
+            const actionResult = await dispatch(editContact(editedContact as ContactModel));
+
+            if (editContact.rejected.match(actionResult)) {
+                setAlertState({ type: 'error', isOpen: true, message: actionResult.error.message ?? '' });
+
+                return;
+            }
+
+            setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
+            hideAlertAutomatically(setAlertState);
+        }
+    };
+
+    const handleReset = (action: 'edit' | 'add'): void => {
+        if (action === 'add') {
+            setNewContact(contactTemplate);
+        }
+
+        if (action === 'edit' && editedContactCopyRef.current) {
+            setEditedContact(editedContactCopyRef.current);
+        }
+
+        setAlertState({ type: 'warning', isOpen: true, message: ALERT_RESET_MGS });
+        hideAlertAutomatically(setAlertState);
+    };
+
+    const handleFind = (id: string): void => {
+        const jsonEditorData = contacts.find((c) => c._id === id);
+
+        if (jsonEditorData) {
+            setEditedContact(jsonEditorData);
+            editedContactCopyRef.current = jsonEditorData;
+        }
+    };
+
+    const handleDelete = async (): Promise<void> => {
+        const actionResult = await dispatch(deleteContact(deletedContactId));
+        setDeletedContactId('');
+
+        if (deleteContact.rejected.match(actionResult)) {
+            setAlertState({ type: 'error', isOpen: true, message: actionResult.error.message ?? '' });
+
+            return;
+        }
+
+        setAlertState({ type: 'success', isOpen: true, message: 'Contact successfully deleted' });
+        hideAlertAutomatically(setAlertState);
+    };
+
+    const handleAlertClose = () => {
+        setAlertState({ ...alertState, isOpen: false });
+    };
+
+    return (
+        <div className={styles.Contacts}>
+
+            {/* DTO accordion */}
+            <Accordion className={cn(styles.Contacts__accordion, {
+                [styles.Contacts__accordion_hidden]: isMenuOpen === true
+            })}>
+                <AccordionSummary
+                    expandIcon={<ExpandMoreIcon sx={{ color: theme.palette.primary.contrastText }} />}
+                    aria-controls='contacts-dto-preview-accordion-content'
+                    id='contacts-dto-preview-accordion-header'
+                >
+                    <Typography component='h1' variant='h5'>Dto</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                    <CodeBlock
+                        code={codeBlockDtoTemplates.contacts}
+                    />
+                </AccordionDetails>
+            </Accordion>
+
+            {/* All contacts accordion */}
+            <Accordion className={cn(styles.Contacts__accordion, {
+                [styles.Contacts__accordion_hidden]: isMenuOpen === true
+            })}>
+                <AccordionSummary
+                    expandIcon={<ExpandMoreIcon sx={{ color: theme.palette.primary.contrastText }} />}
+                    aria-controls='contacts-json-preview-accordion-content'
+                    id='contacts-json-preview-accordion-header'
+                >
+                    <Typography component='h1' variant='h5'>All contacts</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                    {
+                        viewportWidth < VIEWPORT_MIN_WIDTH ?
+                            <Typography component='h2' variant='body1'>
+                                {JSON_EDITOR_WARN_MSG}
+                            </Typography>
+                            :
+                            <JsonEditor
+                                data={contacts}
+                                className={styles.Contacts__jsonEditor}
+                                theme={githubDarkTheme}
+                                restrictEdit={({ fullData }) => fullData !== null}
+                                restrictAdd={({ fullData }) => fullData !== null}
+                                restrictDelete={({ fullData }) => fullData !== null}
+                            />
+                    }
+                </AccordionDetails>
+            </Accordion>
+
+            {/* Add contact accordion */}
+            <Accordion className={cn(styles.Contacts__accordion, {
+                [styles.Contacts__accordion_hidden]: isMenuOpen === true
+            })}>
+                <AccordionSummary
+                    expandIcon={<ExpandMoreIcon sx={{ color: theme.palette.primary.contrastText }} />}
+                    aria-controls='add-contact-json-editor-content'
+                    id='add-contact-json-editor-header'
+                >
+                    <Typography component='h1' variant='h5'>Add contact</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                    {
+                        viewportWidth < VIEWPORT_MIN_WIDTH ?
+                            <Typography component='h2' variant='body1'>
+                                {JSON_EDITOR_WARN_MSG}
+                            </Typography>
+                            :
+                            <>
+                                <JsonEditor
+                                    data={newContact}
+                                    className={styles.Contacts__jsonEditor}
+                                    theme={githubDarkTheme}
+                                    onUpdate={({ newData }) => {
+                                        setNewContact(newData as object);
+                                    }}
+                                    restrictAdd={({ fullData }) => fullData !== null}
+                                    restrictDelete={({ key }) => contactModelKeys.includes(key as string)}
+                                    restrictTypeSelection={() => {
+                                        return ['string'];
+                                    }}
+                                    defaultValue={''}
+                                />
+
+                                <div className={styles.Contacts__jsonEditorControls}>
+                                    <Button onClick={() => handleSave('add')}>Save changes</Button>
+                                    <Button variant='outlined' onClick={() => handleReset('add')}>Reset state</Button>
+                                </div>
+                            </>
+                    }
+                </AccordionDetails>
+            </Accordion>
+
+            {/* Edit contact accordion */}
+            <Accordion className={cn(styles.Contacts__accordion, {
+                [styles.Contacts__accordion_hidden]: isMenuOpen === true
+            })}>
+                <AccordionSummary
+                    expandIcon={<ExpandMoreIcon sx={{ color: theme.palette.primary.contrastText }} />}
+                    aria-controls='edit-contact-json-editor-content'
+                    id='edit-contact-json-editor-header'
+                >
+                    <Typography component='h1' variant='h5'>Edit contact</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+
+                    <SelectionForm
+                        values={contactsIds}
+                        label='Choose contact id'
+                        selectId='contacts-select'
+                        labelId='contacts-select-label'
+                        id='contacts-select-form'
+                        onFind={handleFind}
+                    />
+
+                    {
+                        !editedContact ?
+                            <Typography component='h2' variant='h5' sx={{ textAlign: 'center', marginTop: '30px' }}>
+                                Contact ID is not selected
+                            </Typography>
+                            :
+                            viewportWidth < VIEWPORT_MIN_WIDTH ?
+                                <Typography component='h2' variant='body1' sx={{ marginTop: '30px' }}>
+                                    {JSON_EDITOR_WARN_MSG}
+                                </Typography>
+                                :
+                                <>
+                                    <Box component='div' sx={{ marginTop: '20px' }}>
+                                        <JsonEditor
+                                            data={editedContact}
+                                            className={styles.Contacts__jsonEditor}
+                                            theme={githubDarkTheme}
+                                            onUpdate={({ newData }) => {
+                                                // ! Temporary fix
+                                                setEditedContact(newData as object);
+                                            }}
+                                            restrictAdd={({ key }) => key in editContact}
+                                            restrictDelete={({ key }) => contactModelKeys.includes(key as string)}
+                                            restrictEdit={({ key }) => key === '_id'}
+                                            restrictTypeSelection={({ value }) => {
+                                                if (typeof value === 'boolean') return false;
+                                                if (typeof value === 'string') return ['string'];
+                                                return ['string'];
+                                            }}
+                                            defaultValue={''}
+                                        />
+                                    </Box>
+
+                                    <div className={styles.Contacts__jsonEditorControls}>
+                                        <Button onClick={() => handleSave('edit')}>Save changes</Button>
+                                        <Button variant='outlined' onClick={() => handleReset('edit')}>
+                                            Reset state
+                                        </Button>
+                                    </div>
+                                </>
+                    }
+                </AccordionDetails>
+            </Accordion>
+
+            {/* Delete contact accordion */}
+            <Accordion className={cn(styles.Contacts__accordion, {
+                [styles.Contacts__accordion_hidden]: isMenuOpen === true
+            })}>
+                <AccordionSummary
+                    expandIcon={<ExpandMoreIcon sx={{ color: theme.palette.primary.contrastText }} />}
+                    aria-controls='delete-contact-accordion-content'
+                    id='delete-contact-accordion-header'
+                >
+                    <Typography component='h1' variant='h5'>Delete contact</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+
+                    <SelectionForm
+                        values={contactsIds}
+                        label='Choose contact id'
+                        selectId='contacts-select'
+                        labelId='contacts-select-label'
+                        id='contacts-select-form'
+                        onFind={setDeletedContactId}
+                        onDelete={handleDelete}
+                    />
+
+                    {
+                        !deletedContact
+                            ?
+                            <Typography component='h2' variant='h5' sx={{ textAlign: 'center', marginTop: '30px' }}>
+                                Contact ID is not selected
+                            </Typography>
+                            :
+                            <Box component='div' sx={{ marginTop: '20px' }}>
+                                <CodeBlock
+                                    code={generateCodeBlock(deletedContact)}
+                                    copyButton={false}
+                                    lang='json'
+                                />
+                            </Box>
+                    }
+
+                </AccordionDetails>
+            </Accordion>
+
+            {/* Alerts */}
+            <Alert
+                type={alertState.type}
+                message={alertState.message}
+                isOpen={alertState.isOpen}
+                onClose={handleAlertClose}
+            />
+
+            {/* Loader */}
+            {loading && <Loader />}
+        </div>
+    );
+};

@@ -1,0 +1,192 @@
+import { asyncThunkCreator, buildCreateSlice, PayloadAction } from '@reduxjs/toolkit';
+import axios, { AxiosResponse } from 'axios';
+
+import { Content, ContentModel } from '@alexey-kuzmenko/ok-apps-sdk';
+import { CreateContentDto } from '@alexey-kuzmenko/ok-apps-sdk';
+import type { RootState } from './types';
+import { ResponseError } from '../types';
+import excludeObjectValues from '../utils/excludeObjectValues';
+import { ENV_VAR_IS_NOT_DEFINED, ERROR_MSG_TEMPLATE } from '../constants';
+
+const API_URL = import.meta.env.VITE_API_URL;
+const API_KEY = import.meta.env.VITE_API_KEY;
+
+if (!API_URL) throw new Error(`API_URL ${ENV_VAR_IS_NOT_DEFINED} contactSlice`);
+if (!API_KEY) throw new Error(`API_KEY ${ENV_VAR_IS_NOT_DEFINED} contactSlice`);
+
+const createContentSlice = buildCreateSlice({
+    creators: { asyncThunk: asyncThunkCreator }
+});
+
+interface ContentSate {
+    content: Array<ContentModel>,
+    loading: boolean | null
+    error: ResponseError
+}
+
+export const initialState: ContentSate = {
+    content: [],
+    loading: null,
+    error: {
+        exists: null,
+        message: null
+    }
+};
+
+const contentSlice = createContentSlice({
+    name: 'content',
+    initialState,
+    selectors: {
+        selectContent: (state) => state.content,
+        selectLoading: (state) => state.loading,
+        selectError: (state) => state.error
+    },
+    reducers: (create) => ({
+        deletePageContentLocally: create.reducer((state, { payload }: PayloadAction<string>) => {
+            state.content = state.content.filter((c) => c._id !== payload);
+        }),
+        fetchPagesContent: create.asyncThunk(async () => {
+            const response: AxiosResponse<ContentModel[]> = await axios.get(`${API_URL}/content`, {
+                headers: {
+                    'Api-key': API_KEY
+                }
+            });
+
+            return response.data;
+        },
+            {
+                pending: (state) => {
+                    state.loading = true;
+                },
+                fulfilled: (state, { payload }) => {
+                    const data = excludeObjectValues<ContentModel>(['createdAt', 'updatedAt', '__v'], payload);
+                    state.content = data;
+                },
+                rejected: (state, { error }) => {
+                    state.error.exists = true;
+                    state.error.message = error.message ? error.message : `${ERROR_MSG_TEMPLATE} Content slice`;
+                },
+                settled: (state) => {
+                    state.loading = false;
+                }
+            }
+        ),
+        addPageContent: create.asyncThunk(async (dto: CreateContentDto, thunkApi) => {
+            const state = thunkApi.getState() as RootState;
+            const token = state.authentication.token;
+
+            const response: AxiosResponse<ContentModel> = await axios.post(`${API_URL}/content/create`, dto, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            return response.data;
+        },
+            {
+                pending: (state) => {
+                    state.loading = true;
+                },
+                fulfilled: (state, { payload }) => {
+                    const data = excludeObjectValues<ContentModel>(['createdAt', 'updatedAt', '__v'], [payload]);
+                    state.content.push(...data);
+                },
+                rejected: (state, { error }) => {
+                    state.error.exists = true;
+                    state.error.message = error.message ? error.message : `${ERROR_MSG_TEMPLATE} Content slice`;
+                },
+                settled: (state) => {
+                    state.loading = false;
+                }
+            }
+        ),
+        deletePageContent: create.asyncThunk(async (id: string, thunkApi) => {
+            const state = thunkApi.getState() as RootState;
+            const token = state.authentication.token;
+
+            await axios.delete(`${API_URL}/content/${id}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            thunkApi.dispatch(deletePageContentLocally(id));
+        },
+            {
+                pending: (state) => {
+                    state.loading = true;
+                },
+                rejected: (state, { error }) => {
+                    state.error.exists = true;
+                    state.error.message = error.message ? error.message : `${ERROR_MSG_TEMPLATE} Content slice`;
+                },
+                settled: (state) => {
+                    state.loading = false;
+                }
+            }
+        ),
+        editContent: create.asyncThunk(async (payload: { content: Content, formValue: string }, thunkApi) => {
+            const [type, lang]: Array<string> = payload.formValue.replace(/\s+/g, '').split('|');
+            const state = thunkApi.getState() as RootState;
+            const pageContent = state.content.content.find((c) => c.type === type);
+            const token = state.authentication.token;
+
+            if (pageContent) {
+                const { _id } = pageContent;
+                const response: AxiosResponse<ContentModel> = await axios.patch(`${API_URL}/content/${_id}/${lang}`,
+                    payload.content,
+                    {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    }
+                );
+                return { type, lang, data: response.data };
+            }
+        },
+            {
+                pending: (state) => {
+                    state.loading = true;
+                },
+                fulfilled: (state, { payload }) => {
+                    if (payload) {
+                        const pageContent = state.content.find((c) => c.type === payload.type);
+
+                        if (pageContent) {
+                            const pageContentIndex = state.content.indexOf(pageContent);
+                            const contentCopy = [...state.content];
+
+                            if (payload.lang === 'eng') {
+                                pageContent.eng = payload.data.eng;
+                            } else {
+                                pageContent.ua = payload.data.ua;
+                            }
+
+                            contentCopy[pageContentIndex] = pageContent;
+                            state.content = contentCopy;
+                        }
+                    }
+                },
+                rejected: (state, { error }) => {
+                    state.error.exists = true;
+                    state.error.message = error.message ? error.message : `${ERROR_MSG_TEMPLATE} Content slice`;
+                },
+                settled: (state) => {
+                    state.loading = false;
+                }
+            }
+        )
+    })
+});
+
+export const { selectContent, selectLoading, selectError } = contentSlice.selectors;
+
+export const {
+    deletePageContentLocally,
+    fetchPagesContent,
+    addPageContent,
+    deletePageContent,
+    editContent
+} = contentSlice.actions;
+
+export default contentSlice.reducer;

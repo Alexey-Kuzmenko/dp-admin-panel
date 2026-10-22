@@ -1,0 +1,364 @@
+import { useEffect, useRef, useState } from 'react';
+
+import { Accordion, AccordionSummary, Typography, AccordionDetails, Box } from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { theme } from '../../theme/ThemeRegistry';
+import { Alert, Button, CodeBlock, Loader, SelectionForm } from '../../components';
+
+import cn from 'classnames';
+import { JsonEditor, githubDarkTheme } from 'json-edit-react';
+
+import { useAppSelector, useAppDispatch } from '../../hooks/redux-hooks';
+import {
+    addProject,
+    deleteProject,
+    editProject,
+    fetchProjects,
+    selectLoading,
+    selectProjects
+} from '../../store/projectSlice';
+import { selectMenuSlice } from '../../store/menuSlice';
+
+import { codeBlockDtoTemplates } from '../../constants/code-block-dto';
+import { ProjectDto } from '@alexey-kuzmenko/ok-apps-sdk';
+import { AlertState } from '../../types';
+import { ProjectModel, projectModelKeys } from '@alexey-kuzmenko/ok-apps-sdk';
+
+import generateCodeBlock from '../../utils/generateCodeBlock';
+import validateValue from '../../utils/validateValue';
+import hideAlertAutomatically from '../../utils/hideAlertAutomatically';
+
+import {
+    ALERT_ERROR_MGS,
+    ALERT_RESET_MGS,
+    ALERT_SUCCESS_MGS,
+    JSON_EDITOR_WARN_MSG,
+    VIEWPORT_MIN_WIDTH
+} from '../../constants';
+import { projectTemplate } from './project.template';
+
+import styles from './Projects.module.scss';
+
+export const Projects: React.FC = () => {
+    const dispatch = useAppDispatch();
+
+    useEffect(() => {
+        dispatch(fetchProjects());
+    }, [dispatch]);
+
+    const projects = useAppSelector(selectProjects);
+    const loading = useAppSelector(selectLoading);
+    const { isMenuOpen } = useAppSelector(selectMenuSlice);
+    const projectsIds = projects.map((p) => p._id);
+
+    const [alertState, setAlertState] = useState<AlertState>({ type: 'success', isOpen: false, message: '' });
+    const [newProject, setNewProject] = useState<object>(projectTemplate);
+
+    const [deletedProjectId, setDeletedProjectId] = useState<string>('');
+    const deletedProject = projects.find((p) => p._id === deletedProjectId);
+
+    const [editedProject, setEditedProject] = useState<object>();
+    const editedProjectCopyRef = useRef<ProjectModel | null>(null);
+
+    const viewportWidth = window.innerWidth;
+
+    const handleSave = async (action: 'edit' | 'add'): Promise<void> => {
+        if (action === 'add') {
+            if (validateValue(newProject) === false) {
+                setAlertState({ type: 'error', isOpen: true, message: ALERT_ERROR_MGS });
+                hideAlertAutomatically(setAlertState);
+
+                return;
+            }
+
+            const actionResult = await dispatch(addProject(newProject as ProjectDto));
+            setNewProject(projectTemplate);
+
+            if (addProject.rejected.match(actionResult)) {
+                setAlertState({ type: 'error', isOpen: true, message: actionResult.error.message ?? '' });
+
+                return;
+            }
+
+            setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
+            hideAlertAutomatically(setAlertState);
+
+        }
+
+        if (action === 'edit' && editedProject) {
+            if (validateValue(editedProject) === false) {
+                setAlertState({ type: 'error', isOpen: true, message: ALERT_ERROR_MGS });
+                hideAlertAutomatically(setAlertState);
+
+                return;
+            }
+
+            const actionResult = await dispatch(editProject(editedProject as ProjectModel));
+
+            if (editProject.rejected.match(actionResult)) {
+                setAlertState({ type: 'error', isOpen: true, message: actionResult.error.message ?? '' });
+
+                return;
+            }
+
+            setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
+            hideAlertAutomatically(setAlertState);
+        }
+    };
+
+    const handleReset = (action: 'edit' | 'add'): void => {
+        if (action === 'add') {
+            setNewProject(projectTemplate);
+        }
+
+        if (action === 'edit' && editedProjectCopyRef.current) {
+            setEditedProject(editedProjectCopyRef.current);
+        }
+
+        setAlertState({ type: 'warning', isOpen: true, message: ALERT_RESET_MGS });
+        hideAlertAutomatically(setAlertState);
+    };
+
+    const handleFind = (id: string): void => {
+        const jsonEditorData = projects.find((p) => p._id === id);
+
+        if (jsonEditorData) {
+            setEditedProject(jsonEditorData);
+            editedProjectCopyRef.current = jsonEditorData;
+        }
+    };
+
+    const handleDelete = async (): Promise<void> => {
+        const actionResult = await dispatch(deleteProject(deletedProjectId));
+        setDeletedProjectId('');
+
+        if (deleteProject.rejected.match(actionResult)) {
+            setAlertState({ type: 'error', isOpen: true, message: actionResult.error.message ?? '' });
+
+            return;
+        }
+
+        setAlertState({ type: 'success', isOpen: true, message: 'Project successfully deleted' });
+        hideAlertAutomatically(setAlertState);
+    };
+
+    const handleAlertClose = () => {
+        setAlertState({ ...alertState, isOpen: false });
+    };
+
+    return (
+        <div className={styles.Projects}>
+
+            {/* DTO accordion */}
+            <Accordion className={cn(styles.Projects__accordion, {
+                [styles.Projects__accordion_hidden]: isMenuOpen === true
+            })}>
+                <AccordionSummary
+                    expandIcon={<ExpandMoreIcon sx={{ color: theme.palette.primary.contrastText }} />}
+                    aria-controls='projects-dto-preview-accordion-content'
+                    id='projects-dto-preview-accordion-header'
+                >
+                    <Typography component='h1' variant='h5'>Dto</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                    <CodeBlock
+                        code={codeBlockDtoTemplates.projects}
+                    />
+                </AccordionDetails>
+            </Accordion>
+
+            {/* All projects accordion */}
+            <Accordion className={cn(styles.Projects__accordion, {
+                [styles.Projects__accordion_hidden]: isMenuOpen === true
+            })}>
+                <AccordionSummary
+                    expandIcon={<ExpandMoreIcon sx={{ color: theme.palette.primary.contrastText }} />}
+                    aria-controls='projects-json-preview-accordion-content'
+                    id='projects-json-preview-accordion-header'
+                >
+                    <Typography component='h1' variant='h5'>All projects</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                    {
+                        viewportWidth < VIEWPORT_MIN_WIDTH ?
+                            <Typography component='h2' variant='body1'>
+                                {JSON_EDITOR_WARN_MSG}
+                            </Typography>
+                            :
+                            <JsonEditor
+                                data={projects}
+                                className={styles.Projects__jsonEditor}
+                                theme={githubDarkTheme}
+                                restrictEdit={({ fullData }) => fullData !== null}
+                                restrictAdd={({ fullData }) => fullData !== null}
+                                restrictDelete={({ fullData }) => fullData !== null}
+                            />
+                    }
+                </AccordionDetails>
+            </Accordion>
+
+            {/* Add projects accordion */}
+            <Accordion className={cn(styles.Projects__accordion, {
+                [styles.Projects__accordion_hidden]: isMenuOpen === true
+            })}>
+                <AccordionSummary
+                    expandIcon={<ExpandMoreIcon sx={{ color: theme.palette.primary.contrastText }} />}
+                    aria-controls='add-project-json-editor-content'
+                    id='add-project-json-editor-header'
+                >
+                    <Typography component='h1' variant='h5'>Add project</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                    {
+                        viewportWidth < VIEWPORT_MIN_WIDTH ?
+                            <Typography component='h2' variant='body1'>
+                                {JSON_EDITOR_WARN_MSG}
+                            </Typography>
+                            :
+                            <>
+                                <JsonEditor
+                                    data={newProject}
+                                    className={styles.Projects__jsonEditor}
+                                    theme={githubDarkTheme}
+                                    onUpdate={({ newData }) => {
+                                        setNewProject(newData as object);
+                                    }}
+                                    restrictAdd={({ fullData }) => fullData !== null}
+                                    restrictDelete={({ key }) => projectModelKeys.includes(key as string)}
+                                    restrictTypeSelection={({ value }) => {
+                                        if (typeof value === 'boolean') return false;
+                                        if (typeof value === 'string') return ['string'];
+                                        return ['string'];
+                                    }}
+                                />
+
+                                <div className={styles.Projects__jsonEditorControls}>
+                                    <Button onClick={() => handleSave('add')}>Save changes</Button>
+                                    <Button variant='outlined' onClick={() => handleReset('add')}>Reset state</Button>
+                                </div>
+                            </>
+                    }
+                </AccordionDetails>
+            </Accordion>
+
+            {/* Edit project accordion */}
+            <Accordion className={cn(styles.Projects__accordion, {
+                [styles.Projects__accordion_hidden]: isMenuOpen === true
+            })}>
+                <AccordionSummary
+                    expandIcon={<ExpandMoreIcon sx={{ color: theme.palette.primary.contrastText }} />}
+                    aria-controls='edit-projects-json-editor-content'
+                    id='edit-projects-json-editor-header'
+                >
+                    <Typography component='h1' variant='h5'>Edit project</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+
+                    <SelectionForm
+                        values={projectsIds}
+                        label='Choose project id'
+                        selectId='projects-select'
+                        labelId='projects-select-label'
+                        id='projects-select-form'
+                        onFind={handleFind}
+                    />
+
+                    {
+                        !editedProject ?
+                            <Typography component='h2' variant='h5' sx={{ textAlign: 'center', marginTop: '30px' }}>
+                                Project ID is not selected
+                            </Typography>
+                            :
+                            viewportWidth < VIEWPORT_MIN_WIDTH ?
+                                <Typography component='h2' variant='body1' sx={{ marginTop: '30px' }}>
+                                    {JSON_EDITOR_WARN_MSG}
+                                </Typography>
+                                :
+                                <>
+                                    <Box component='div' sx={{ marginTop: '20px' }}>
+                                        <JsonEditor
+                                            data={editedProject}
+                                            className={styles.Projects__jsonEditor}
+                                            theme={githubDarkTheme}
+                                            onUpdate={({ newData }) => {
+                                                // ! Temporary fix
+                                                setEditedProject(newData as object);
+                                            }}
+                                            restrictAdd={({ key }) => key !== 'technologies' && key !== 'tags'}
+                                            restrictDelete={({ key }) => projectModelKeys.includes(key as string)}
+                                            restrictEdit={({ key }) => key === '_id'}
+                                            restrictTypeSelection={({ value }) => {
+                                                if (typeof value === 'boolean') return false;
+                                                return ['string', 'object'];
+                                            }}
+                                            defaultValue={''}
+                                        />
+                                    </Box>
+
+                                    <div className={styles.Projects__jsonEditorControls}>
+                                        <Button onClick={() => handleSave('edit')}>Save changes</Button>
+                                        <Button variant='outlined' onClick={() => handleReset('edit')}>
+                                            Reset state
+                                        </Button>
+                                    </div>
+                                </>
+                    }
+                </AccordionDetails>
+            </Accordion>
+
+            {/* Delete project accordion */}
+            <Accordion className={cn(styles.Projects__accordion, {
+                [styles.Projects__accordion_hidden]: isMenuOpen === true
+            })}>
+                <AccordionSummary
+                    expandIcon={<ExpandMoreIcon sx={{ color: theme.palette.primary.contrastText }} />}
+                    aria-controls='delete-project-accordion-content'
+                    id='delete-project-accordion-header'
+                >
+                    <Typography component='h1' variant='h5'>Delete project</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+
+                    <SelectionForm
+                        values={projectsIds}
+                        label='Choose project id'
+                        selectId='projects-select'
+                        labelId='projects-select-label'
+                        id='projects-select-form'
+                        onFind={setDeletedProjectId}
+                        onDelete={handleDelete}
+                    />
+
+                    {
+                        !deletedProject
+                            ?
+                            <Typography component='h2' variant='h5' sx={{ textAlign: 'center', marginTop: '30px' }}>
+                                Project ID is not selected
+                            </Typography>
+                            :
+                            <Box component='div' sx={{ marginTop: '20px' }}>
+                                <CodeBlock
+                                    code={generateCodeBlock(deletedProject)}
+                                    copyButton={false}
+                                    lang='json'
+                                />
+                            </Box>
+                    }
+
+                </AccordionDetails>
+            </Accordion>
+
+            {/* Alerts */}
+            <Alert
+                type={alertState.type}
+                message={alertState.message}
+                isOpen={alertState.isOpen}
+                onClose={handleAlertClose}
+            />
+
+            {/* Loader */}
+            {loading && <Loader />}
+
+        </div>
+    );
+};

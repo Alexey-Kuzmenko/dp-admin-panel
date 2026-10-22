@@ -1,0 +1,363 @@
+import { useEffect, useRef, useState } from 'react';
+
+import Accordion from '@mui/material/Accordion';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { Typography, Box } from '@mui/material';
+import { theme } from '../../theme/ThemeRegistry';
+import { Alert, Button, CodeBlock, Loader, SelectionForm } from '../../components';
+
+import cn from 'classnames';
+import { JsonEditor, githubDarkTheme } from 'json-edit-react';
+
+import { useAppDispatch, useAppSelector } from '../../hooks/redux-hooks';
+import {
+    addSkill,
+    deleteSkill,
+    editSkill,
+    fetchSkills,
+    selectLoading,
+    selectSkills
+} from '../../store/skillSlice';
+import { selectMenuSlice } from '../../store/menuSlice';
+
+import { codeBlockDtoTemplates } from '../../constants/code-block-dto';
+import { SkillDto } from '@alexey-kuzmenko/ok-apps-sdk';
+import { AlertState } from '../../types';
+import { SkillModel, skillModelKeys } from '@alexey-kuzmenko/ok-apps-sdk';
+
+import generateCodeBlock from '../../utils/generateCodeBlock';
+import validateValue from '../../utils/validateValue';
+import hideAlertAutomatically from '../../utils/hideAlertAutomatically';
+
+import {
+    VIEWPORT_MIN_WIDTH,
+    ALERT_SUCCESS_MGS,
+    ALERT_ERROR_MGS,
+    ALERT_RESET_MGS,
+    JSON_EDITOR_WARN_MSG
+} from '../../constants';
+import { skillTemplate } from './skill.template';
+
+import styles from './Skills.module.scss';
+
+export const Skills: React.FC = () => {
+    const dispatch = useAppDispatch();
+
+    useEffect(() => {
+        dispatch(fetchSkills());
+    }, [dispatch]);
+
+    const skills = useAppSelector(selectSkills);
+    const loading = useAppSelector(selectLoading);
+    const { isMenuOpen } = useAppSelector(selectMenuSlice);
+    const skillsIds = skills.map((s) => s._id);
+
+    const [alertState, setAlertState] = useState<AlertState>({ type: 'success', isOpen: false, message: '' });
+    const [newSkill, setNewSkill] = useState<object>(skillTemplate);
+
+    const [deletedSkillId, setDeletedSkillId] = useState<string>('');
+    const deletedSkill = skills.find((s) => s._id === deletedSkillId);
+
+    const [editedSkill, setEditedSkill] = useState<object>();
+    const editedSkillCopyRef = useRef<SkillModel | null>(null);
+
+    const viewportWidth = window.innerWidth;
+
+    const handleSave = async (action: 'edit' | 'add'): Promise<void> => {
+        if (action === 'add') {
+            if (validateValue(newSkill) === false) {
+                setAlertState({ type: 'error', isOpen: true, message: ALERT_ERROR_MGS });
+                hideAlertAutomatically(setAlertState);
+
+                return;
+            }
+
+            const actionResult = await dispatch(addSkill(newSkill as SkillDto));
+            setNewSkill(skillTemplate);
+
+            if (addSkill.rejected.match(actionResult)) {
+                setAlertState({ type: 'error', isOpen: true, message: actionResult.error.message ?? '' });
+
+                return;
+            }
+
+            setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
+            hideAlertAutomatically(setAlertState);
+        }
+
+        if (action === 'edit' && editedSkill) {
+            if (validateValue(editedSkill) === false) {
+                setAlertState({ type: 'error', isOpen: true, message: ALERT_ERROR_MGS });
+                hideAlertAutomatically(setAlertState);
+
+                return;
+            }
+
+            const actionResult = await dispatch(editSkill(editedSkill as SkillModel));
+
+            if (editSkill.rejected.match(actionResult)) {
+                setAlertState({ type: 'error', isOpen: true, message: actionResult.error.message ?? '' });
+
+                return;
+            }
+
+            setAlertState({ type: 'success', isOpen: true, message: ALERT_SUCCESS_MGS });
+            hideAlertAutomatically(setAlertState);
+        }
+    };
+
+    const handleReset = (action: 'edit' | 'add'): void => {
+        if (action === 'add') {
+            setNewSkill(skillTemplate);
+        }
+
+        if (action === 'edit' && editedSkillCopyRef.current) {
+            setEditedSkill(editedSkillCopyRef.current);
+        }
+
+        setAlertState({ type: 'warning', isOpen: true, message: ALERT_RESET_MGS });
+        hideAlertAutomatically(setAlertState);
+    };
+
+    const handleFind = (id: string): void => {
+        const jsonEditorData = skills.find((s) => s._id === id);
+
+        if (jsonEditorData) {
+            setEditedSkill(jsonEditorData);
+            editedSkillCopyRef.current = jsonEditorData;
+        }
+    };
+
+    const handleDelete = async (): Promise<void> => {
+        const actionResult = await dispatch(deleteSkill(deletedSkillId));
+        setDeletedSkillId('');
+
+        if (deleteSkill.rejected.match(actionResult)) {
+            setAlertState({ type: 'error', isOpen: true, message: actionResult.error.message ?? '' });
+
+            return;
+        }
+
+        setAlertState({ type: 'success', isOpen: true, message: 'Skill successfully deleted' });
+        hideAlertAutomatically(setAlertState);
+    };
+
+    const handleAlertClose = () => {
+        setAlertState({ ...alertState, isOpen: false });
+    };
+
+    return (
+        <div className={styles.Skills}>
+
+            {/* DTO accordion */}
+            <Accordion className={cn(styles.Skills__accordion, {
+                [styles.Skills__accordion_hidden]: isMenuOpen === true
+            })}>
+                <AccordionSummary
+                    expandIcon={<ExpandMoreIcon sx={{ color: theme.palette.primary.contrastText }} />}
+                    aria-controls='skills-dto-preview-accordion-content'
+                    id='skills-dto-preview-accordion-header'
+                >
+                    <Typography component='h1' variant='h5'>Dto</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                    <CodeBlock
+                        code={codeBlockDtoTemplates.skills}
+                    />
+                </AccordionDetails>
+            </Accordion>
+
+            {/* All skills accordion */}
+            <Accordion className={cn(styles.Skills__accordion, {
+                [styles.Skills__accordion_hidden]: isMenuOpen === true
+            })}>
+                <AccordionSummary
+                    expandIcon={<ExpandMoreIcon sx={{ color: theme.palette.primary.contrastText }} />}
+                    aria-controls='skills-json-preview-accordion-content'
+                    id='skills-json-preview-accordion-header'
+                >
+                    <Typography component='h1' variant='h5'>All skills</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                    {
+                        viewportWidth < VIEWPORT_MIN_WIDTH ?
+                            <Typography component='h2' variant='body1'>
+                                {JSON_EDITOR_WARN_MSG}
+                            </Typography>
+                            :
+                            <JsonEditor
+                                data={skills}
+                                className={styles.Skills__jsonEditor}
+                                theme={githubDarkTheme}
+                                restrictEdit={({ fullData }) => fullData !== null}
+                                restrictAdd={({ fullData }) => fullData !== null}
+                                restrictDelete={({ fullData }) => fullData !== null}
+                            />
+                    }
+                </AccordionDetails>
+            </Accordion>
+
+            {/* Add skill accordion */}
+            <Accordion className={cn(styles.Skills__accordion, {
+                [styles.Skills__accordion_hidden]: isMenuOpen === true
+            })}>
+                <AccordionSummary
+                    expandIcon={<ExpandMoreIcon sx={{ color: theme.palette.primary.contrastText }} />}
+                    aria-controls='add-skill-json-editor-content'
+                    id='add-skill-json-editor-header'
+                >
+                    <Typography component='h1' variant='h5'>Add skill</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                    {
+                        viewportWidth < VIEWPORT_MIN_WIDTH ?
+                            <Typography component='h2' variant='body1'>
+                                {JSON_EDITOR_WARN_MSG}
+                            </Typography>
+                            :
+                            <>
+                                <JsonEditor
+                                    data={newSkill}
+                                    className={styles.Skills__jsonEditor}
+                                    theme={githubDarkTheme}
+                                    onUpdate={({ newData }) => {
+                                        // ! temporary fix
+                                        setNewSkill(newData as object);
+                                    }}
+                                    restrictAdd={({ fullData }) => fullData !== null}
+                                    restrictDelete={({ key }) => skillModelKeys.includes(key as string)}
+                                    restrictTypeSelection={({ value }) => {
+                                        if (typeof value === 'boolean') return false;
+                                        if (typeof value === 'string') return ['string'];
+                                        return ['string'];
+                                    }}
+                                />
+
+                                <div className={styles.Skills__jsonEditorControls}>
+                                    <Button onClick={() => handleSave('add')}>Save changes</Button>
+                                    <Button variant='outlined' onClick={() => handleReset('add')}>Reset state</Button>
+                                </div>
+                            </>
+                    }
+                </AccordionDetails>
+            </Accordion>
+
+            {/* Edit skills accordion */}
+            <Accordion className={cn(styles.Skills__accordion, {
+                [styles.Skills__accordion_hidden]: isMenuOpen === true
+            })}>
+                <AccordionSummary
+                    expandIcon={<ExpandMoreIcon sx={{ color: theme.palette.primary.contrastText }} />}
+                    aria-controls='edit-skill-json-editor-content'
+                    id='edit-skill-json-editor-header'
+                >
+                    <Typography component='h1' variant='h5'>Edit skill</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+
+                    <SelectionForm
+                        values={skillsIds}
+                        label='Choose skill id'
+                        selectId='skill-select'
+                        labelId='skill-select-label'
+                        id='skill-select-form'
+                        onFind={handleFind}
+                    />
+
+                    {
+                        !editedSkill ?
+                            <Typography component='h2' variant='h5' sx={{ textAlign: 'center', marginTop: '30px' }}>
+                                Skill ID is not selected
+                            </Typography>
+                            :
+                            viewportWidth < VIEWPORT_MIN_WIDTH ?
+                                <Typography component='h2' variant='body1' sx={{ marginTop: '30px' }}>
+                                    {JSON_EDITOR_WARN_MSG}
+                                </Typography>
+                                :
+                                <>
+                                    <Box component='div' sx={{ marginTop: '20px' }}>
+                                        <JsonEditor
+                                            data={editedSkill}
+                                            className={styles.Skills__jsonEditor}
+                                            theme={githubDarkTheme}
+                                            onUpdate={({ newData }) => {
+                                                setEditedSkill(newData as object);
+                                            }}
+                                            restrictAdd={({ fullData }) => fullData !== null}
+                                            restrictDelete={({ key }) => skillModelKeys.includes(key as string)}
+                                            restrictEdit={({ key }) => key === '_id'}
+                                            restrictTypeSelection={() => {
+                                                return ['string'];
+                                            }}
+                                        />
+                                    </Box>
+
+                                    <div className={styles.Skills__jsonEditorControls}>
+                                        <Button onClick={() => handleSave('edit')}>Save changes</Button>
+                                        <Button variant='outlined' onClick={() => handleReset('edit')}>
+                                            Reset state
+                                        </Button>
+                                    </div>
+                                </>
+                    }
+                </AccordionDetails>
+            </Accordion>
+
+            {/* Delete skill accordion */}
+            <Accordion className={cn(styles.Skills__accordion, {
+                [styles.Skills__accordion_hidden]: isMenuOpen === true
+            })}>
+                <AccordionSummary
+                    expandIcon={<ExpandMoreIcon sx={{ color: theme.palette.primary.contrastText }} />}
+                    aria-controls='delete-skill-accordion-content'
+                    id='delete-skill-accordion-header'
+                >
+                    <Typography component='h1' variant='h5'>Delete skill</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+
+                    <SelectionForm
+                        values={skillsIds}
+                        label='Choose skill id'
+                        selectId='skills-select'
+                        labelId='skills-select-label'
+                        id='skills-select-form'
+                        onFind={setDeletedSkillId}
+                        onDelete={handleDelete}
+                    />
+
+                    {
+                        !deletedSkill
+                            ?
+                            <Typography component='h2' variant='h5' sx={{ textAlign: 'center', marginTop: '30px' }}>
+                                Skill ID is not selected
+                            </Typography>
+                            :
+                            <Box component='div' sx={{ marginTop: '20px' }}>
+                                <CodeBlock
+                                    code={generateCodeBlock(deletedSkill)}
+                                    copyButton={false}
+                                    lang='json'
+                                />
+                            </Box>
+                    }
+
+                </AccordionDetails>
+            </Accordion>
+
+            {/* Alerts */}
+            <Alert
+                type={alertState.type}
+                message={alertState.message}
+                isOpen={alertState.isOpen}
+                onClose={handleAlertClose}
+            />
+
+            {loading && <Loader />}
+
+        </div>
+    );
+};
